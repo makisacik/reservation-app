@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
@@ -9,92 +11,109 @@ namespace ReservationApp.Infrastructure.Repositories;
 public class ReservationRepository : Repository<Reservation>, IReservationRepository
 {
     private readonly ReservationDbContext _dbContext;
+    private new readonly ILogger<ReservationRepository> _logger;
 
-    public ReservationRepository(ReservationDbContext context) : base(context)
+    public ReservationRepository(ReservationDbContext context, ILogger<ReservationRepository> logger) 
+        : base(context, logger)
     {
         _dbContext = context;
+        _logger = logger;
     }
 
     public async Task<PaginatedResult<Reservation>> GetPaginatedAsync(ReservationQueryParams query, CancellationToken cancellationToken = default)
     {
-        // Normalize pagination parameters
-        var page = query.Page < 1 ? 1 : query.Page;
-        var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
-        if (pageSize > 100) pageSize = 100; // Max page size limit
-
-        // Start with base query
-        var q = _context.Reservations.AsQueryable();
-
-        // Apply search filter (customer name contains) - case-insensitive for PostgreSQL
-        if (!string.IsNullOrWhiteSpace(query.Search))
+        var sw = Stopwatch.StartNew();
+        try
         {
-            q = q.Where(r => EF.Functions.ILike(r.CustomerName, $"%{query.Search}%"));
-        }
+            // Normalize pagination parameters
+            var page = query.Page < 1 ? 1 : query.Page;
+            var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
+            if (pageSize > 100) pageSize = 100; // Max page size limit
 
-        // Apply date filters
-        if (query.Date.HasValue)
-        {
-            // Exact date filter (takes precedence over range filters)
-            var date = query.Date.Value.Date;
-            var nextDay = date.AddDays(1);
-            q = q.Where(r => r.Date >= date && r.Date < nextDay);
-        }
-        else
-        {
-            // Apply date range filters only if exact date is not specified
-            if (query.From.HasValue)
+            // Start with base query
+            var q = _context.Reservations.AsQueryable();
+
+            // Apply search filter (customer name contains) - case-insensitive for PostgreSQL
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                q = q.Where(r => r.Date >= query.From.Value);
+                q = q.Where(r => EF.Functions.ILike(r.CustomerName, $"%{query.Search}%"));
             }
 
-            if (query.To.HasValue)
+            // Apply date filters
+            if (query.Date.HasValue)
             {
-                // Include the entire day for 'to' date
-                var toDate = query.To.Value.Date.AddDays(1).AddTicks(-1);
-                q = q.Where(r => r.Date <= toDate);
+                // Exact date filter (takes precedence over range filters)
+                var date = query.Date.Value.Date;
+                var nextDay = date.AddDays(1);
+                q = q.Where(r => r.Date >= date && r.Date < nextDay);
             }
+            else
+            {
+                // Apply date range filters only if exact date is not specified
+                if (query.From.HasValue)
+                {
+                    q = q.Where(r => r.Date >= query.From.Value);
+                }
+
+                if (query.To.HasValue)
+                {
+                    // Include the entire day for 'to' date
+                    var toDate = query.To.Value.Date.AddDays(1).AddTicks(-1);
+                    q = q.Where(r => r.Date <= toDate);
+                }
+            }
+
+            // Apply sorting
+            var sortBy = string.IsNullOrWhiteSpace(query.SortBy) ? "date" : query.SortBy.ToLower();
+            var sortOrder = string.IsNullOrWhiteSpace(query.SortOrder) ? "asc" : query.SortOrder.ToLower();
+
+            q = sortBy switch
+            {
+                "customername" => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.CustomerName) 
+                    : q.OrderBy(r => r.CustomerName),
+                "guests" => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.Guests) 
+                    : q.OrderBy(r => r.Guests),
+                "createdat" => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.CreatedAt) 
+                    : q.OrderBy(r => r.CreatedAt),
+                _ => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.Date) 
+                    : q.OrderBy(r => r.Date) // Default: date ascending
+            };
+
+            // Get total count before pagination
+            var totalCount = await q.CountAsync(cancellationToken);
+
+            // Apply pagination
+            var data = await q
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            // Calculate total pages
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            sw.Stop();
+            _logger.LogInformation("Query GetPaginatedAsync returned {Count} reservations (Page {Page}, PageSize {PageSize}, Total {TotalCount}) in {ElapsedMs}ms", 
+                data.Count, page, pageSize, totalCount, sw.ElapsedMilliseconds);
+
+            return new PaginatedResult<Reservation>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                Data = data
+            };
         }
-
-        // Apply sorting
-        var sortBy = string.IsNullOrWhiteSpace(query.SortBy) ? "date" : query.SortBy.ToLower();
-        var sortOrder = string.IsNullOrWhiteSpace(query.SortOrder) ? "asc" : query.SortOrder.ToLower();
-
-        q = sortBy switch
+        catch (Exception ex)
         {
-            "customername" => sortOrder == "desc" 
-                ? q.OrderByDescending(r => r.CustomerName) 
-                : q.OrderBy(r => r.CustomerName),
-            "guests" => sortOrder == "desc" 
-                ? q.OrderByDescending(r => r.Guests) 
-                : q.OrderBy(r => r.Guests),
-            "createdat" => sortOrder == "desc" 
-                ? q.OrderByDescending(r => r.CreatedAt) 
-                : q.OrderBy(r => r.CreatedAt),
-            _ => sortOrder == "desc" 
-                ? q.OrderByDescending(r => r.Date) 
-                : q.OrderBy(r => r.Date) // Default: date ascending
-        };
-
-        // Get total count before pagination
-        var totalCount = await q.CountAsync(cancellationToken);
-
-        // Apply pagination
-        var data = await q
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        // Calculate total pages
-        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
-        return new PaginatedResult<Reservation>
-        {
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = totalCount,
-            TotalPages = totalPages,
-            Data = data
-        };
+            sw.Stop();
+            _logger.LogError(ex, "Query GetPaginatedAsync failed after {ElapsedMs}ms", sw.ElapsedMilliseconds);
+            throw;
+        }
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
