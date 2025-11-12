@@ -13,7 +13,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
             .ForMember(dest => dest.RestaurantName, opt => opt.MapFrom(src => src.Restaurant.Name))
             .ForMember(dest => dest.MenuDate, opt => opt.MapFrom(src => src.Menu.Date))
-            .ForMember(dest => dest.MealTimeSlotName, opt => opt.MapFrom(src => src.MealTimeSlot.Name));
+            .ForMember(dest => dest.MealTimeSlotName, opt => opt.MapFrom(src => src.MealTimeSlot.Name))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
         
         CreateMap<CreateReservationDto, Reservation>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

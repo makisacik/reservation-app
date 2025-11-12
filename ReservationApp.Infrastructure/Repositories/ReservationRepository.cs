@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Enums;
 using ReservationApp.Infrastructure.Data;
 
 namespace ReservationApp.Infrastructure.Repositories;
@@ -31,7 +32,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             if (pageSize > 100) pageSize = 100; // Max page size limit
 
             // Start with base query
-            var q = _context.Reservations
+            var q = _dbContext.Reservations
                 .Include(r => r.User)
                 .Include(r => r.Restaurant)
                 .Include(r => r.Menu)
@@ -121,9 +122,87 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
         }
     }
 
+    public async Task<PaginatedResult<Reservation>> GetAdminFilteredAsync(AdminReservationQueryParams query, CancellationToken cancellationToken = default)
+    {
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            // Normalize pagination parameters
+            var page = query.Page < 1 ? 1 : query.Page;
+            var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
+            if (pageSize > 100) pageSize = 100; // Max page size limit
+
+            // Start with base query with all navigation properties
+            var q = _dbContext.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Restaurant)
+                .Include(r => r.Menu)
+                .Include(r => r.MealTimeSlot)
+                .AsQueryable();
+
+            // Date range filter (required)
+            var dateFrom = query.DateFrom.Date;
+            var dateTo = query.DateTo.Date.AddDays(1).AddTicks(-1); // Include the entire end date
+            q = q.Where(r => r.Date >= dateFrom && r.Date <= dateTo);
+
+            // Restaurant filter
+            if (query.RestaurantId.HasValue)
+            {
+                q = q.Where(r => r.RestaurantId == query.RestaurantId.Value);
+            }
+
+            // Department filter (join from User)
+            if (!string.IsNullOrEmpty(query.Department))
+            {
+                var departmentLower = query.Department.ToLower();
+                q = q.Where(r => r.User.Department != null && r.User.Department.ToLower().Contains(departmentLower));
+            }
+
+            // Status filter
+            if (query.Status.HasValue)
+            {
+                q = q.Where(r => r.Status == query.Status.Value);
+            }
+
+            // Order by date descending (most recent first)
+            q = q.OrderByDescending(r => r.Date).ThenByDescending(r => r.CreatedAt);
+
+            // Get total count before pagination
+            var totalCount = await q.CountAsync(cancellationToken);
+
+            // Apply pagination
+            var data = await q
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            // Calculate total pages
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            sw.Stop();
+            _logger.LogInformation("Query GetAdminFilteredAsync returned {Count} reservations (Page {Page}, PageSize {PageSize}, Total {TotalCount}) in {ElapsedMs}ms", 
+                data.Count, page, pageSize, totalCount, sw.ElapsedMilliseconds);
+
+            return new PaginatedResult<Reservation>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                Data = data
+            };
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            _logger.LogError(ex, "Query GetAdminFilteredAsync failed after {ElapsedMs}ms", sw.ElapsedMilliseconds);
+            throw;
+        }
+    }
+
     public override async Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Reservations
+        return await _dbContext.Reservations
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
@@ -133,7 +212,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
 
     public override async Task<IEnumerable<Reservation>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Reservations
+        return await _dbContext.Reservations
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
@@ -153,7 +232,8 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
         return await _dbContext.Reservations
             .AnyAsync(r => r.UserId == userId 
                 && r.Date.Date == dateTime.Date 
-                && r.MealTimeSlotId == mealTimeSlotId, 
+                && r.MealTimeSlotId == mealTimeSlotId
+                && r.Status == ReservationStatus.Active, 
                 cancellationToken);
     }
 
@@ -165,7 +245,8 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
         return await _dbContext.Reservations
             .CountAsync(r => r.UserId == userId 
                 && r.Date >= startDateTime 
-                && r.Date <= endDateTime, 
+                && r.Date <= endDateTime
+                && r.Status == ReservationStatus.Active, 
                 cancellationToken);
     }
 

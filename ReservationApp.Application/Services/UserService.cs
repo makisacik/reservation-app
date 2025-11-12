@@ -72,6 +72,65 @@ public class UserService : IUserService
         return users.Select(MapToDto);
     }
 
+    public async Task<PaginatedResult<UserDto>> GetFilteredAsync(UserFilterDto filter, CancellationToken cancellationToken = default)
+    {
+        var paginatedResult = await _userRepository.GetFilteredAsync(filter, cancellationToken);
+        
+        return new PaginatedResult<UserDto>
+        {
+            Page = paginatedResult.Page,
+            PageSize = paginatedResult.PageSize,
+            TotalCount = paginatedResult.TotalCount,
+            TotalPages = paginatedResult.TotalPages,
+            Data = paginatedResult.Data.Select(MapToDto)
+        };
+    }
+
+    public async Task<UserDto> UpdateAsync(Guid id, UserUpdateDto dto, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {id} not found.");
+        }
+
+        // Update profile (name, department)
+        user.UpdateProfile(dto.Name, dto.Department);
+
+        // Update role if changed
+        if (user.Role != dto.Role)
+        {
+            user.UpdateRole(dto.Role);
+        }
+
+        // Update status if changed
+        if (user.Status != dto.Status)
+        {
+            user.UpdateStatus(dto.Status);
+        }
+
+        await _userRepository.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(user);
+    }
+
+    public async Task<UserDto> ToggleStatusAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {id} not found.");
+        }
+
+        // Toggle status: Active -> Passive, Passive -> Active
+        var newStatus = user.Status == UserStatus.Active ? UserStatus.Passive : UserStatus.Active;
+        user.UpdateStatus(newStatus);
+
+        await _userRepository.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(user);
+    }
+
     public async Task<UserDto> UpdateUserRoleAsync(Guid userId, UserRole newRole, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);

@@ -1,3 +1,4 @@
+using ReservationApp.Domain.Enums;
 using ReservationApp.Domain.Exceptions;
 
 namespace ReservationApp.Domain.Entities;
@@ -11,6 +12,7 @@ public class Reservation
     public int MealTimeSlotId { get; private set; }
     public DateTime Date { get; private set; }
     public bool Appetizer { get; private set; }
+    public ReservationStatus Status { get; private set; } = ReservationStatus.Active;
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
@@ -46,6 +48,7 @@ public class Reservation
         MealTimeSlotId = mealTimeSlotId;
         Date = date.Date; // Store only date part
         Appetizer = appetizer;
+        Status = ReservationStatus.Active;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
 
@@ -66,6 +69,12 @@ public class Reservation
         UpdatedAt = DateTime.UtcNow;
 
         Validate();
+    }
+
+    public void Cancel()
+    {
+        Status = ReservationStatus.Cancelled;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     private void Validate()

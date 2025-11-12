@@ -18,6 +18,14 @@ public class MealRepository : Repository<Meal>, IMealRepository
         _logger = logger;
     }
 
+    public new async Task<Meal?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Meals
+            .Include(m => m.Category)
+            .Include(m => m.Restaurant)
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Meal>> GetAllAsync(Guid? restaurantId = null, Guid? categoryId = null, CancellationToken cancellationToken = default)
     {
         var q = _dbContext.Meals
@@ -38,6 +46,32 @@ public class MealRepository : Repository<Meal>, IMealRepository
         q = q.OrderBy(m => m.Name);
 
         return await q.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Meal>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        var idList = ids.ToList();
+        return await _dbContext.Meals
+            .Include(m => m.Category)
+            .Include(m => m.Restaurant)
+            .Where(m => idList.Contains(m.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> CategoryExistsAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.MenuCategories
+            .AnyAsync(c => c.Id == categoryId, cancellationToken);
+    }
+
+    public new async Task UpdateAsync(Meal meal, CancellationToken cancellationToken = default)
+    {
+        await base.UpdateAsync(meal, cancellationToken);
+    }
+
+    public new async Task DeleteAsync(Meal meal, CancellationToken cancellationToken = default)
+    {
+        await base.DeleteAsync(meal, cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

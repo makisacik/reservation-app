@@ -8,6 +8,7 @@ public interface IReservationRepository
     Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Reservation>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<PaginatedResult<Reservation>> GetPaginatedAsync(ReservationQueryParams query, CancellationToken cancellationToken = default);
+    Task<PaginatedResult<Reservation>> GetAdminFilteredAsync(AdminReservationQueryParams query, CancellationToken cancellationToken = default);
     Task<Reservation> AddAsync(Reservation entity, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<bool> HasReservationForDayAsync(Guid userId, DateOnly date, int mealTimeSlotId, CancellationToken cancellationToken = default);

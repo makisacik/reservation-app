@@ -1,3 +1,5 @@
+using ReservationApp.Domain.Enums;
+
 namespace ReservationApp.Application.DTOs;
 
 public class ReservationDto
@@ -13,6 +15,7 @@ public class ReservationDto
     public string MealTimeSlotName { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public bool Appetizer { get; set; }
+    public ReservationStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

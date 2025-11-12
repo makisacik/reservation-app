@@ -42,6 +42,20 @@ public class ReservationService : IReservationService
         };
     }
 
+    public async Task<PaginatedResult<ReservationDto>> GetAdminFilteredAsync(AdminReservationQueryParams query, CancellationToken cancellationToken = default)
+    {
+        var paginatedResult = await _reservationRepository.GetAdminFilteredAsync(query, cancellationToken);
+        
+        return new PaginatedResult<ReservationDto>
+        {
+            Page = paginatedResult.Page,
+            PageSize = paginatedResult.PageSize,
+            TotalCount = paginatedResult.TotalCount,
+            TotalPages = paginatedResult.TotalPages,
+            Data = paginatedResult.Data.Select(MapToDto)
+        };
+    }
+
     public async Task<ReservationDto> GetReservationByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var reservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
@@ -153,7 +167,32 @@ public class ReservationService : IReservationService
             throw new BadRequestException("Cannot cancel past reservations.");
         }
 
-        await _reservationRepository.DeleteAsync(reservation, cancellationToken);
+        // Check if already cancelled
+        if (reservation.Status == ReservationStatus.Cancelled)
+        {
+            throw new BadRequestException("Reservation is already cancelled.");
+        }
+
+        reservation.Cancel();
+        await _reservationRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AdminCancelAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
+        if (reservation == null)
+        {
+            throw new NotFoundException($"Reservation with id {id} not found.");
+        }
+
+        // Check if already cancelled
+        if (reservation.Status == ReservationStatus.Cancelled)
+        {
+            throw new BadRequestException("Reservation is already cancelled.");
+        }
+
+        // Admin can cancel any reservation (no date restrictions)
+        reservation.Cancel();
         await _reservationRepository.SaveChangesAsync(cancellationToken);
     }
 
@@ -172,6 +211,7 @@ public class ReservationService : IReservationService
             MealTimeSlotName = reservation.MealTimeSlot?.Name ?? string.Empty,
             Date = reservation.Date,
             Appetizer = reservation.Appetizer,
+            Status = reservation.Status,
             CreatedAt = reservation.CreatedAt,
             UpdatedAt = reservation.UpdatedAt
         };

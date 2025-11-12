@@ -339,12 +339,14 @@ public class ReservationServiceTests
 
         _repositoryMock.Setup(r => r.GetUserReservationByIdAsync(reservationId, userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(reservation);
+        _repositoryMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         // Act
         await _service.CancelAsync(reservationId, userId);
 
         // Assert
-        _repositoryMock.Verify(r => r.DeleteAsync(reservation, It.IsAny<CancellationToken>()), Times.Once);
+        reservation.Status.Should().Be(ReservationStatus.Cancelled);
         _repositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

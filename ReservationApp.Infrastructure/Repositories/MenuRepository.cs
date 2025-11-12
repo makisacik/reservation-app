@@ -19,6 +19,14 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
         _logger = logger;
     }
 
+    public new async Task<Menu?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Menus
+            .Include(m => m.Restaurant)
+            .Include(m => m.Meals)
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Menu>> GetMenusAsync(MenuQueryParams query, CancellationToken cancellationToken = default)
     {
         var q = _dbContext.Menus
@@ -41,6 +49,16 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
         q = q.OrderBy(m => m.Date).ThenBy(m => m.RestaurantId);
 
         return await q.ToListAsync(cancellationToken);
+    }
+
+    public new async Task UpdateAsync(Menu menu, CancellationToken cancellationToken = default)
+    {
+        await base.UpdateAsync(menu, cancellationToken);
+    }
+
+    public new async Task DeleteAsync(Menu menu, CancellationToken cancellationToken = default)
+    {
+        await base.DeleteAsync(menu, cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

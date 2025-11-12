@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Enums;
 
 namespace ReservationApp.Infrastructure.Data.Configurations;
 
@@ -34,6 +35,14 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(r => r.Status)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => (ReservationStatus)Enum.Parse(typeof(ReservationStatus), v))
+            .HasMaxLength(50)
+            .HasDefaultValue(ReservationStatus.Active);
+
         builder.Property(r => r.CreatedAt)
             .IsRequired();
 
@@ -45,6 +54,7 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
         builder.HasIndex(r => r.RestaurantId);
         builder.HasIndex(r => r.MenuId);
         builder.HasIndex(r => r.Date);
+        builder.HasIndex(r => r.Status);
         builder.HasIndex(r => new { r.UserId, r.Date });
 
         // Relationships
