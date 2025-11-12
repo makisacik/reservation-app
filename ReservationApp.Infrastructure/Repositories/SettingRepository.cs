@@ -23,10 +23,33 @@ public class SettingRepository : ISettingRepository
             .FirstOrDefaultAsync(s => s.Key == key, cancellationToken);
     }
 
+    public async Task<SystemSetting?> GetByCategoryAndKeyAsync(string category, string key, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.SystemSettings
+            .FirstOrDefaultAsync(s => s.Category == category && s.Key == key, cancellationToken);
+    }
+
+    public async Task<IEnumerable<SystemSetting>> GetByCategoryAsync(string category, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.SystemSettings
+            .Where(s => s.Category == category)
+            .OrderBy(s => s.Key)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<SystemSetting>> GetByCategoryAndKeysAsync(string category, IEnumerable<string> keys, CancellationToken cancellationToken = default)
+    {
+        var keysList = keys.ToList();
+        return await _dbContext.SystemSettings
+            .Where(s => s.Category == category && keysList.Contains(s.Key))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<SystemSetting>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.SystemSettings
-            .OrderBy(s => s.Key)
+            .OrderBy(s => s.Category)
+            .ThenBy(s => s.Key)
             .ToListAsync(cancellationToken);
     }
 
@@ -34,6 +57,12 @@ public class SettingRepository : ISettingRepository
     {
         await _dbContext.SystemSettings.AddAsync(setting, cancellationToken);
         return setting;
+    }
+
+    public async Task UpdateAsync(SystemSetting setting, CancellationToken cancellationToken = default)
+    {
+        _dbContext.SystemSettings.Update(setting);
+        await Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

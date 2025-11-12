@@ -6,6 +6,7 @@ namespace ReservationApp.Domain.Entities;
 public class SystemSetting
 {
     public Guid Id { get; private set; }
+    public string Category { get; private set; } = string.Empty;
     public string Key { get; private set; } = string.Empty;
     public string Value { get; private set; } = string.Empty;
     public SettingType Type { get; private set; }
@@ -15,8 +16,13 @@ public class SystemSetting
 
     private SystemSetting() { } // For EF Core
 
-    public SystemSetting(string key, string value, SettingType type, string? description = null)
+    public SystemSetting(string category, string key, string value, SettingType type, string? description = null)
     {
+        if (string.IsNullOrWhiteSpace(category))
+        {
+            throw new DomainException("Setting category cannot be empty.");
+        }
+
         if (string.IsNullOrWhiteSpace(key))
         {
             throw new DomainException("Setting key cannot be empty.");
@@ -28,6 +34,7 @@ public class SystemSetting
         }
 
         Id = Guid.NewGuid();
+        Category = category;
         Key = key;
         Value = value;
         Type = type;

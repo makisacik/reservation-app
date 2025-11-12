@@ -16,11 +16,15 @@ public class SystemSettingConfiguration : IEntityTypeConfiguration<SystemSetting
         builder.Property(s => s.Id)
             .IsRequired();
 
+        builder.Property(s => s.Category)
+            .IsRequired()
+            .HasMaxLength(100);
+
         builder.Property(s => s.Key)
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.HasIndex(s => s.Key)
+        builder.HasIndex(s => new { s.Category, s.Key })
             .IsUnique();
 
         builder.Property(s => s.Value)

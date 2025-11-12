@@ -17,6 +17,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMealTimeSlotService, MealTimeSlotService>();
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+        services.AddHostedService<EmailNotificationWorker>();
         
         return services;
     }

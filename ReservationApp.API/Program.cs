@@ -44,6 +44,9 @@ try
     // Add Infrastructure services
     builder.Services.AddInfrastructureServices(builder.Configuration);
 
+    // Add Memory Cache
+    builder.Services.AddMemoryCache();
+
     // Add Application services
     builder.Services.AddApplicationServices();
 

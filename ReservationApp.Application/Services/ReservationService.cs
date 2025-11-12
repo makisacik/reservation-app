@@ -11,15 +11,18 @@ public class ReservationService : IReservationService
     private readonly IReservationRepository _reservationRepository;
     private readonly ISettingService _settingService;
     private readonly IUserRepository _userRepository;
+    private readonly IEmailNotificationService _emailNotificationService;
 
     public ReservationService(
         IReservationRepository reservationRepository,
         ISettingService settingService,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IEmailNotificationService emailNotificationService)
     {
         _reservationRepository = reservationRepository;
         _settingService = settingService;
         _userRepository = userRepository;
+        _emailNotificationService = emailNotificationService;
     }
 
     public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync(CancellationToken cancellationToken = default)
@@ -78,9 +81,11 @@ public class ReservationService : IReservationService
 
         var isAdmin = user.Role == UserRole.Admin;
 
-        // Get settings
-        var allowPastReservations = await _settingService.GetAllowPastReservationsAsync(cancellationToken);
-        var maxWeeklyReservations = await _settingService.GetMaxWeeklyReservationsAsync(cancellationToken);
+        // Get settings using category-based methods
+        var allowPastReservationsResult = await _settingService.GetValueAsync<bool?>("Reservation", "AllowPastReservations", null, cancellationToken);
+        var allowPastReservations = allowPastReservationsResult ?? false;
+        var maxWeeklyReservationsResult = await _settingService.GetValueAsync<int?>("Reservation", "MaxWeeklyReservations", null, cancellationToken);
+        var maxWeeklyReservations = maxWeeklyReservationsResult ?? 2;
 
         // Check past date (unless admin or setting allows)
         if (!isAdmin && !allowPastReservations && dto.Date.Date < DateTime.UtcNow.Date)
@@ -137,6 +142,20 @@ public class ReservationService : IReservationService
         {
             throw new DomainException("Failed to retrieve created reservation.");
         }
+
+        // Send confirmation email (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
+            }
+            catch
+            {
+                // Log but don't throw - email failures shouldn't break reservation creation
+                // EmailNotificationService handles its own logging
+            }
+        }, cancellationToken);
 
         return MapToDto(createdReservation);
     }

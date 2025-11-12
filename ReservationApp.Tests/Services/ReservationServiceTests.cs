@@ -15,6 +15,7 @@ public class ReservationServiceTests
     private readonly Mock<IReservationRepository> _repositoryMock;
     private readonly Mock<ISettingService> _settingServiceMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IEmailNotificationService> _emailNotificationServiceMock;
     private readonly ReservationService _service;
 
     public ReservationServiceTests()
@@ -22,7 +23,8 @@ public class ReservationServiceTests
         _repositoryMock = new Mock<IReservationRepository>();
         _settingServiceMock = new Mock<ISettingService>();
         _userRepositoryMock = new Mock<IUserRepository>();
-        _service = new ReservationService(_repositoryMock.Object, _settingServiceMock.Object, _userRepositoryMock.Object);
+        _emailNotificationServiceMock = new Mock<IEmailNotificationService>();
+        _service = new ReservationService(_repositoryMock.Object, _settingServiceMock.Object, _userRepositoryMock.Object, _emailNotificationServiceMock.Object);
     }
 
     [Fact]

@@ -31,17 +31,58 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed default SystemSettings if they don't exist
-        if (!await context.SystemSettings.AnyAsync())
-        {
-            var settings = new List<SystemSetting>
-            {
-                new SystemSetting("MaxWeeklyReservations", "2", SettingType.Int, "Maximum number of reservations a user can make per week"),
-                new SystemSetting("AllowPastReservations", "false", SettingType.Bool, "Whether users can make reservations for past dates"),
-                new SystemSetting("AllowSameDayReservations", "false", SettingType.Bool, "Whether users can make multiple reservations for the same day")
-            };
+        // Seed default SystemSettings with categories
+        var settingsToSeed = new List<SystemSetting>();
 
-            await context.SystemSettings.AddRangeAsync(settings);
+        // General settings
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "General" && s.Key == "CompanyName"))
+        {
+            settingsToSeed.Add(new SystemSetting("General", "CompanyName", "Toyota ISS", SettingType.String, "Company name"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "General" && s.Key == "Timezone"))
+        {
+            settingsToSeed.Add(new SystemSetting("General", "Timezone", "Europe/Istanbul", SettingType.String, "System timezone"));
+        }
+
+        // Reservation settings
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "MaxWeeklyReservations"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "MaxWeeklyReservations", "2", SettingType.Int, "Maximum number of reservations a user can make per week"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "AllowPastReservations"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "AllowPastReservations", "false", SettingType.Bool, "Whether users can make reservations for past dates"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "CancellationNoticeHours"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "CancellationNoticeHours", "2", SettingType.Int, "Hours before reservation that cancellation is allowed"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "AutoApproval"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "AutoApproval", "false", SettingType.Bool, "Whether reservations are automatically approved"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "AllowSameDayReservations"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "AllowSameDayReservations", "false", SettingType.Bool, "Whether users can make multiple reservations for the same day"));
+        }
+
+        // Notification settings
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Notifications" && s.Key == "EmailEnabled"))
+        {
+            settingsToSeed.Add(new SystemSetting("Notifications", "EmailEnabled", "true", SettingType.Bool, "Whether email notifications are enabled"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Notifications" && s.Key == "DailyReminderEnabled"))
+        {
+            settingsToSeed.Add(new SystemSetting("Notifications", "DailyReminderEnabled", "true", SettingType.Bool, "Whether daily menu reminder emails are enabled"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Notifications" && s.Key == "ReminderTime"))
+        {
+            settingsToSeed.Add(new SystemSetting("Notifications", "ReminderTime", "09:00", SettingType.String, "Time of day to send daily menu reminder emails (HH:mm format)"));
+        }
+
+        if (settingsToSeed.Any())
+        {
+            await context.SystemSettings.AddRangeAsync(settingsToSeed);
             await context.SaveChangesAsync();
         }
     }
