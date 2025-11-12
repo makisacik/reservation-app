@@ -42,10 +42,10 @@ public class ReservationController : ControllerBase
         [FromBody] CreateReservationDto createReservationDto,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating reservation for customer: {CustomerName}", createReservationDto.CustomerName);
+        _logger.LogInformation("Creating reservation");
         var reservation = await _reservationService.CreateReservationAsync(createReservationDto, cancellationToken);
-        _logger.LogInformation("Reservation created successfully. ReservationId: {ReservationId}, CustomerName: {CustomerName}, Date: {Date}, Guests: {Guests}", 
-            reservation.Id, reservation.CustomerName, reservation.Date, reservation.Guests);
+        _logger.LogInformation("Reservation created successfully. ReservationId: {ReservationId}, UserId: {UserId}, Date: {Date}", 
+            reservation.Id, reservation.UserId, reservation.Date);
         return CreatedAtAction(nameof(GetReservation), new { id = reservation.Id }, reservation);
     }
 }

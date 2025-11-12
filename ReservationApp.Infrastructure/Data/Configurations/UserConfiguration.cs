@@ -16,6 +16,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Id)
             .IsRequired();
 
+        builder.Property(u => u.Name)
+            .IsRequired()
+            .HasMaxLength(200);
+
         builder.Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(200);
@@ -27,11 +31,21 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.Property(u => u.Department)
+            .HasMaxLength(200);
+
         builder.Property(u => u.Role)
             .IsRequired()
             .HasConversion(
                 v => v.ToString(),
                 v => (UserRole)Enum.Parse(typeof(UserRole), v))
+            .HasMaxLength(50);
+
+        builder.Property(u => u.Status)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => (UserStatus)Enum.Parse(typeof(UserStatus), v))
             .HasMaxLength(50);
 
         builder.Property(u => u.CreatedAt)

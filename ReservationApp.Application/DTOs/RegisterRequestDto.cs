@@ -1,4 +1,4 @@
 namespace ReservationApp.Application.DTOs;
 
-public record RegisterRequestDto(string Email, string Password);
+public record RegisterRequestDto(string Name, string Email, string Password);
 

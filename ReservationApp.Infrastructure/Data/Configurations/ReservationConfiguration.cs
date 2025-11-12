@@ -15,21 +15,58 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
         builder.Property(r => r.Id)
             .IsRequired();
 
-        builder.Property(r => r.CustomerName)
-            .IsRequired()
-            .HasMaxLength(200);
+        builder.Property(r => r.UserId)
+            .IsRequired();
+
+        builder.Property(r => r.RestaurantId)
+            .IsRequired();
+
+        builder.Property(r => r.MenuId)
+            .IsRequired();
+
+        builder.Property(r => r.MealTimeSlotId)
+            .IsRequired();
 
         builder.Property(r => r.Date)
             .IsRequired();
 
-        builder.Property(r => r.Guests)
-            .IsRequired();
+        builder.Property(r => r.Appetizer)
+            .IsRequired()
+            .HasDefaultValue(false);
 
         builder.Property(r => r.CreatedAt)
             .IsRequired();
 
         builder.Property(r => r.UpdatedAt)
             .IsRequired(false);
+
+        // Indexes
+        builder.HasIndex(r => r.UserId);
+        builder.HasIndex(r => r.RestaurantId);
+        builder.HasIndex(r => r.MenuId);
+        builder.HasIndex(r => r.Date);
+        builder.HasIndex(r => new { r.UserId, r.Date });
+
+        // Relationships
+        builder.HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.Restaurant)
+            .WithMany()
+            .HasForeignKey(r => r.RestaurantId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.Menu)
+            .WithMany()
+            .HasForeignKey(r => r.MenuId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.MealTimeSlot)
+            .WithMany()
+            .HasForeignKey(r => r.MealTimeSlotId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

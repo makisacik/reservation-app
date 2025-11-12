@@ -29,8 +29,34 @@ public class ReservationControllerTests
         var queryParams = new ReservationQueryParams { Page = 1, PageSize = 10 };
         var reservations = new List<ReservationDto>
         {
-            new ReservationDto { Id = Guid.NewGuid(), CustomerName = "John Doe", Date = DateTime.UtcNow.AddDays(1), Guests = 2 },
-            new ReservationDto { Id = Guid.NewGuid(), CustomerName = "Jane Smith", Date = DateTime.UtcNow.AddDays(2), Guests = 4 }
+            new ReservationDto 
+            { 
+                Id = Guid.NewGuid(), 
+                UserId = Guid.NewGuid(),
+                UserName = "John Doe",
+                RestaurantId = Guid.NewGuid(),
+                RestaurantName = "Test Restaurant",
+                MenuId = Guid.NewGuid(),
+                MenuDate = DateTime.UtcNow.AddDays(1),
+                MealTimeSlotId = 1,
+                MealTimeSlotName = "Breakfast",
+                Date = DateTime.UtcNow.AddDays(1),
+                Appetizer = false
+            },
+            new ReservationDto 
+            { 
+                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                UserName = "Jane Smith",
+                RestaurantId = Guid.NewGuid(),
+                RestaurantName = "Test Restaurant",
+                MenuId = Guid.NewGuid(),
+                MenuDate = DateTime.UtcNow.AddDays(2),
+                MealTimeSlotId = 2,
+                MealTimeSlotName = "Lunch",
+                Date = DateTime.UtcNow.AddDays(2),
+                Appetizer = true
+            }
         };
 
         var paginatedResult = new PaginatedResult<ReservationDto>
@@ -65,9 +91,16 @@ public class ReservationControllerTests
         var reservation = new ReservationDto
         {
             Id = reservationId,
-            CustomerName = "John Doe",
+            UserId = Guid.NewGuid(),
+            UserName = "John Doe",
+            RestaurantId = Guid.NewGuid(),
+            RestaurantName = "Test Restaurant",
+            MenuId = Guid.NewGuid(),
+            MenuDate = DateTime.UtcNow.AddDays(1),
+            MealTimeSlotId = 1,
+            MealTimeSlotName = "Breakfast",
             Date = DateTime.UtcNow.AddDays(1),
-            Guests = 2
+            Appetizer = false
         };
 
         _serviceMock.Setup(s => s.GetReservationByIdAsync(reservationId, It.IsAny<CancellationToken>()))
@@ -80,10 +113,11 @@ public class ReservationControllerTests
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
         var returnedReservation = okResult.Value.Should().BeOfType<ReservationDto>().Subject;
         returnedReservation.Id.Should().Be(reservationId);
+        returnedReservation.UserName.Should().Be("John Doe");
     }
 
     [Fact]
-    public async Task CreateReservation_ShouldReturnCreatedResult()
+    public async Task CreateReservation_ShouldThrowNotImplementedException()
     {
         // Arrange
         var createDto = new CreateReservationDto
@@ -93,24 +127,11 @@ public class ReservationControllerTests
             Guests = 2
         };
 
-        var reservationDto = new ReservationDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerName = createDto.CustomerName,
-            Date = createDto.Date,
-            Guests = createDto.Guests
-        };
-
         _serviceMock.Setup(s => s.CreateReservationAsync(createDto, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(reservationDto);
+            .ThrowsAsync(new NotImplementedException());
 
-        // Act
-        var result = await _controller.CreateReservation(createDto, CancellationToken.None);
-
-        // Assert
-        var createdResult = result.Result.Should().BeOfType<CreatedAtActionResult>().Subject;
-        var returnedReservation = createdResult.Value.Should().BeOfType<ReservationDto>().Subject;
-        returnedReservation.CustomerName.Should().Be(createDto.CustomerName);
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => _controller.CreateReservation(createDto, CancellationToken.None));
     }
 }
 

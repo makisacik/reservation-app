@@ -4,6 +4,7 @@ using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Application.Services;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Enums;
 using ReservationApp.Domain.Exceptions;
 using Xunit;
 
@@ -24,10 +25,16 @@ public class ReservationServiceTests
     public async Task GetAllReservationsAsync_ShouldReturnAllReservations()
     {
         // Arrange
+        var userId = Guid.NewGuid();
+        var restaurantId = Guid.NewGuid();
+        var menuId = Guid.NewGuid();
+        var mealTimeSlotId = 1;
+        var date = DateTime.UtcNow.AddDays(1);
+
         var reservations = new List<Reservation>
         {
-            new Reservation("John Doe", DateTime.UtcNow.AddDays(1), 2),
-            new Reservation("Jane Smith", DateTime.UtcNow.AddDays(2), 4)
+            new Reservation(userId, restaurantId, menuId, mealTimeSlotId, date),
+            new Reservation(userId, restaurantId, menuId, mealTimeSlotId, date.AddDays(1))
         };
 
         _repositoryMock.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
@@ -47,7 +54,13 @@ public class ReservationServiceTests
     {
         // Arrange
         var reservationId = Guid.NewGuid();
-        var reservation = new Reservation("John Doe", DateTime.UtcNow.AddDays(1), 2);
+        var userId = Guid.NewGuid();
+        var restaurantId = Guid.NewGuid();
+        var menuId = Guid.NewGuid();
+        var mealTimeSlotId = 1;
+        var date = DateTime.UtcNow.AddDays(1);
+
+        var reservation = new Reservation(userId, restaurantId, menuId, mealTimeSlotId, date);
 
         _repositoryMock.Setup(r => r.GetByIdAsync(reservationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(reservation);
@@ -57,7 +70,10 @@ public class ReservationServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.CustomerName.Should().Be("John Doe");
+        result.UserId.Should().Be(userId);
+        result.RestaurantId.Should().Be(restaurantId);
+        result.MenuId.Should().Be(menuId);
+        result.MealTimeSlotId.Should().Be(mealTimeSlotId);
         _repositoryMock.Verify(r => r.GetByIdAsync(reservationId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -77,7 +93,7 @@ public class ReservationServiceTests
     }
 
     [Fact]
-    public async Task CreateReservationAsync_ShouldCreateAndReturnReservation()
+    public async Task CreateReservationAsync_ShouldThrowNotImplementedException()
     {
         // Arrange
         var createDto = new CreateReservationDto
@@ -87,20 +103,8 @@ public class ReservationServiceTests
             Guests = 2
         };
 
-        _repositoryMock.Setup(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Reservation r, CancellationToken ct) => r);
-        _repositoryMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        var result = await _service.CreateReservationAsync(createDto);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.CustomerName.Should().Be(createDto.CustomerName);
-        result.Guests.Should().Be(createDto.Guests);
-        _repositoryMock.Verify(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => _service.CreateReservationAsync(createDto));
     }
 }
 

@@ -11,6 +11,10 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(typeof(MappingProfile));
         services.AddScoped<IReservationService, ReservationService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRestaurantService, RestaurantService>();
+        services.AddScoped<IMenuService, MenuService>();
+        services.AddScoped<IMealService, MealService>();
+        services.AddScoped<IMealTimeSlotService, MealTimeSlotService>();
         
         return services;
     }

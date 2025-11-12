@@ -31,12 +31,17 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             if (pageSize > 100) pageSize = 100; // Max page size limit
 
             // Start with base query
-            var q = _context.Reservations.AsQueryable();
+            var q = _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Restaurant)
+                .Include(r => r.Menu)
+                .Include(r => r.MealTimeSlot)
+                .AsQueryable();
 
-            // Apply search filter (customer name contains) - case-insensitive for PostgreSQL
+            // Apply search filter (user name contains) - case-insensitive for PostgreSQL
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                q = q.Where(r => EF.Functions.ILike(r.CustomerName, $"%{query.Search}%"));
+                q = q.Where(r => EF.Functions.ILike(r.User.Name, $"%{query.Search}%"));
             }
 
             // Apply date filters
@@ -69,12 +74,12 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
 
             q = sortBy switch
             {
-                "customername" => sortOrder == "desc" 
-                    ? q.OrderByDescending(r => r.CustomerName) 
-                    : q.OrderBy(r => r.CustomerName),
-                "guests" => sortOrder == "desc" 
-                    ? q.OrderByDescending(r => r.Guests) 
-                    : q.OrderBy(r => r.Guests),
+                "username" => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.User.Name) 
+                    : q.OrderBy(r => r.User.Name),
+                "restaurantname" => sortOrder == "desc" 
+                    ? q.OrderByDescending(r => r.Restaurant.Name) 
+                    : q.OrderBy(r => r.Restaurant.Name),
                 "createdat" => sortOrder == "desc" 
                     ? q.OrderByDescending(r => r.CreatedAt) 
                     : q.OrderBy(r => r.CreatedAt),
@@ -114,6 +119,27 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             _logger.LogError(ex, "Query GetPaginatedAsync failed after {ElapsedMs}ms", sw.ElapsedMilliseconds);
             throw;
         }
+    }
+
+    public override async Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Reservations
+            .Include(r => r.User)
+            .Include(r => r.Restaurant)
+            .Include(r => r.Menu)
+            .Include(r => r.MealTimeSlot)
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
+    public override async Task<IEnumerable<Reservation>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Reservations
+            .Include(r => r.User)
+            .Include(r => r.Restaurant)
+            .Include(r => r.Menu)
+            .Include(r => r.MealTimeSlot)
+            .OrderByDescending(r => r.Date)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

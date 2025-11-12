@@ -30,7 +30,7 @@ public class UserService : IUserService
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var user = new User(request.Email, passwordHash, UserRole.User);
+        var user = new User(request.Name, request.Email, passwordHash, UserRole.User);
 
         await _userRepository.AddAsync(user, cancellationToken);
         await _userRepository.SaveChangesAsync(cancellationToken);
@@ -115,8 +115,11 @@ public class UserService : IUserService
         return new UserDto
         {
             Id = user.Id,
+            Name = user.Name,
             Email = user.Email,
+            Department = user.Department,
             Role = user.Role,
+            Status = user.Status,
             CreatedAt = user.CreatedAt
         };
     }

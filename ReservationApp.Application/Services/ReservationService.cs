@@ -45,18 +45,11 @@ public class ReservationService : IReservationService
         return MapToDto(reservation);
     }
 
-    public async Task<ReservationDto> CreateReservationAsync(CreateReservationDto createReservationDto, CancellationToken cancellationToken = default)
+    public Task<ReservationDto> CreateReservationAsync(CreateReservationDto createReservationDto, CancellationToken cancellationToken = default)
     {
-        var reservation = new Reservation(
-            createReservationDto.CustomerName,
-            createReservationDto.Date,
-            createReservationDto.Guests
-        );
-
-        await _reservationRepository.AddAsync(reservation, cancellationToken);
-        await _reservationRepository.SaveChangesAsync(cancellationToken);
-
-        return MapToDto(reservation);
+        // Note: CreateReservationDto needs to be updated in Phase 2 to match new structure
+        // For now, this will need to be updated when CreateReservationDto is refactored
+        throw new NotImplementedException("CreateReservationAsync needs to be updated with new Reservation structure. This will be handled in Phase 2.");
     }
 
     private static ReservationDto MapToDto(Reservation reservation)
@@ -64,9 +57,16 @@ public class ReservationService : IReservationService
         return new ReservationDto
         {
             Id = reservation.Id,
-            CustomerName = reservation.CustomerName,
+            UserId = reservation.UserId,
+            UserName = reservation.User?.Name ?? string.Empty,
+            RestaurantId = reservation.RestaurantId,
+            RestaurantName = reservation.Restaurant?.Name ?? string.Empty,
+            MenuId = reservation.MenuId,
+            MenuDate = reservation.Menu?.Date ?? reservation.Date,
+            MealTimeSlotId = reservation.MealTimeSlotId,
+            MealTimeSlotName = reservation.MealTimeSlot?.Name ?? string.Empty,
             Date = reservation.Date,
-            Guests = reservation.Guests,
+            Appetizer = reservation.Appetizer,
             CreatedAt = reservation.CreatedAt,
             UpdatedAt = reservation.UpdatedAt
         };

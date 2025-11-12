@@ -6,15 +6,18 @@ namespace ReservationApp.Domain.Entities;
 public class User
 {
     public Guid Id { get; private set; }
+    public string Name { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
+    public string? Department { get; private set; }
     public UserRole Role { get; private set; } = UserRole.User;
+    public UserStatus Status { get; private set; } = UserStatus.Active;
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
     private User() { } // For EF Core
 
-    public User(string email, string passwordHash, UserRole role = UserRole.User)
+    public User(string name, string email, string passwordHash, UserRole role = UserRole.User, string? department = null, UserStatus status = UserStatus.Active)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -31,10 +34,18 @@ public class User
             throw new DomainException("Password hash cannot be empty.");
         }
 
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new DomainException("Name cannot be empty.");
+        }
+
         Id = Guid.NewGuid();
+        Name = name;
         Email = email;
         PasswordHash = passwordHash;
         Role = role;
+        Department = department;
+        Status = status;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
     }
@@ -53,6 +64,24 @@ public class User
     public void UpdateRole(UserRole newRole)
     {
         Role = newRole;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateProfile(string name, string? department = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new DomainException("Name cannot be empty.");
+        }
+
+        Name = name;
+        Department = department;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateStatus(UserStatus newStatus)
+    {
+        Status = newStatus;
         UpdatedAt = DateTime.UtcNow;
     }
 
