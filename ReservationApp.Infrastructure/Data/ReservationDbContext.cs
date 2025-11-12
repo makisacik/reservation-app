@@ -10,6 +10,7 @@ public class ReservationDbContext : DbContext
     }
 
     public DbSet<Reservation> Reservations { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

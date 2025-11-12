@@ -1,0 +1,14 @@
+using ReservationApp.Application.DTOs;
+using ReservationApp.Domain.Enums;
+
+namespace ReservationApp.Application.Interfaces;
+
+public interface IUserService
+{
+    Task<UserDto?> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default);
+    Task<AuthResponseDto?> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
+    Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<UserDto>> GetAllUsersAsync(CancellationToken cancellationToken = default);
+    Task<UserDto?> UpdateUserRoleAsync(Guid userId, UserRole newRole, CancellationToken cancellationToken = default);
+}
+
