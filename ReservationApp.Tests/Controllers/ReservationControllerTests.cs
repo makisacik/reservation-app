@@ -1,4 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,6 +23,23 @@ public class ReservationControllerTests
         _serviceMock = new Mock<IReservationService>();
         _loggerMock = new Mock<ILogger<ReservationController>>();
         _controller = new ReservationController(_serviceMock.Object, _loggerMock.Object);
+        
+        // Setup controller context with user claims
+        var userId = Guid.NewGuid();
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString())
+        };
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = principal
+            }
+        };
     }
 
     [Fact]
@@ -117,21 +137,98 @@ public class ReservationControllerTests
     }
 
     [Fact]
-    public async Task CreateReservation_ShouldThrowNotImplementedException()
+    public async Task CreateReservation_ShouldReturnCreatedResult()
     {
         // Arrange
+        var userId = Guid.Parse(_controller.ControllerContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var createDto = new CreateReservationDto
         {
-            CustomerName = "John Doe",
+            RestaurantId = Guid.NewGuid(),
+            MenuId = Guid.NewGuid(),
+            MealTimeSlotId = 1,
             Date = DateTime.UtcNow.AddDays(1),
-            Guests = 2
+            Appetizer = false
         };
 
-        _serviceMock.Setup(s => s.CreateReservationAsync(createDto, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new NotImplementedException());
+        var reservationDto = new ReservationDto
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            UserName = "Test User",
+            RestaurantId = createDto.RestaurantId,
+            RestaurantName = "Test Restaurant",
+            MenuId = createDto.MenuId,
+            MenuDate = createDto.Date,
+            MealTimeSlotId = createDto.MealTimeSlotId,
+            MealTimeSlotName = "Breakfast",
+            Date = createDto.Date,
+            Appetizer = createDto.Appetizer
+        };
 
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => _controller.CreateReservation(createDto, CancellationToken.None));
+        _serviceMock.Setup(s => s.CreateAsync(createDto, userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(reservationDto);
+
+        // Act
+        var result = await _controller.CreateReservation(createDto, CancellationToken.None);
+
+        // Assert
+        var createdResult = result.Result.Should().BeOfType<CreatedAtActionResult>().Subject;
+        var returnedReservation = createdResult.Value.Should().BeOfType<ReservationDto>().Subject;
+        returnedReservation.RestaurantId.Should().Be(createDto.RestaurantId);
+        returnedReservation.MenuId.Should().Be(createDto.MenuId);
+    }
+
+    [Fact]
+    public async Task GetMyReservations_ShouldReturnOkResult()
+    {
+        // Arrange
+        var userId = Guid.Parse(_controller.ControllerContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var reservations = new List<ReservationDto>
+        {
+            new ReservationDto
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                UserName = "Test User",
+                RestaurantId = Guid.NewGuid(),
+                RestaurantName = "Test Restaurant",
+                MenuId = Guid.NewGuid(),
+                MenuDate = DateTime.UtcNow.AddDays(1),
+                MealTimeSlotId = 1,
+                MealTimeSlotName = "Breakfast",
+                Date = DateTime.UtcNow.AddDays(1),
+                Appetizer = false
+            }
+        };
+
+        _serviceMock.Setup(s => s.GetMyReservationsAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(reservations);
+
+        // Act
+        var result = await _controller.GetMyReservations(CancellationToken.None);
+
+        // Assert
+        var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        var returnedReservations = okResult.Value.Should().BeAssignableTo<IEnumerable<ReservationDto>>().Subject;
+        returnedReservations.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task CancelReservation_ShouldReturnNoContent()
+    {
+        // Arrange
+        var userId = Guid.Parse(_controller.ControllerContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var reservationId = Guid.NewGuid();
+
+        _serviceMock.Setup(s => s.CancelAsync(reservationId, userId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _controller.CancelReservation(reservationId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+        _serviceMock.Verify(s => s.CancelAsync(reservationId, userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 }
 

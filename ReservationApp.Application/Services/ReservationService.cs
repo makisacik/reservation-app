@@ -1,6 +1,7 @@
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Enums;
 using ReservationApp.Domain.Exceptions;
 
 namespace ReservationApp.Application.Services;
@@ -8,10 +9,17 @@ namespace ReservationApp.Application.Services;
 public class ReservationService : IReservationService
 {
     private readonly IReservationRepository _reservationRepository;
+    private readonly ISettingService _settingService;
+    private readonly IUserRepository _userRepository;
 
-    public ReservationService(IReservationRepository reservationRepository)
+    public ReservationService(
+        IReservationRepository reservationRepository,
+        ISettingService settingService,
+        IUserRepository userRepository)
     {
         _reservationRepository = reservationRepository;
+        _settingService = settingService;
+        _userRepository = userRepository;
     }
 
     public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync(CancellationToken cancellationToken = default)
@@ -45,11 +53,108 @@ public class ReservationService : IReservationService
         return MapToDto(reservation);
     }
 
-    public Task<ReservationDto> CreateReservationAsync(CreateReservationDto createReservationDto, CancellationToken cancellationToken = default)
+    public async Task<ReservationDto> CreateAsync(CreateReservationDto dto, Guid userId, CancellationToken cancellationToken = default)
     {
-        // Note: CreateReservationDto needs to be updated in Phase 2 to match new structure
-        // For now, this will need to be updated when CreateReservationDto is refactored
-        throw new NotImplementedException("CreateReservationAsync needs to be updated with new Reservation structure. This will be handled in Phase 2.");
+        // Get user to check role
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {userId} not found.");
+        }
+
+        var isAdmin = user.Role == UserRole.Admin;
+
+        // Get settings
+        var allowPastReservations = await _settingService.GetAllowPastReservationsAsync(cancellationToken);
+        var maxWeeklyReservations = await _settingService.GetMaxWeeklyReservationsAsync(cancellationToken);
+
+        // Check past date (unless admin or setting allows)
+        if (!isAdmin && !allowPastReservations && dto.Date.Date < DateTime.UtcNow.Date)
+        {
+            throw new InvalidReservationDateException(dto.Date);
+        }
+
+        // Check duplicate reservation (same user, date, meal time slot)
+        var reservationDate = DateOnly.FromDateTime(dto.Date);
+        var hasDuplicate = await _reservationRepository.HasReservationForDayAsync(userId, reservationDate, dto.MealTimeSlotId, cancellationToken);
+        if (hasDuplicate)
+        {
+            // Get meal time slot name for error message
+            var existingReservation = await _reservationRepository.GetUserReservationsAsync(userId, cancellationToken);
+            var duplicate = existingReservation.FirstOrDefault(r => 
+                DateOnly.FromDateTime(r.Date) == reservationDate && r.MealTimeSlotId == dto.MealTimeSlotId);
+            var mealTimeSlotName = duplicate?.MealTimeSlot?.Name ?? "the selected time slot";
+            throw new DuplicateReservationException(dto.Date, mealTimeSlotName);
+        }
+
+        // Check weekly limit (unless admin)
+        if (!isAdmin)
+        {
+            // Calculate week start (Monday) and end (Sunday) using ISO 8601
+            var date = dto.Date.Date;
+            var dayOfWeek = (int)date.DayOfWeek;
+            var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1; // Sunday = 0, convert to Monday = 0
+            var weekStart = DateOnly.FromDateTime(date.AddDays(-daysFromMonday));
+            var weekEnd = weekStart.AddDays(6);
+
+            var currentWeekCount = await _reservationRepository.CountReservationsThisWeekAsync(userId, weekStart, weekEnd, cancellationToken);
+            if (currentWeekCount >= maxWeeklyReservations)
+            {
+                throw new WeeklyLimitExceededException(maxWeeklyReservations, currentWeekCount);
+            }
+        }
+
+        // Create reservation
+        var reservation = new Reservation(
+            userId,
+            dto.RestaurantId,
+            dto.MenuId,
+            dto.MealTimeSlotId,
+            dto.Date,
+            dto.Appetizer
+        );
+
+        await _reservationRepository.AddAsync(reservation, cancellationToken);
+        await _reservationRepository.SaveChangesAsync(cancellationToken);
+
+        // Reload with navigation properties
+        var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
+        if (createdReservation == null)
+        {
+            throw new DomainException("Failed to retrieve created reservation.");
+        }
+
+        return MapToDto(createdReservation);
+    }
+
+    public async Task<IEnumerable<ReservationDto>> GetMyReservationsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var reservations = await _reservationRepository.GetUserReservationsAsync(userId, cancellationToken);
+        return reservations.Select(MapToDto);
+    }
+
+    public async Task CancelAsync(Guid reservationId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var reservation = await _reservationRepository.GetUserReservationByIdAsync(reservationId, userId, cancellationToken);
+        if (reservation == null)
+        {
+            // Check if reservation exists but belongs to another user
+            var anyReservation = await _reservationRepository.GetByIdAsync(reservationId, cancellationToken);
+            if (anyReservation != null)
+            {
+                throw new BadRequestException("You can only cancel your own reservations.");
+            }
+            throw new NotFoundException($"Reservation with id {reservationId} not found.");
+        }
+
+        // Only allow cancellation of future reservations
+        if (reservation.Date.Date < DateTime.UtcNow.Date)
+        {
+            throw new BadRequestException("Cannot cancel past reservations.");
+        }
+
+        await _reservationRepository.DeleteAsync(reservation, cancellationToken);
+        await _reservationRepository.SaveChangesAsync(cancellationToken);
     }
 
     private static ReservationDto MapToDto(Reservation reservation)

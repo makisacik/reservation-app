@@ -16,6 +16,7 @@ public class ReservationDbContext : DbContext
     public DbSet<Meal> Meals { get; set; } = null!;
     public DbSet<Menu> Menus { get; set; } = null!;
     public DbSet<MealTimeSlot> MealTimeSlots { get; set; } = null!;
+    public DbSet<SystemSetting> SystemSettings { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

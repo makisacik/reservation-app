@@ -89,6 +89,36 @@ namespace ReservationApp.Infrastructure.Migrations
                     table.PrimaryKey("PK_MealTimeSlots", x => x.Id);
                 });
 
+            // Seed default meal time slots
+            migrationBuilder.InsertData(
+                table: "MealTimeSlots",
+                columns: new[] { "Id", "Name", "StartTime", "EndTime", "CreatedAt", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, "Breakfast", new TimeSpan(7, 0, 0), new TimeSpan(10, 0, 0), DateTime.UtcNow, null },
+                    { 2, "Lunch", new TimeSpan(12, 0, 0), new TimeSpan(14, 0, 0), DateTime.UtcNow, null },
+                    { 3, "Dinner", new TimeSpan(18, 0, 0), new TimeSpan(21, 0, 0), DateTime.UtcNow, null }
+                });
+
+            // Update existing reservations to have valid MealTimeSlotId (default to 1 = Breakfast)
+            // Since Guests column was renamed to MealTimeSlotId, we need to ensure all values are valid (1, 2, or 3)
+            migrationBuilder.Sql(@"
+                UPDATE ""Reservations""
+                SET ""MealTimeSlotId"" = CASE 
+                    WHEN ""MealTimeSlotId"" IN (1, 2, 3) THEN ""MealTimeSlotId""
+                    ELSE 1
+                END;
+            ");
+
+            // Delete existing reservations that have invalid foreign keys (Guid.Empty values)
+            // These reservations are incompatible with the new structure and need to be recreated
+            migrationBuilder.Sql(@"
+                DELETE FROM ""Reservations""
+                WHERE ""UserId"" = '00000000-0000-0000-0000-000000000000'
+                   OR ""RestaurantId"" = '00000000-0000-0000-0000-000000000000'
+                   OR ""MenuId"" = '00000000-0000-0000-0000-000000000000';
+            ");
+
             migrationBuilder.CreateTable(
                 name: "MenuCategories",
                 columns: table => new

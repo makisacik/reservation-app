@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<IMealService, MealService>();
         services.AddScoped<IMealTimeSlotService, MealTimeSlotService>();
+        services.AddScoped<ISettingService, SettingService>();
         
         return services;
     }

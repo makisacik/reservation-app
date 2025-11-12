@@ -30,7 +30,9 @@ public class ExceptionHandlingMiddleware
         catch (Exception ex)
         {
             // Log client errors (4xx) as Warning, server errors (5xx) as Error
-            var isClientError = ex is BadRequestException or NotFoundException or DomainException or ArgumentException or ArgumentNullException or KeyNotFoundException;
+            var isClientError = ex is BadRequestException or NotFoundException or DomainException 
+                or WeeklyLimitExceededException or DuplicateReservationException or InvalidReservationDateException
+                or ArgumentException or ArgumentNullException or KeyNotFoundException;
             
             if (isClientError)
             {
@@ -70,6 +72,24 @@ public class ExceptionHandlingMiddleware
                 HttpStatusCode.BadRequest,
                 "Bad Request",
                 badRequestException.Message,
+                context.Request.Path
+            ),
+            WeeklyLimitExceededException weeklyLimitException => CreateProblemDetails(
+                HttpStatusCode.BadRequest,
+                "Weekly Limit Exceeded",
+                weeklyLimitException.Message,
+                context.Request.Path
+            ),
+            DuplicateReservationException duplicateException => CreateProblemDetails(
+                HttpStatusCode.BadRequest,
+                "Duplicate Reservation",
+                duplicateException.Message,
+                context.Request.Path
+            ),
+            InvalidReservationDateException invalidDateException => CreateProblemDetails(
+                HttpStatusCode.BadRequest,
+                "Invalid Reservation Date",
+                invalidDateException.Message,
                 context.Request.Path
             ),
             DomainException domainException => CreateProblemDetails(

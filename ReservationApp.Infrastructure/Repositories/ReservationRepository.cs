@@ -146,5 +146,56 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
     {
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<bool> HasReservationForDayAsync(Guid userId, DateOnly date, int mealTimeSlotId, CancellationToken cancellationToken = default)
+    {
+        var dateTime = date.ToDateTime(TimeOnly.MinValue);
+        return await _dbContext.Reservations
+            .AnyAsync(r => r.UserId == userId 
+                && r.Date.Date == dateTime.Date 
+                && r.MealTimeSlotId == mealTimeSlotId, 
+                cancellationToken);
+    }
+
+    public async Task<int> CountReservationsThisWeekAsync(Guid userId, DateOnly weekStart, DateOnly weekEnd, CancellationToken cancellationToken = default)
+    {
+        var startDateTime = weekStart.ToDateTime(TimeOnly.MinValue);
+        var endDateTime = weekEnd.ToDateTime(TimeOnly.MaxValue);
+        
+        return await _dbContext.Reservations
+            .CountAsync(r => r.UserId == userId 
+                && r.Date >= startDateTime 
+                && r.Date <= endDateTime, 
+                cancellationToken);
+    }
+
+    public async Task<IEnumerable<Reservation>> GetUserReservationsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Reservations
+            .Include(r => r.User)
+            .Include(r => r.Restaurant)
+            .Include(r => r.Menu)
+            .Include(r => r.MealTimeSlot)
+            .Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.Date)
+            .ThenBy(r => r.MealTimeSlotId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Reservation?> GetUserReservationByIdAsync(Guid reservationId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Reservations
+            .Include(r => r.User)
+            .Include(r => r.Restaurant)
+            .Include(r => r.Menu)
+            .Include(r => r.MealTimeSlot)
+            .FirstOrDefaultAsync(r => r.Id == reservationId && r.UserId == userId, cancellationToken);
+    }
+
+    public new async Task DeleteAsync(Reservation reservation, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Reservations.Remove(reservation);
+        await Task.CompletedTask;
+    }
 }
 
