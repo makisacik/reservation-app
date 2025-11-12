@@ -20,6 +20,20 @@ public class ReservationService : IReservationService
         return reservations.Select(MapToDto);
     }
 
+    public async Task<PaginatedResult<ReservationDto>> GetReservationsAsync(ReservationQueryParams query, CancellationToken cancellationToken = default)
+    {
+        var paginatedResult = await _reservationRepository.GetPaginatedAsync(query, cancellationToken);
+        
+        return new PaginatedResult<ReservationDto>
+        {
+            Page = paginatedResult.Page,
+            PageSize = paginatedResult.PageSize,
+            TotalCount = paginatedResult.TotalCount,
+            TotalPages = paginatedResult.TotalPages,
+            Data = paginatedResult.Data.Select(MapToDto)
+        };
+    }
+
     public async Task<ReservationDto> GetReservationByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var reservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);

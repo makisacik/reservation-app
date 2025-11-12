@@ -23,25 +23,38 @@ public class ReservationControllerTests
     }
 
     [Fact]
-    public async Task GetReservations_ShouldReturnOkResultWithReservations()
+    public async Task GetReservations_ShouldReturnOkResultWithPaginatedReservations()
     {
         // Arrange
+        var queryParams = new ReservationQueryParams { Page = 1, PageSize = 10 };
         var reservations = new List<ReservationDto>
         {
             new ReservationDto { Id = Guid.NewGuid(), CustomerName = "John Doe", Date = DateTime.UtcNow.AddDays(1), Guests = 2 },
             new ReservationDto { Id = Guid.NewGuid(), CustomerName = "Jane Smith", Date = DateTime.UtcNow.AddDays(2), Guests = 4 }
         };
 
-        _serviceMock.Setup(s => s.GetAllReservationsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(reservations);
+        var paginatedResult = new PaginatedResult<ReservationDto>
+        {
+            Page = 1,
+            PageSize = 10,
+            TotalCount = 2,
+            TotalPages = 1,
+            Data = reservations
+        };
+
+        _serviceMock.Setup(s => s.GetReservationsAsync(It.IsAny<ReservationQueryParams>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(paginatedResult);
 
         // Act
-        var result = await _controller.GetReservations(CancellationToken.None);
+        var result = await _controller.GetReservations(queryParams, CancellationToken.None);
 
         // Assert
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-        var returnedReservations = okResult.Value.Should().BeAssignableTo<IEnumerable<ReservationDto>>().Subject;
-        returnedReservations.Should().HaveCount(2);
+        var returnedResult = okResult.Value.Should().BeOfType<PaginatedResult<ReservationDto>>().Subject;
+        returnedResult.Data.Should().HaveCount(2);
+        returnedResult.TotalCount.Should().Be(2);
+        returnedResult.Page.Should().Be(1);
+        returnedResult.PageSize.Should().Be(10);
     }
 
     [Fact]

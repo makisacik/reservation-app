@@ -4,6 +4,7 @@ using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Application.Services;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Exceptions;
 using Xunit;
 
 namespace ReservationApp.Tests.Services;
@@ -61,7 +62,7 @@ public class ReservationServiceTests
     }
 
     [Fact]
-    public async Task GetReservationByIdAsync_WhenReservationDoesNotExist_ShouldThrowKeyNotFoundException()
+    public async Task GetReservationByIdAsync_WhenReservationDoesNotExist_ShouldThrowNotFoundException()
     {
         // Arrange
         var reservationId = Guid.NewGuid();
@@ -70,7 +71,8 @@ public class ReservationServiceTests
             .ReturnsAsync((Reservation?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.GetReservationByIdAsync(reservationId));
+        var exception = await Assert.ThrowsAsync<NotFoundException>(() => _service.GetReservationByIdAsync(reservationId));
+        exception.Message.Should().Contain($"Reservation with id {reservationId} not found.");
         _repositoryMock.Verify(r => r.GetByIdAsync(reservationId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
