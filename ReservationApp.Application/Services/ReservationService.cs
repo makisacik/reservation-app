@@ -1,6 +1,7 @@
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
+using ReservationApp.Domain.Exceptions;
 
 namespace ReservationApp.Application.Services;
 
@@ -24,7 +25,7 @@ public class ReservationService : IReservationService
         var reservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
         if (reservation == null)
         {
-            throw new KeyNotFoundException($"Reservation with id {id} not found.");
+            throw new NotFoundException($"Reservation with id {id} not found.");
         }
 
         return MapToDto(reservation);

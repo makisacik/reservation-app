@@ -7,6 +7,7 @@ using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
 using ReservationApp.Domain.Enums;
+using ReservationApp.Domain.Exceptions;
 
 namespace ReservationApp.Application.Services;
 
@@ -21,11 +22,11 @@ public class UserService : IUserService
         _configuration = configuration;
     }
 
-    public async Task<UserDto?> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default)
+    public async Task<UserDto> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default)
     {
         if (await _userRepository.ExistsByEmailAsync(request.Email, cancellationToken))
         {
-            return null; // User already exists
+            throw new BadRequestException("User with this email already exists.");
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -54,12 +55,12 @@ public class UserService : IUserService
         return new AuthResponseDto(token);
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByIdAsync(id, cancellationToken);
         if (user == null)
         {
-            return null;
+            throw new NotFoundException($"User with id {id} not found.");
         }
 
         return MapToDto(user);
@@ -71,12 +72,12 @@ public class UserService : IUserService
         return users.Select(MapToDto);
     }
 
-    public async Task<UserDto?> UpdateUserRoleAsync(Guid userId, UserRole newRole, CancellationToken cancellationToken = default)
+    public async Task<UserDto> UpdateUserRoleAsync(Guid userId, UserRole newRole, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null)
         {
-            return null;
+            throw new NotFoundException($"User with id {userId} not found.");
         }
 
         user.UpdateRole(newRole);
