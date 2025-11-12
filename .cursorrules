@@ -1,0 +1,125 @@
+# ReservationApp Backend - Cursor Rules
+
+## Project Overview
+- **Language**: C# (.NET 8)
+- **Framework**: ASP.NET Core Web API
+- **Database**: PostgreSQL
+- **Architecture**: Clean Architecture + Onion Principles
+
+## Coding Conventions
+
+### Coding Style
+- Follow Microsoft C# conventions (PascalCase for classes, camelCase for locals, constants in UPPER_CASE)
+- Use nullable reference types enabled
+- Use expression-bodied members when appropriate
+- Avoid public setters on entities — prefer methods for state change
+
+### Error Handling
+- Use middleware for exception handling
+- No try/catch blocks in controllers unless domain-specific
+- Handle errors via centralized middleware returning ProblemDetails JSON
+
+### Async/Await
+- Use async/await for all I/O operations
+
+### Logging
+- Use Serilog with structured logs
+
+### Validation
+- Use FluentValidation for DTO validation
+
+### Dependency Injection
+- Register dependencies via interfaces only
+- No direct `new` keyword in controllers or services
+
+## Project Structure
+
+### Solution: ReservationApp.sln
+- **ReservationApp.API**: Entry point (Controllers, Dependency Injection, Swagger, Middleware, Startup)
+- **ReservationApp.Application**: Business logic layer (Services, Interfaces, DTOs, Validators, Commands/Queries)
+- **ReservationApp.Domain**: Core domain (Entities, ValueObjects, Enums, Interfaces)
+- **ReservationApp.Infrastructure**: Persistence + External services (DbContext, EF Core, Repositories, Configs)
+- **ReservationApp.Tests**: Unit + Integration tests
+
+## Architecture Rules
+
+### Controllers
+- Controllers should not contain business logic
+- Each controller method should call exactly one service method
+- Return IActionResult with typed DTO responses, never domain entities
+
+### Services
+- Implement all services in Application layer using interface-first approach
+- Keep them stateless where possible
+- Throw custom exceptions (e.g. DomainException) for business rule violations
+
+### Domain Layer
+- No dependencies on other layers
+- Contain only Entities, Enums, Interfaces, and Domain Exceptions
+- Entities should use constructor injection for required fields
+
+### Infrastructure Layer
+- Use EF Core with Npgsql for PostgreSQL
+- DbContext should live here, and only repositories access it
+- Configure EF entities in separate TypeConfiguration files
+- Use migrations via: `dotnet ef migrations add <Name> -p ReservationApp.Infrastructure -s ReservationApp.API`
+
+### Application Layer
+- Map domain entities to DTOs via AutoMapper profiles
+- Use MediatR (optional) for CQRS commands/queries if complexity grows
+- Business rules live here, not in controllers
+
+## Security
+
+- Use JWT Authentication
+- Store secrets in appsettings.Development.json or environment variables, never hardcoded
+- Add CORS policy explicitly for React + Mobile origins
+- Enforce HTTPS redirect
+
+## Testing
+
+- Write unit tests for Application and Domain layers
+- Use Moq or NSubstitute for mocking interfaces
+- Keep integration tests isolated using an in-memory PostgreSQL instance
+
+## API Standards
+
+- Use RESTful naming (GET /api/reservations/{id})
+- Return 201 on creation with Location header
+- Handle errors via centralized middleware returning ProblemDetails JSON
+
+### Example Endpoints
+- `GET /api/reservations`: Returns all reservations with pagination
+- `POST /api/reservations`: Creates a new reservation with validation
+- `GET /api/users/{id}`: Fetch user profile
+- `POST /api/auth/login`: Authenticate and return JWT
+
+## Tools & Packages
+
+### NuGet Packages
+- Microsoft.EntityFrameworkCore
+- Npgsql.EntityFrameworkCore.PostgreSQL
+- FluentValidation.AspNetCore
+- Serilog.AspNetCore
+- Swashbuckle.AspNetCore
+- xUnit
+- Moq
+
+## Quality Checks
+
+Before considering work complete, verify:
+- Project builds successfully
+- All tests pass
+- Swagger docs load correctly
+- CORS + Auth configured
+- No controller directly calls DbContext
+
+## Git Conventions
+
+- Commit small, atomic changes with descriptive messages
+- Never commit credentials or appsettings with secrets
+- Branch naming convention: `feature/<name>`, `fix/<name>`, `refactor/<name>`
+
+## Primary Goal
+
+Generate maintainable, layered .NET 8 backend with clean separation of concerns and PostgreSQL persistence.

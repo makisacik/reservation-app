@@ -1,0 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+using ReservationApp.Domain.Entities;
+
+namespace ReservationApp.Infrastructure.Data;
+
+public class ReservationDbContext : DbContext
+{
+    public ReservationDbContext(DbContextOptions<ReservationDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<Reservation> Reservations { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ReservationDbContext).Assembly);
+    }
+}
+
