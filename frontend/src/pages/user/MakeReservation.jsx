@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { Box, Typography, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { reservationsApi } from '../api/reservationsApi';
-import { menusApi } from '../api/menusApi';
-import ReservationStepper from '../components/reservation/ReservationStepper';
-import NavigationButtons from '../components/reservation/NavigationButtons';
-import Step1DateSelection from '../components/reservation/Step1DateSelection';
-import Step2RestaurantSelection from '../components/reservation/Step2RestaurantSelection';
-import Step3MenuTypeSelection from '../components/reservation/Step3MenuTypeSelection';
-import Step4MenuSelection from '../components/reservation/Step4MenuSelection';
-import Step5Confirmation from '../components/reservation/Step5Confirmation';
+import { reservationsApi } from '../../api/reservationsApi';
+import { menusApi } from '../../api/menusApi';
+import ReservationStepper from '../../components/reservation/ReservationStepper';
+import NavigationButtons from '../../components/reservation/NavigationButtons';
+import Step1DateSelection from '../../components/reservation/Step1DateSelection';
+import Step2RestaurantSelection from '../../components/reservation/Step2RestaurantSelection';
+import Step3MenuTypeSelection from '../../components/reservation/Step3MenuTypeSelection';
+import Step4MenuSelection from '../../components/reservation/Step4MenuSelection';
+import Step5Confirmation from '../../components/reservation/Step5Confirmation';
 
 const MakeReservation = () => {
   const navigate = useNavigate();

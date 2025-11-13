@@ -14,8 +14,8 @@ import {
   useTheme,
 } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
-import { useAuth } from '../context/AuthContext';
-import { ROUTES, STORAGE_KEYS } from '../utils/constants';
+import { useAuth } from '../../context/AuthContext';
+import { ROUTES, STORAGE_KEYS } from '../../utils/constants';
 
 const Login = () => {
   const theme = useTheme();

@@ -1,10 +1,10 @@
 import { Box, Grid, Typography, CircularProgress, useTheme } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { dashboardApi } from '../api/dashboardApi';
-import StatCard from '../components/common/StatCard';
-import TodayReservations from '../components/dashboard/TodayReservations';
-import PopularMenus from '../components/dashboard/PopularMenus';
-import WeeklySummary from '../components/dashboard/WeeklySummary';
+import { dashboardApi } from '../../api/dashboardApi';
+import StatCard from '../../components/common/StatCard';
+import TodayReservations from '../../components/dashboard/TodayReservations';
+import PopularMenus from '../../components/dashboard/PopularMenus';
+import WeeklySummary from '../../components/dashboard/WeeklySummary';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import PeopleIcon from '@mui/icons-material/People';
 import RestaurantIcon from '@mui/icons-material/Restaurant';

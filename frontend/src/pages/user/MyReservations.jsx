@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Box, Typography, Button, Grid, CircularProgress, Alert, useTheme } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { reservationsApi } from '../api/reservationsApi';
-import { menusApi } from '../api/menusApi';
-import ReservationCard from '../components/reservations/ReservationCard';
-import { convertUtcToLocal, isPast } from '../utils/timezone';
+import { reservationsApi } from '../../api/reservationsApi';
+import { menusApi } from '../../api/menusApi';
+import ReservationCard from '../../components/reservations/ReservationCard';
+import { convertUtcToLocal, isPast } from '../../utils/timezone';
 
 const MyReservations = () => {
   const theme = useTheme();

@@ -20,11 +20,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { mealsApi } from '../api/mealsApi';
-import { restaurantsApi } from '../api/restaurantsApi';
-import { categoriesApi } from '../api/categoriesApi';
-import AdminMealCard from '../components/menu/AdminMealCard';
-import MealModal from '../components/menu/MealModal';
+import { mealsApi } from '../../api/mealsApi';
+import { restaurantsApi } from '../../api/restaurantsApi';
+import { categoriesApi } from '../../api/categoriesApi';
+import AdminMealCard from '../../components/menu/AdminMealCard';
+import MealModal from '../../components/menu/MealModal';
 
 const MenuManagement = () => {
   const theme = useTheme();

@@ -4,7 +4,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import StoreIcon from '@mui/icons-material/Store';
-import { ROUTES } from '../utils/constants';
+import { ROUTES } from '../../utils/constants';
 
 const Onboarding = () => {
   const theme = useTheme();

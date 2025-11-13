@@ -1,8 +1,8 @@
-import { createTheme } from '@mui/material/styles';
-import { colors } from './colors';
-import { borderRadius } from './borderRadius';
-import { shadows } from './shadows';
-import { typography as typographyConfig } from './typography';
+import { createTheme } from "@mui/material/styles";
+import { colors } from "./colors";
+import { borderRadius } from "./borderRadius";
+import { shadows } from "./shadows";
+import { typography as typographyConfig } from "./typography";
 
 const theme = createTheme({
   palette: {
@@ -51,54 +51,54 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
+      "-apple-system",
+      "BlinkMacSystemFont",
       '"Segoe UI"',
-      'Roboto',
+      "Roboto",
       '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+      "Arial",
+      "sans-serif",
+    ].join(","),
     h1: {
-      fontSize: '2.5rem',
+      fontSize: "2.5rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.tight,
     },
     h2: {
-      fontSize: '2rem',
+      fontSize: "2rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.normal,
     },
     h3: {
-      fontSize: '1.75rem',
+      fontSize: "1.75rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.relaxed,
     },
     h4: {
-      fontSize: '1.5rem',
+      fontSize: "1.5rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.relaxed,
     },
     h5: {
-      fontSize: '1.25rem',
+      fontSize: "1.25rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.loose,
     },
     h6: {
-      fontSize: '1rem',
+      fontSize: "1rem",
       fontWeight: typographyConfig.fontWeight.semibold,
       lineHeight: typographyConfig.lineHeight.loose,
     },
     body1: {
-      fontSize: '1rem',
+      fontSize: "1rem",
       lineHeight: typographyConfig.lineHeight.loose,
     },
     body2: {
-      fontSize: '0.875rem',
+      fontSize: "0.875rem",
       lineHeight: 1.43,
     },
     button: {
-      textTransform: 'none',
+      textTransform: "none",
       fontWeight: typographyConfig.fontWeight.medium,
     },
   },
@@ -107,7 +107,7 @@ const theme = createTheme({
   },
   spacing: 8,
   shadows: [
-    'none',
+    "none",
     shadows.card,
     shadows.cardElevated,
     shadows.button,
@@ -121,14 +121,15 @@ const theme = createTheme({
     shadows.onboardingCardHover,
     shadows.icon,
     // ... add more shadow levels as needed
-    ...Array(11).fill('none'), // Fill remaining shadow slots
+    ...Array(11).fill("none"), // Fill remaining shadow slots (13-23)
+    shadows.modal, // Index 24 for Dialog/Modal high elevation
   ],
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: borderRadius.button,
-          padding: '8px 16px',
+          padding: "8px 16px",
         },
       },
     },
@@ -157,4 +158,3 @@ const theme = createTheme({
 });
 
 export default theme;
-

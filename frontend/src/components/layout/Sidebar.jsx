@@ -18,8 +18,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { ROUTES } from '../utils/constants';
-import { useAuth } from '../context/AuthContext';
+import { ROUTES } from '../../utils/constants';
+import { useAuth } from '../../context/AuthContext';
 
 const drawerWidth = 240;
 

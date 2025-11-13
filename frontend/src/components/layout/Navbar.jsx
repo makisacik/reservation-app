@@ -1,7 +1,7 @@
 import { AppBar, Toolbar, Typography, Button, Box, useTheme } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../utils/constants';
+import { ROUTES } from '../../utils/constants';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 

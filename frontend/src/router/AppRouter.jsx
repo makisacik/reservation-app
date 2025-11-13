@@ -2,19 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES } from '../utils/constants';
-import Onboarding from '../pages/Onboarding';
-import Login from '../pages/Login';
-import HomePage from '../pages/HomePage';
-import Dashboard from '../pages/Dashboard';
-import MakeReservation from '../pages/MakeReservation';
-import MyReservations from '../pages/MyReservations';
-import Users from '../pages/Users';
-import Profile from '../pages/Profile';
-import Settings from '../pages/Settings';
-import MenuManagement from '../pages/MenuManagement';
-import AdminReservations from '../pages/AdminReservations';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+import { Login, Onboarding } from '../pages/auth';
+import { HomePage, MakeReservation, MyReservations, Profile } from '../pages/user';
+import { Dashboard, AdminReservations, MenuManagement, Users, Settings } from '../pages/admin';
+import { Navbar, Sidebar } from '../components/layout';
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {

@@ -20,8 +20,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import BusinessIcon from '@mui/icons-material/Business';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { usersApi } from '../api/usersApi';
-import { useAuth } from '../context/AuthContext';
+import { usersApi } from '../../api/usersApi';
+import { useAuth } from '../../context/AuthContext';
 
 const Profile = () => {
   const theme = useTheme();

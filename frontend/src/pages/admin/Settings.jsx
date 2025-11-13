@@ -15,7 +15,7 @@ import {
   useTheme,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-import { settingsApi } from '../api/settingsApi';
+import { settingsApi } from '../../api/settingsApi';
 
 const Settings = () => {
   const theme = useTheme();

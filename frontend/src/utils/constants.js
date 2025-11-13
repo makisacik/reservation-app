@@ -59,3 +59,9 @@ export const DEFAULT_PAGINATION = {
   PAGE_SIZE: 10,
 };
 
+// Home page constants
+export const HOME_PAGE_CONSTANTS = {
+  DEFAULT_CATEGORY: 'Aylık Menü',
+  BORDER_RADIUS: '20px',
+};
+

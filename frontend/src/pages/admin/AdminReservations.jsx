@@ -31,11 +31,11 @@ import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { reservationsApi } from '../api/reservationsApi';
-import StatusBadge from '../components/reservations/StatusBadge';
-import CreateReservationModal from '../components/reservations/CreateReservationModal';
-import ReservationDetailModal from '../components/reservations/ReservationDetailModal';
-import ConfirmApprovalDialog from '../components/reservations/ConfirmApprovalDialog';
+import { reservationsApi } from '../../api/reservationsApi';
+import StatusBadge from '../../components/reservations/StatusBadge';
+import CreateReservationModal from '../../components/reservations/CreateReservationModal';
+import ReservationDetailModal from '../../components/reservations/ReservationDetailModal';
+import ConfirmApprovalDialog from '../../components/reservations/ConfirmApprovalDialog';
 
 // Turkish day names and months
 const TURKISH_DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];

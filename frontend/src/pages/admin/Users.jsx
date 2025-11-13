@@ -26,12 +26,12 @@ import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EmailIcon from '@mui/icons-material/Email';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersApi } from '../api/usersApi';
-import UserAvatar from '../components/users/UserAvatar';
-import StatusBadge from '../components/users/StatusBadge';
-import UserDetailModal from '../components/users/UserDetailModal';
-import EditUserModal from '../components/users/EditUserModal';
-import CreateUserModal from '../components/users/CreateUserModal';
+import { usersApi } from '../../api/usersApi';
+import UserAvatar from '../../components/users/UserAvatar';
+import StatusBadge from '../../components/users/StatusBadge';
+import UserDetailModal from '../../components/users/UserDetailModal';
+import EditUserModal from '../../components/users/EditUserModal';
+import CreateUserModal from '../../components/users/CreateUserModal';
 
 const Users = () => {
   const theme = useTheme();

@@ -7,10 +7,9 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  CircularProgress,
-  Box,
-  Typography,
 } from '@mui/material';
+import LoadingSpinner from './LoadingSpinner';
+import EmptyState from './EmptyState';
 
 const Table = ({
   columns,
@@ -35,21 +34,11 @@ const Table = ({
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingSpinner loading={true} />;
   }
 
   if (!rows || rows.length === 0) {
-    return (
-      <Paper sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
-          No data available
-        </Typography>
-      </Paper>
-    );
+    return <EmptyState message="No data available" />;
   }
 
   return (

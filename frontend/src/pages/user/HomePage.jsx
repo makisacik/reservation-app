@@ -1,17 +1,17 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../context/AuthContext';
-import { menusApi } from '../api/menusApi';
-import { mealsApi } from '../api/mealsApi';
-import { categoriesApi } from '../api/categoriesApi';
-import { homeApi } from '../api/homeApi';
+import { useAuth } from '../../context/AuthContext';
+import { menusApi } from '../../api/menusApi';
+import { mealsApi } from '../../api/mealsApi';
+import { categoriesApi } from '../../api/categoriesApi';
+import { homeApi } from '../../api/homeApi';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../utils/constants';
-import { generateAlertMessage, filterMealsByCategory } from '../utils/homePageUtils';
-import UserHeaderCard from '../components/home/UserHeaderCard';
-import StatsSection from '../components/home/StatsSection';
-import MenuSection from '../components/home/MenuSection';
+import { ROUTES } from '../../utils/constants';
+import { generateAlertMessage, filterMealsByCategory } from '../../utils/homePageUtils';
+import UserHeaderCard from '../../components/home/UserHeaderCard';
+import StatsSection from '../../components/home/StatsSection';
+import MenuSection from '../../components/home/MenuSection';
 
 const HomePage = () => {
   const { user } = useAuth();
