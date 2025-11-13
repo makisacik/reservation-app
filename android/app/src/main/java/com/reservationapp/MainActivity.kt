@@ -6,43 +6,51 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.reservationapp.core.ui.theme.ReservationAppTheme
+import com.reservationapp.navigation.NavGraph
+import com.reservationapp.navigation.Screen
 
-// @AndroidEntryPoint - Temporarily disabled due to KAPT/Java 17 compatibility issues
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val authStateManager = DependencyContainer.getAuthStateManager()
+        // Check auth state on startup
+        authStateManager.checkAuthState()
+
         setContent {
             ReservationAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    val navController = rememberNavController()
+                    val authStateManager = remember { DependencyContainer.getAuthStateManager() }
+                    val isAuthenticated by authStateManager.isAuthenticated.collectAsState()
+
+                    // Determine start destination based on auth state
+                    val startDestination = remember(isAuthenticated) {
+                        if (isAuthenticated) {
+                            // Will navigate to main app in later phases
+                            Screen.Home.route
+                        } else {
+                            Screen.Onboarding.route
+                        }
+                    }
+
+                    NavGraph(
+                        navController = navController,
+                        startDestination = startDestination
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ReservationAppTheme {
-        Greeting("Android")
     }
 }
 

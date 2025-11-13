@@ -10,8 +10,9 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitModule {
 
-    // Same API base URL as iOS app - use 127.0.0.1 for emulator compatibility
-    private const val BASE_URL = "http://127.0.0.1:5053/api/"
+    // Android emulator uses 10.0.2.2 to access host machine's localhost
+    // For physical devices, use your machine's actual IP address (e.g., http://192.168.x.x:5053/api/)
+    private const val BASE_URL = "http://10.0.2.2:5053/api/"
 
     fun provideGson(): Gson {
         return GsonBuilder()

@@ -1,10 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    // Hilt temporarily disabled due to KAPT/Java 17 compatibility issues
-    // Will be re-enabled when we have proper Hilt module configuration
-    // alias(libs.plugins.hilt)
-    // alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -71,6 +67,9 @@ dependencies {
     // Data
     implementation(project(":data"))
 
+    // Feature modules
+    implementation(project(":feature:auth"))
+
     // Compose BOM
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -78,16 +77,18 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.activity)
     implementation(libs.compose.navigation)
-    implementation(libs.compose.hilt.navigation)
     implementation(libs.compose.lifecycle.runtime)
     implementation(libs.compose.lifecycle.viewmodel)
 
-    // Hilt (temporarily disabled due to KAPT/Java 17 compatibility issues)
-    // implementation(libs.hilt.android)
-    // kapt(libs.hilt.compiler)
-
     // Timber
     implementation(libs.timber)
+
+    // Network dependencies (for DependencyContainer)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
 
     // Testing
     testImplementation(libs.junit)

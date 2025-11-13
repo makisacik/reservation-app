@@ -40,8 +40,6 @@ dependencies {
     // Domain
     implementation(project(":domain"))
 
-    // Hilt (will be enabled when we create data repositories with @HiltModule)
-
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

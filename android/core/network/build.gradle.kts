@@ -35,6 +35,9 @@ dependencies {
     // Core common
     implementation(project(":core:common"))
 
+    // Domain
+    implementation(project(":domain"))
+
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)

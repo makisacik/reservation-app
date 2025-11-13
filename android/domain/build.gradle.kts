@@ -35,6 +35,9 @@ dependencies {
     // Core common
     implementation(project(":core:common"))
 
+    // Gson (for @SerializedName annotation)
+    implementation(libs.gson)
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
 }
