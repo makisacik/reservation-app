@@ -24,10 +24,18 @@ const MyReservations = () => {
       const localDate = convertUtcToLocal(reservation.date);
       const menuDate = convertUtcToLocal(reservation.menuDate || reservation.date);
 
+      // Validate dates
+      if (!localDate || !localDate.isValid()) {
+        console.warn('Invalid localDate for reservation:', reservation.id, reservation.date);
+      }
+      if (!menuDate || !menuDate.isValid()) {
+        console.warn('Invalid menuDate for reservation:', reservation.id, reservation.menuDate || reservation.date);
+      }
+
       return {
         ...reservation,
-        localDate,
-        menuDate,
+        localDate: localDate && localDate.isValid() ? localDate : null,
+        menuDate: menuDate && menuDate.isValid() ? menuDate : null,
         isPastReservation: isPast(reservation.date),
       };
     });
@@ -38,9 +46,13 @@ const MyReservations = () => {
   const uniqueMenuKeys = useMemo(() => {
     const keys = new Set();
     enrichedReservations.forEach((reservation) => {
-      if (reservation.menuDate && reservation.restaurantId) {
+      if (reservation.menuDate && reservation.menuDate.isValid() && reservation.restaurantId) {
         const dateStr = reservation.menuDate.format('YYYY-MM-DD');
-        keys.add(`${dateStr}-${reservation.restaurantId}`);
+        // Only add if date string is valid (not "Invalid Date")
+        if (dateStr && dateStr !== 'Invalid Date' && dateStr.includes('-')) {
+          // Use '|' as separator to avoid conflicts with date dashes and GUID dashes
+          keys.add(`${dateStr}|${reservation.restaurantId}`);
+        }
       }
     });
     return Array.from(keys);
@@ -51,7 +63,8 @@ const MyReservations = () => {
     queryFn: async () => {
       // Fetch all unique menus in parallel
       const menuPromises = uniqueMenuKeys.map(async (key) => {
-        const [dateStr, restaurantId] = key.split('-');
+        // Split by '|' separator (date|restaurantId)
+        const [dateStr, restaurantId] = key.split('|');
         try {
           const menus = await menusApi.getMenus(dateStr, restaurantId);
           return { key, menu: menus[0] || null };
@@ -91,7 +104,7 @@ const MyReservations = () => {
     // If not found, try to get by date and restaurant key
     if (!menu && reservation.menuDate && reservation.restaurantId) {
       const dateStr = reservation.menuDate.format('YYYY-MM-DD');
-      const key = `${dateStr}-${reservation.restaurantId}`;
+      const key = `${dateStr}|${reservation.restaurantId}`;
       menu = menuMap.get(key);
     }
     

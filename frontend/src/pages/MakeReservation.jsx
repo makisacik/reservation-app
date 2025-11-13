@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Typography, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reservationsApi } from '../api/reservationsApi';
 import { menusApi } from '../api/menusApi';
 import ReservationStepper from '../components/reservation/ReservationStepper';
@@ -14,6 +14,7 @@ import Step5Confirmation from '../components/reservation/Step5Confirmation';
 
 const MakeReservation = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -99,9 +100,11 @@ const MakeReservation = () => {
         }
 
         // Convert date string (YYYY-MM-DD) to ISO 8601 datetime string
-        // Backend expects DateTime, so we send it as midnight in local timezone
+        // For date-only values, we send as UTC midnight to preserve the calendar date
+        // The backend will extract Year/Month/Day from this UTC date, so sending as UTC
+        // ensures the date doesn't shift when converted
         const dateStr = dateObj.date; // Already in YYYY-MM-DD format
-        const dateTimeStr = `${dateStr}T00:00:00`; // Add time component
+        const dateTimeStr = `${dateStr}T00:00:00Z`; // Add time component and UTC indicator
 
         const reservation = {
           restaurantId: selectedRestaurant.id,
@@ -138,6 +141,10 @@ const MakeReservation = () => {
 
       await Promise.all(promises);
       console.log('=== RESERVATION CREATION SUCCESS ===');
+
+      // Invalidate and refetch reservations query to update the list
+      queryClient.invalidateQueries({ queryKey: ['myReservations'] });
+      queryClient.invalidateQueries({ queryKey: ['reservationMenus'] });
 
       // Show success message
       const dayCount = reservations.length;

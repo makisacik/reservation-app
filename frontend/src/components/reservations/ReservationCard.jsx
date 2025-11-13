@@ -25,7 +25,13 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
   const timeRange = mealTimeSlot?.formattedTimeRange || '';
 
   // Format date in Turkish: "4 Kasım 2025"
-  const formattedDate = formatDateInTimezone(reservation.date, 'D MMMM YYYY');
+  // Use the localDate if available (already converted), otherwise convert from UTC
+  const dateToFormat = reservation.localDate || reservation.date;
+  const formattedDate = dateToFormat 
+    ? (reservation.localDate && reservation.localDate.isValid()
+        ? reservation.localDate.locale('tr').format('D MMMM YYYY')
+        : formatDateInTimezone(reservation.date, 'D MMMM YYYY'))
+    : '';
 
   // Format time slot display: "Öğle Yemeği • 12:00 - 14:00"
   const timeSlotDisplay = timeRange 
