@@ -1,3 +1,5 @@
+using System;
+using Microsoft.Extensions.Logging;
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
@@ -12,17 +14,20 @@ public class ReservationService : IReservationService
     private readonly ISettingService _settingService;
     private readonly IUserRepository _userRepository;
     private readonly IEmailNotificationService _emailNotificationService;
+    private readonly ILogger<ReservationService> _logger;
 
     public ReservationService(
         IReservationRepository reservationRepository,
         ISettingService settingService,
         IUserRepository userRepository,
-        IEmailNotificationService emailNotificationService)
+        IEmailNotificationService emailNotificationService,
+        ILogger<ReservationService> logger)
     {
         _reservationRepository = reservationRepository;
         _settingService = settingService;
         _userRepository = userRepository;
         _emailNotificationService = emailNotificationService;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync(CancellationToken cancellationToken = default)
@@ -123,18 +128,70 @@ public class ReservationService : IReservationService
             }
         }
 
+        _logger.LogInformation("=== SERVICE: CreateAsync START ===");
+        _logger.LogInformation("Service - Received DTO: RestaurantId={RestaurantId}, MenuId={MenuId}, MealTimeSlotId={MealTimeSlotId}, Date={Date}, Appetizer={Appetizer}",
+            dto.RestaurantId, dto.MenuId, dto.MealTimeSlotId, dto.Date, dto.Appetizer);
+        _logger.LogInformation("Service - DTO Date Analysis: Value={Value}, Kind={Kind}, Ticks={Ticks}",
+            dto.Date, dto.Date.Kind, dto.Date.Ticks);
+
+        // Ensure date is UTC before creating entity
+        var utcReservationDate = dto.Date;
+        _logger.LogInformation("Service - Initial date: Value={Value}, Kind={Kind}", utcReservationDate, utcReservationDate.Kind);
+        
+        if (utcReservationDate.Kind != DateTimeKind.Utc)
+        {
+            _logger.LogWarning("Service - Date is NOT UTC! Kind={Kind}, converting...", utcReservationDate.Kind);
+            if (utcReservationDate.Kind == DateTimeKind.Unspecified)
+            {
+                _logger.LogInformation("Service - Date is Unspecified, treating as Turkey timezone");
+                // Treat as Turkey timezone and convert to UTC
+                var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
+                var turkeyDateTimeOffset = new DateTimeOffset(
+                    utcReservationDate.Year,
+                    utcReservationDate.Month,
+                    utcReservationDate.Day,
+                    utcReservationDate.Hour,
+                    utcReservationDate.Minute,
+                    utcReservationDate.Second,
+                    turkeyTz.GetUtcOffset(DateTimeOffset.UtcNow));
+                utcReservationDate = turkeyDateTimeOffset.UtcDateTime;
+                _logger.LogInformation("Service - Converted from Turkey timezone: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
+                    dto.Date, utcReservationDate, utcReservationDate.Kind);
+            }
+            else
+            {
+                _logger.LogInformation("Service - Date is Local, converting to UTC");
+                utcReservationDate = utcReservationDate.ToUniversalTime();
+                _logger.LogInformation("Service - Converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
+                    dto.Date, utcReservationDate, utcReservationDate.Kind);
+            }
+        }
+        else
+        {
+            _logger.LogInformation("Service - Date is already UTC, no conversion needed");
+        }
+
+        _logger.LogInformation("Service - Final date before entity creation: Value={Value}, Kind={Kind}, Ticks={Ticks}",
+            utcReservationDate, utcReservationDate.Kind, utcReservationDate.Ticks);
+
         // Create reservation
+        _logger.LogInformation("Service - Creating Reservation entity...");
         var reservation = new Reservation(
             userId,
             dto.RestaurantId,
             dto.MenuId,
             dto.MealTimeSlotId,
-            dto.Date,
+            utcReservationDate,
             dto.Appetizer
         );
+        _logger.LogInformation("Service - Entity created: Id={Id}, Date={Date}, Date Kind={DateKind}",
+            reservation.Id, reservation.Date, reservation.Date.Kind);
 
+        _logger.LogInformation("Service - Adding to repository...");
         await _reservationRepository.AddAsync(reservation, cancellationToken);
+        _logger.LogInformation("Service - Saving changes to database...");
         await _reservationRepository.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Service - Changes saved successfully");
 
         // Reload with navigation properties
         var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);

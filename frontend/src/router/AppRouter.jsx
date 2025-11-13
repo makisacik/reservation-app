@@ -5,7 +5,7 @@ import { ROUTES } from '../utils/constants';
 import Login from '../pages/Login';
 import HomePage from '../pages/HomePage';
 import Dashboard from '../pages/Dashboard';
-import Reservations from '../pages/Reservations';
+import MakeReservation from '../pages/MakeReservation';
 import MyReservations from '../pages/MyReservations';
 import Users from '../pages/Users';
 import Settings from '../pages/Settings';
@@ -112,7 +112,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <Reservations />
+              <MakeReservation />
             </AppLayout>
           </ProtectedRoute>
         }

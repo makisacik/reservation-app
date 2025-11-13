@@ -35,10 +35,16 @@ public class MealConfiguration : IEntityTypeConfiguration<Meal>
             .HasMaxLength(500);
 
         builder.Property(m => m.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(m => m.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Indexes
         builder.HasIndex(m => m.RestaurantId);

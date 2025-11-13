@@ -42,10 +42,16 @@ public class SystemSettingConfiguration : IEntityTypeConfiguration<SystemSetting
             .HasMaxLength(1000);
 
         builder.Property(s => s.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(s => s.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
     }
 }
 

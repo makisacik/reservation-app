@@ -23,10 +23,16 @@ public class MenuCategoryConfiguration : IEntityTypeConfiguration<MenuCategory>
             .IsUnique();
 
         builder.Property(mc => mc.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(mc => mc.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Relationships
         builder.HasMany(mc => mc.Meals)

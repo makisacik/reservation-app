@@ -49,10 +49,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(50);
 
         builder.Property(u => u.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(u => u.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
     }
 }
 

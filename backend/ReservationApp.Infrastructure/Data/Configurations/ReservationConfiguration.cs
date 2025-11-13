@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ReservationApp.Domain.Entities;
@@ -7,6 +8,22 @@ namespace ReservationApp.Infrastructure.Data.Configurations;
 
 public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
 {
+    private static DateTime ConvertToUtcDateTime(DateTime dateTime)
+    {
+        if (dateTime.Kind == DateTimeKind.Utc)
+        {
+            return dateTime;
+        }
+        
+        if (dateTime.Kind == DateTimeKind.Unspecified)
+        {
+            // Treat Unspecified as UTC (for date-only values)
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
+        }
+        
+        // Local time, convert to UTC
+        return dateTime.ToUniversalTime();
+    }
     public void Configure(EntityTypeBuilder<Reservation> builder)
     {
         builder.ToTable("Reservations");
@@ -29,7 +46,12 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
             .IsRequired();
 
         builder.Property(r => r.Date)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                // Convert to UTC when writing to database
+                v => ConvertToUtcDateTime(v),
+                // Read as UTC from database
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(r => r.Appetizer)
             .IsRequired()
@@ -44,10 +66,16 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
             .HasDefaultValue(ReservationStatus.Active);
 
         builder.Property(r => r.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => ConvertToUtcDateTime(v),
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(r => r.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v.HasValue ? ConvertToUtcDateTime(v.Value) : (DateTime?)null,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Indexes
         builder.HasIndex(r => r.UserId);

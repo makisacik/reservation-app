@@ -46,7 +46,8 @@ public class Reservation
         RestaurantId = restaurantId;
         MenuId = menuId;
         MealTimeSlotId = mealTimeSlotId;
-        Date = date.Date; // Store only date part
+        // Store only date part, explicitly as UTC for PostgreSQL compatibility
+        Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
         Status = ReservationStatus.Active;
         CreatedAt = DateTime.UtcNow;
@@ -64,7 +65,8 @@ public class Reservation
 
         MenuId = menuId;
         MealTimeSlotId = mealTimeSlotId;
-        Date = date.Date; // Store only date part
+        // Store only date part, explicitly as UTC for PostgreSQL compatibility
+        Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
         UpdatedAt = DateTime.UtcNow;
 

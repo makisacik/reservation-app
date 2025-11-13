@@ -36,10 +36,16 @@ public class MealTimeSlotConfiguration : IEntityTypeConfiguration<MealTimeSlot>
                 v => TimeOnly.FromTimeSpan(v));
 
         builder.Property(mts => mts.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(mts => mts.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
     }
 }
 

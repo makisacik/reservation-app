@@ -39,6 +39,8 @@ try
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.WriteIndented = true;
+            // Add custom DateTime converter to handle Unspecified dates
+            options.JsonSerializerOptions.Converters.Add(new ReservationApp.Application.Converters.UtcDateTimeJsonConverter());
         });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>

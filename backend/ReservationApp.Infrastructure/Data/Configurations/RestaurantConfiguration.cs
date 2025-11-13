@@ -26,10 +26,16 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Restaurant>
             .HasMaxLength(1000);
 
         builder.Property(r => r.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => v,
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(r => r.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Relationships
         builder.HasMany(r => r.Menus)

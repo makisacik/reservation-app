@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ReservationApp.Domain.Entities;
@@ -7,6 +8,23 @@ namespace ReservationApp.Infrastructure.Data.Configurations;
 
 public class MenuConfiguration : IEntityTypeConfiguration<Menu>
 {
+    private static DateTime ConvertToUtcDateTime(DateTime dateTime)
+    {
+        if (dateTime.Kind == DateTimeKind.Utc)
+        {
+            return dateTime;
+        }
+        
+        if (dateTime.Kind == DateTimeKind.Unspecified)
+        {
+            // Treat Unspecified as UTC (for date-only values)
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
+        }
+        
+        // Local time, convert to UTC
+        return dateTime.ToUniversalTime();
+    }
+
     public void Configure(EntityTypeBuilder<Menu> builder)
     {
         builder.ToTable("Menus");
@@ -20,7 +38,10 @@ public class MenuConfiguration : IEntityTypeConfiguration<Menu>
             .IsRequired();
 
         builder.Property(m => m.Date)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => ConvertToUtcDateTime(v),
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(m => m.MenuType)
             .IsRequired()
@@ -30,10 +51,16 @@ public class MenuConfiguration : IEntityTypeConfiguration<Menu>
             .HasMaxLength(50);
 
         builder.Property(m => m.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                v => ConvertToUtcDateTime(v),
+                v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(m => m.UpdatedAt)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasConversion(
+                v => v.HasValue ? ConvertToUtcDateTime(v.Value) : (DateTime?)null,
+                v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Indexes
         builder.HasIndex(m => m.RestaurantId);

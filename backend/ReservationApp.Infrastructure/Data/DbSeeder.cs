@@ -255,30 +255,107 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed today's menu
-        var today = DateTime.UtcNow.Date;
-        if (!await context.Menus.AnyAsync(m => m.Date == today && m.RestaurantId == mainRestaurant!.Id))
+        // Seed menus for the next 30 days
+        // Use Turkey timezone (UTC+3) for consistency
+        var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
+        var turkeyNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, turkeyTz);
+        var today = turkeyNow.Date;
+        
+        // Convert back to UTC for storage
+        var todayUtc = TimeZoneInfo.ConvertTimeToUtc(today, turkeyTz);
+        for (int i = 0; i < 30; i++)
         {
-            var todayMenu = new Menu(mainRestaurant!.Id, today, MenuType.Standard);
+            var menuDate = todayUtc.AddDays(i);
             
-            // Get meals for today's menu
-            var menuMeals = await context.Meals
-                .Include(m => m.Category)
-                .Include(m => m.Restaurant)
-                .Where(m => m.RestaurantId == mainRestaurant.Id && 
-                    (m.CategoryId == anaYemekCategory!.Id || 
-                     m.CategoryId == corbaCategory!.Id || 
-                     m.CategoryId == alakartCategory!.Id))
-                .Take(4)
-                .ToListAsync();
-            
-            foreach (var meal in menuMeals)
+            // Create Standard menu for Yemekhane restaurant if it doesn't exist
+            if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == mainRestaurant!.Id && m.MenuType == MenuType.Standard))
             {
-                todayMenu.Meals.Add(meal);
+                var standardMenu = new Menu(mainRestaurant!.Id, menuDate, MenuType.Standard);
+                
+                // Get meals for the menu
+                var menuMeals = await context.Meals
+                    .Include(m => m.Category)
+                    .Include(m => m.Restaurant)
+                    .Where(m => m.RestaurantId == mainRestaurant.Id && 
+                        (m.CategoryId == anaYemekCategory!.Id || 
+                         m.CategoryId == corbaCategory!.Id || 
+                         m.CategoryId == alakartCategory!.Id))
+                    .Take(4)
+                    .ToListAsync();
+                
+                foreach (var meal in menuMeals)
+                {
+                    standardMenu.Meals.Add(meal);
+                }
+                
+                await context.Menus.AddAsync(standardMenu);
+                await context.SaveChangesAsync();
             }
             
-            await context.Menus.AddAsync(todayMenu);
-            await context.SaveChangesAsync();
+            // Create Special menu for Yemekhane restaurant if it doesn't exist
+            if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == mainRestaurant!.Id && m.MenuType == MenuType.Special))
+            {
+                var specialMenuYemekhane = new Menu(mainRestaurant!.Id, menuDate, MenuType.Special);
+                
+                // Get meals for the special menu (can include more variety)
+                var specialMenuMeals = await context.Meals
+                    .Include(m => m.Category)
+                    .Include(m => m.Restaurant)
+                    .Where(m => m.RestaurantId == mainRestaurant.Id)
+                    .Take(5)
+                    .ToListAsync();
+                
+                foreach (var meal in specialMenuMeals)
+                {
+                    specialMenuYemekhane.Meals.Add(meal);
+                }
+                
+                await context.Menus.AddAsync(specialMenuYemekhane);
+                await context.SaveChangesAsync();
+            }
+            
+            // Create Standard menu for Japon Restoran if it doesn't exist
+            if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == japaneseRestaurant!.Id && m.MenuType == MenuType.Standard))
+            {
+                var standardMenuJapanese = new Menu(japaneseRestaurant!.Id, menuDate, MenuType.Standard);
+                
+                // Get Japanese meals for the standard menu (fewer items)
+                var japaneseStandardMeals = await context.Meals
+                    .Include(m => m.Category)
+                    .Include(m => m.Restaurant)
+                    .Where(m => m.RestaurantId == japaneseRestaurant.Id)
+                    .Take(3)
+                    .ToListAsync();
+                
+                foreach (var meal in japaneseStandardMeals)
+                {
+                    standardMenuJapanese.Meals.Add(meal);
+                }
+                
+                await context.Menus.AddAsync(standardMenuJapanese);
+                await context.SaveChangesAsync();
+            }
+            
+            // Create Special menu for Japon Restoran if it doesn't exist
+            if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == japaneseRestaurant!.Id && m.MenuType == MenuType.Special))
+            {
+                var specialMenu = new Menu(japaneseRestaurant!.Id, menuDate, MenuType.Special);
+                
+                // Get Japanese meals for the menu
+                var japaneseMenuMeals = await context.Meals
+                    .Include(m => m.Category)
+                    .Include(m => m.Restaurant)
+                    .Where(m => m.RestaurantId == japaneseRestaurant.Id)
+                    .ToListAsync();
+                
+                foreach (var meal in japaneseMenuMeals)
+                {
+                    specialMenu.Meals.Add(meal);
+                }
+                
+                await context.Menus.AddAsync(specialMenu);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -47,14 +47,34 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
 
         if (query.Date.HasValue)
         {
-            var date = query.Date.Value.Date;
-            var nextDay = date.AddDays(1);
-            q = q.Where(m => m.Date >= date && m.Date < nextDay);
+            // Query for menus on the given date (at any time on that date)
+            // Ensure the date is explicitly UTC for PostgreSQL compatibility
+            var inputDate = query.Date.Value;
+            var utcDate = inputDate.Kind == DateTimeKind.Utc 
+                ? inputDate 
+                : new DateTime(inputDate.Year, inputDate.Month, inputDate.Day, inputDate.Hour, inputDate.Minute, inputDate.Second, DateTimeKind.Utc);
+            
+            var dateOnly = new DateTime(utcDate.Year, utcDate.Month, utcDate.Day, 0, 0, 0, DateTimeKind.Utc);
+            var nextDay = dateOnly.AddDays(1);
+            q = q.Where(m => m.Date >= dateOnly && m.Date < nextDay);
         }
 
         q = q.OrderBy(m => m.Date).ThenBy(m => m.RestaurantId);
 
-        return await q.ToListAsync(cancellationToken);
+        var result = await q.ToListAsync(cancellationToken);
+        
+        // Debug logging
+        _logger.LogInformation("MenuRepository.GetMenusAsync - Query params: RestaurantId={RestaurantId}, Date={Date}. Result count: {ResultCount}", 
+            query.RestaurantId, query.Date, result.Count);
+        
+        if (result.Count == 0 && (query.RestaurantId.HasValue || query.Date.HasValue))
+        {
+            // Log total menus in database for debugging
+            var totalMenus = await _dbContext.Menus.CountAsync(cancellationToken);
+            _logger.LogWarning("No menus found matching query. Total menus in database: {TotalMenus}", totalMenus);
+        }
+
+        return result;
     }
 
     public new async Task UpdateAsync(Menu menu, CancellationToken cancellationToken = default)
