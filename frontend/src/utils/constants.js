@@ -1,5 +1,6 @@
 // App routes
 export const ROUTES = {
+  ONBOARDING: '/',
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   ADMIN_DASHBOARD: '/admin/dashboard',

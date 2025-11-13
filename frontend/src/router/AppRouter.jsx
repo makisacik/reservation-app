@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES } from '../utils/constants';
+import Onboarding from '../pages/Onboarding';
 import Login from '../pages/Login';
 import HomePage from '../pages/HomePage';
 import Dashboard from '../pages/Dashboard';
@@ -160,6 +161,10 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route
+        path={ROUTES.ONBOARDING}
+        element={<Onboarding />}
+      />
+      <Route
         path={ROUTES.LOGIN}
         element={
           <PublicRoute>
@@ -257,8 +262,7 @@ const AppRoutes = () => {
           </AdminRoute>
         }
       />
-      <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
-      <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.ONBOARDING} replace />} />
     </Routes>
   );
 };
