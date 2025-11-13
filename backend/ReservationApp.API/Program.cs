@@ -34,7 +34,12 @@ try
     builder.Host.UseSerilog();
 
     // Add services to the container
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.WriteIndented = true;
+        });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
@@ -56,9 +61,22 @@ try
     builder.Services.AddValidatorsFromAssemblyContaining<CreateReservationDtoValidator>();
 
     // Add CORS
+    // Allow common development ports for Vite (5173-5180) and React (3000-3010)
     var allowedOrigins = new[]
     {
-        "http://localhost:3000",   // React dev server
+        "http://localhost:3000",   // React dev server (Create React App)
+        "http://localhost:5173",   // Vite dev server (default)
+        "http://localhost:5174",   // Vite dev server (fallback)
+        "http://localhost:5175",   // Vite dev server (fallback)
+        "http://localhost:5176",   // Vite dev server (fallback)
+        "http://localhost:5177",   // Vite dev server (fallback)
+        "http://localhost:5178",   // Vite dev server (fallback)
+        "http://localhost:5179",   // Vite dev server (fallback)
+        "http://localhost:5180",   // Vite dev server (fallback)
+        "http://127.0.0.1:5173",   // Vite dev server (alternative)
+        "http://127.0.0.1:5174",   // Vite dev server (alternative)
+        "http://127.0.0.1:5175",   // Vite dev server (alternative)
+        "http://127.0.0.1:3000",    // React dev server (alternative)
         "http://127.0.0.1",        // iOS simulator
         "http://10.0.2.2"          // Android emulator
     };
@@ -145,7 +163,11 @@ try
         app.UseSwaggerUI();
     }
 
-    app.UseHttpsRedirection();
+    // Only use HTTPS redirection in production
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
 
     // Add Serilog request logging
     app.UseSerilogRequestLogging();

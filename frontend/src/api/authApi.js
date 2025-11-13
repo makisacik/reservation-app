@@ -1,4 +1,5 @@
 import axiosClient from './axiosClient';
+import { STORAGE_KEYS } from '../utils/constants';
 
 export const authApi = {
   login: async (email, password) => {
@@ -12,8 +13,8 @@ export const authApi = {
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
   },
 };
 

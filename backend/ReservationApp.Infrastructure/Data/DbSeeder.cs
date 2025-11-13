@@ -17,6 +17,15 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
+        // Seed regular user if it doesn't exist
+        if (!await context.Users.AnyAsync(u => u.Email == "user@example.com"))
+        {
+            var userPasswordHash = BCrypt.Net.BCrypt.HashPassword("user123");
+            var regularUser = new User("Regular User", "user@example.com", userPasswordHash, UserRole.User);
+            await context.Users.AddAsync(regularUser);
+            await context.SaveChangesAsync();
+        }
+
         // Seed default MealTimeSlots if they don't exist
         if (!await context.MealTimeSlots.AnyAsync())
         {

@@ -51,18 +51,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await authApi.login(email, password);
-      const { token: authToken } = response;
+      console.log('Login response:', response); // Debug log
+      
+      // Handle both camelCase (token) and PascalCase (Token) from backend
+      const authToken = response.token || response.Token;
       
       if (authToken) {
         await fetchCurrentUser(authToken);
         return { success: true };
       }
-      return { success: false, error: 'Invalid credentials' };
+      return { success: false, error: 'Invalid credentials - no token received' };
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error response:', error.response?.data); // Debug log
       return {
         success: false,
-        error: error.response?.data?.message || 'Login failed',
+        error: error.response?.data?.message || error.message || 'Login failed',
       };
     }
   };
