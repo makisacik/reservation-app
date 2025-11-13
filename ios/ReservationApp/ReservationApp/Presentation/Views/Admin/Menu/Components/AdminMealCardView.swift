@@ -17,7 +17,7 @@ struct AdminMealCardView: View {
             // Image Section
             ZStack(alignment: .topTrailing) {
                 // Meal Image
-                AsyncImage(url: URL(string: meal.imageUrl ?? "")) { image in
+                CachedAsyncImage(url: URL(string: meal.imageUrl ?? "")) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)

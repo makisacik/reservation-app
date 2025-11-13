@@ -16,7 +16,7 @@ struct MealCardView: View {
             // Image section
             ZStack(alignment: .topTrailing) {
                 // Meal image or placeholder
-                AsyncImage(url: URL(string: meal.imageUrl ?? "")) { image in
+                CachedAsyncImage(url: URL(string: meal.imageUrl ?? "")) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
