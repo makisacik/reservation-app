@@ -14,24 +14,7 @@ struct RootView: View {
     var body: some View {
         Group {
             if authState.isAuthenticated {
-                // Main view - placeholder for now
-                // Will be replaced with actual main views based on user role
-                VStack {
-                    Text("Main View - Coming Soon")
-                        .font(AppTypography.h4())
-                        .foregroundColor(AppColors.textPrimary)
-                    
-                    Button("Logout") {
-                        KeychainManager.shared.deleteToken()
-                        authState.setAuthenticated(false)
-                    }
-                    .padding()
-                    .background(AppColors.errorMain)
-                    .foregroundColor(.white)
-                    .cornerRadius(ThemeManager.BorderRadius.button.value)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(AppColors.backgroundPage)
+                MainTabView()
             } else if authState.hasCheckedAuth {
                 // Show onboarding if no token
                 NavigationStack {
