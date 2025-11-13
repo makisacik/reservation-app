@@ -128,31 +128,56 @@ class AdminRepository: AdminRepositoryProtocol {
         )
     }
     
-    // MARK: - Users methods (to be implemented in later phases)
+    // MARK: - Users methods
     
     func getAdminUsers(queryParams: UserFilterParams) async throws -> PaginatedResult<User> {
-        // TODO: Implement when users management view is added
-        throw NetworkError.unknown
+        var queryItems: [String: String] = [
+            "page": "\(queryParams.page)",
+            "pageSize": "\(queryParams.pageSize)"
+        ]
+
+        if let search = queryParams.search {
+            queryItems["search"] = search
+        }
+
+        return try await apiClient.request(
+            endpoint: .adminUsers,
+            queryParams: queryItems,
+            responseType: PaginatedResult<User>.self
+        )
     }
     
     func getUserStatistics() async throws -> UserStatistics {
-        // TODO: Implement when users management view is added
-        throw NetworkError.unknown
+        return try await apiClient.request(
+            endpoint: .adminUserStatistics,
+            responseType: UserStatistics.self
+        )
     }
     
     func createUser(userData: CreateUserRequest) async throws -> User {
-        // TODO: Implement when users management view is added
-        throw NetworkError.unknown
+        return try await apiClient.request(
+            endpoint: .adminCreateUser,
+            method: "POST",
+            body: userData,
+            responseType: User.self
+        )
     }
     
     func updateUser(id: String, userData: UpdateUserRequest) async throws -> User {
-        // TODO: Implement when users management view is added
-        throw NetworkError.unknown
+        return try await apiClient.request(
+            endpoint: .adminUpdateUser(id: id),
+            method: "PUT",
+            body: userData,
+            responseType: User.self
+        )
     }
     
     func deleteUser(id: String) async throws {
-        // TODO: Implement when users management view is added
-        throw NetworkError.unknown
+        _ = try await apiClient.request(
+            endpoint: .adminDeleteUser(id: id),
+            method: "DELETE",
+            responseType: EmptyResponse.self
+        )
     }
     
     // MARK: - Meals methods

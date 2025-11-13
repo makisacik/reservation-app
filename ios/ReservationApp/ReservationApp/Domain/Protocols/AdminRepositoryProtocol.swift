@@ -68,13 +68,21 @@ struct ReservationSummary: Codable {
     let pendingCount: Int
 }
 
-// Request models (to be implemented when needed)
+// Request models
 struct CreateUserRequest: Codable {
-    // Will be implemented when user management is added
+    let name: String
+    let email: String
+    let password: String
+    let department: String?
+    let role: String // "User" or "Admin"
 }
 
 struct UpdateUserRequest: Codable {
-    // Will be implemented when user management is added
+    let name: String
+    let email: String
+    let department: String?
+    let role: String
+    let status: String // "Active" or "Passive"
 }
 
 struct CreateMealRequest: Codable {

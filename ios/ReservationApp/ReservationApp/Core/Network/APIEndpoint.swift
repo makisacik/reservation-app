@@ -44,6 +44,12 @@ enum APIEndpoint {
     case adminUpdateMeal(id: String)
     case adminDeleteMeal(id: String)
     
+    // Admin Users
+    case adminUserStatistics
+    case adminCreateUser
+    case adminUpdateUser(id: String)
+    case adminDeleteUser(id: String)
+    
     var path: String {
         switch self {
         case .login:
@@ -104,18 +110,26 @@ enum APIEndpoint {
             return "/admin/meals/\(id)"
         case .adminDeleteMeal(let id):
             return "/admin/meals/\(id)"
+        case .adminUserStatistics:
+            return "/admin/users/statistics"
+        case .adminCreateUser:
+            return "/admin/users"
+        case .adminUpdateUser(let id):
+            return "/admin/users/\(id)"
+        case .adminDeleteUser(let id):
+            return "/admin/users/\(id)"
         }
     }
     
     var method: String {
         switch self {
-        case .login, .register, .createReservation, .adminCreateMeal:
+        case .login, .register, .createReservation, .adminCreateMeal, .adminCreateUser:
             return "POST"
-        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation, .adminUpdateMeal:
+        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation, .adminUpdateMeal, .adminUpdateUser:
             return "PUT"
-        case .adminDeleteMeal:
+        case .adminDeleteMeal, .adminDeleteUser:
             return "DELETE"
-        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById, .adminMeals, .adminMeal:
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById, .adminMeals, .adminMeal, .adminUserStatistics:
             return "GET"
         }
     }
