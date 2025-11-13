@@ -25,6 +25,10 @@ public class MealConfiguration : IEntityTypeConfiguration<Meal>
         builder.Property(m => m.Kcal)
             .IsRequired(false);
 
+        builder.Property(m => m.Price)
+            .IsRequired(false)
+            .HasPrecision(18, 2);
+
         builder.Property(m => m.CategoryId)
             .IsRequired();
 

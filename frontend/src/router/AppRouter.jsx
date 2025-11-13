@@ -9,6 +9,7 @@ import MakeReservation from '../pages/MakeReservation';
 import MyReservations from '../pages/MyReservations';
 import Users from '../pages/Users';
 import Profile from '../pages/Profile';
+import MenuManagement from '../pages/MenuManagement';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 
@@ -181,6 +182,16 @@ const AppRoutes = () => {
           <AdminRoute>
             <AppLayout>
               <Dashboard />
+            </AppLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path={ROUTES.ADMIN_MENU_MANAGEMENT}
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <MenuManagement />
             </AppLayout>
           </AdminRoute>
         }

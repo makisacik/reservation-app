@@ -58,6 +58,7 @@ public class MealService : IMealService
             dto.RestaurantId,
             dto.Description,
             dto.Kcal,
+            dto.Price,
             dto.ImageUrl
         );
 
@@ -90,7 +91,7 @@ public class MealService : IMealService
         }
 
         // Update meal
-        meal.Update(dto.Name, dto.CategoryId, dto.Description, dto.Kcal, dto.ImageUrl);
+        meal.Update(dto.Name, dto.CategoryId, dto.Description, dto.Kcal, dto.Price, dto.ImageUrl);
 
         await _mealRepository.UpdateAsync(meal, cancellationToken);
         await _mealRepository.SaveChangesAsync(cancellationToken);
@@ -125,6 +126,7 @@ public class MealService : IMealService
             Name = meal.Name,
             Description = meal.Description,
             Kcal = meal.Kcal,
+            Price = meal.Price,
             CategoryId = meal.CategoryId,
             CategoryName = meal.Category.Name,
             RestaurantId = meal.RestaurantId,

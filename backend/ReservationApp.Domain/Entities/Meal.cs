@@ -8,6 +8,7 @@ public class Meal
     public string Name { get; private set; } = string.Empty;
     public string? Description { get; private set; }
     public int? Kcal { get; private set; }
+    public decimal? Price { get; private set; }
     public Guid CategoryId { get; private set; }
     public Guid RestaurantId { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -21,7 +22,7 @@ public class Meal
 
     private Meal() { } // For EF Core
 
-    public Meal(string name, Guid categoryId, Guid restaurantId, string? description = null, int? kcal = null, string? imageUrl = null)
+    public Meal(string name, Guid categoryId, Guid restaurantId, string? description = null, int? kcal = null, decimal? price = null, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -44,12 +45,13 @@ public class Meal
         RestaurantId = restaurantId;
         Description = description;
         Kcal = kcal;
+        Price = price;
         ImageUrl = imageUrl;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
     }
 
-    public void Update(string name, Guid categoryId, string? description = null, int? kcal = null, string? imageUrl = null)
+    public void Update(string name, Guid categoryId, string? description = null, int? kcal = null, decimal? price = null, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -65,6 +67,7 @@ public class Meal
         CategoryId = categoryId;
         Description = description;
         Kcal = kcal;
+        Price = price;
         ImageUrl = imageUrl;
         UpdatedAt = DateTime.UtcNow;
     }

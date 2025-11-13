@@ -89,7 +89,7 @@ public class MealServiceTests
         var category = new MenuCategory("Test Category");
         typeof(MenuCategory).GetProperty("Id")!.SetValue(category, categoryId);
 
-        var createdMeal = new Meal(createDto.Name, createDto.CategoryId, createDto.RestaurantId, createDto.Description, createDto.Kcal, createDto.ImageUrl);
+        var createdMeal = new Meal(createDto.Name, createDto.CategoryId, createDto.RestaurantId, createDto.Description, createDto.Kcal, createDto.Price, createDto.ImageUrl);
         typeof(Meal).GetProperty("Category")!.SetValue(createdMeal, category);
         typeof(Meal).GetProperty("Restaurant")!.SetValue(createdMeal, restaurant);
 

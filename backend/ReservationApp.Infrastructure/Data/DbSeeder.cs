@@ -203,64 +203,123 @@ public static class DbSeeder
             {
                 // Ana Yemek meals
                 new Meal("Izgara Köfte & Bulgur", anaYemekCategory!.Id, mainRestaurant!.Id, 
-                    "Izgara köfte, bulgur pilavı ve salata", 650, 
+                    "Izgara köfte, bulgur pilavı ve salata", 650, 45m, 
                     "https://images.unsplash.com/photo-1544025162-d76694265947?w=400"),
                 new Meal("Tavuk Şinitzel & Patates", anaYemekCategory.Id, mainRestaurant.Id, 
-                    "Tavuk şinitzel, patates kızartması ve salata", 580, 
+                    "Tavuk şinitzel, patates kızartması ve salata", 580, 42m, 
                     "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400"),
                 new Meal("Karnıyarık & Pilav", anaYemekCategory.Id, mainRestaurant.Id, 
-                    "Karnıyarık, özel pilav ve salata", 720, 
+                    "Karnıyarık, özel pilav ve salata", 720, 48m, 
                     "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400"),
                 new Meal("Izgara Tavuk & Bulgur", anaYemekCategory.Id, mainRestaurant.Id, 
-                    "Izgara tavuk, bulgur pilavı ve salata", 550, 
-                    "https://images.unsplash.com/photo-1532550907401-a5c9e77b0c1a?w=400"),
+                    "Izgara tavuk, bulgur pilavı ve salata", 550, 40m, 
+                    "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400"),
                 
                 // Çorba meals
                 new Meal("Mantar Çorbası", corbaCategory!.Id, mainRestaurant.Id, 
-                    "Kremalı mantar çorbası", 180, 
+                    "Kremalı mantar çorbası", 180, 25m, 
                     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400"),
                 new Meal("Mercimek Çorbası", corbaCategory.Id, mainRestaurant.Id, 
-                    "Geleneksel mercimek çorbası", 150, 
+                    "Geleneksel mercimek çorbası", 150, 20m, 
                     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400"),
                 new Meal("Domates Çorbası", corbaCategory.Id, mainRestaurant.Id, 
-                    "Kremalı domates çorbası", 160, 
+                    "Kremalı domates çorbası", 160, 22m, 
                     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400"),
                 
                 // Alakart meals
                 new Meal("Bonfile Biftek", alakartCategory!.Id, mainRestaurant.Id, 
-                    "Izgara bonfile biftek, patates ve salata", 720, 
+                    "Izgara bonfile biftek, patates ve salata", 720, 85m, 
                     "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400"),
                 new Meal("Izgara Levrek", alakartCategory.Id, mainRestaurant.Id, 
-                    "Izgara levrek, sebze ve pilav", 450, 
-                    "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=400"),
+                    "Izgara levrek, sebze ve pilav", 450, 65m, 
+                    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400"),
                 
                 // Vejetaryen meals
                 new Meal("Mantarlı Risotto", vejetaryenCategory!.Id, mainRestaurant.Id, 
-                    "Mantarlı risotto ve salata", 420, 
+                    "Mantarlı risotto ve salata", 420, 55m, 
                     "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400"),
                 new Meal("Sebzeli Makarna", vejetaryenCategory.Id, mainRestaurant.Id, 
-                    "Taze sebzeli makarna", 380, 
+                    "Taze sebzeli makarna", 380, 50m, 
                     "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400"),
                 
                 // Aperatif meals
                 new Meal("Sandviç Tabağı", aperatifCategory!.Id, mainRestaurant.Id, 
-                    "Çeşitli sandviçler", 320, 
+                    "Çeşitli sandviçler", 320, 35m, 
                     "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400"),
                 new Meal("Salata Tabağı", aperatifCategory.Id, mainRestaurant.Id, 
-                    "Karışık salata tabağı", 250, 
+                    "Karışık salata tabağı", 250, 30m, 
                     "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400"),
                 
                 // Japanese restaurant meals
                 new Meal("Sushi Seti", anaYemekCategory.Id, japaneseRestaurant!.Id, 
-                    "Karışık sushi seti", 450, 
+                    "Karışık sushi seti", 450, 120m, 
                     "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400"),
                 new Meal("Ramen", anaYemekCategory.Id, japaneseRestaurant.Id, 
-                    "Geleneksel ramen çorbası", 520, 
+                    "Geleneksel ramen çorbası", 520, 75m, 
                     "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400"),
             };
             
             await context.Meals.AddRangeAsync(meals);
             await context.SaveChangesAsync();
+        }
+        else
+        {
+            // Update existing meals that don't have prices or need image updates
+            var priceMap = new Dictionary<string, decimal>
+            {
+                { "Izgara Köfte & Bulgur", 45m },
+                { "Tavuk Şinitzel & Patates", 42m },
+                { "Karnıyarık & Pilav", 48m },
+                { "Izgara Tavuk & Bulgur", 40m },
+                { "Mantar Çorbası", 25m },
+                { "Mercimek Çorbası", 20m },
+                { "Domates Çorbası", 22m },
+                { "Bonfile Biftek", 85m },
+                { "Izgara Levrek", 65m },
+                { "Mantarlı Risotto", 55m },
+                { "Sebzeli Makarna", 50m },
+                { "Sandviç Tabağı", 35m },
+                { "Salata Tabağı", 30m },
+                { "Sushi Seti", 120m },
+                { "Ramen", 75m },
+            };
+
+            var imageMap = new Dictionary<string, string>
+            {
+                { "Izgara Tavuk & Bulgur", "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400" },
+                { "Izgara Levrek", "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400" },
+            };
+
+            // Get all meals that might need updates (null prices or all meals for image check)
+            var allMeals = await context.Meals.ToListAsync();
+            
+            var mealsToUpdate = allMeals
+                .Where(m => (m.Price == null && priceMap.ContainsKey(m.Name)) || imageMap.ContainsKey(m.Name))
+                .ToList();
+
+            foreach (var meal in mealsToUpdate)
+            {
+                var entry = context.Entry(meal);
+
+                // Update price if null
+                if (meal.Price == null && priceMap.TryGetValue(meal.Name, out var price))
+                {
+                    entry.Property("Price").CurrentValue = price;
+                    entry.Property("Price").IsModified = true;
+                }
+
+                // Update image if needed
+                if (imageMap.TryGetValue(meal.Name, out var imageUrl))
+                {
+                    entry.Property("ImageUrl").CurrentValue = imageUrl;
+                    entry.Property("ImageUrl").IsModified = true;
+                }
+            }
+
+            if (mealsToUpdate.Any())
+            {
+                await context.SaveChangesAsync();
+            }
         }
 
         // Seed menus for the next 30 days

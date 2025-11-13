@@ -15,6 +15,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import PersonIcon from '@mui/icons-material/Person';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import { ROUTES } from '../utils/constants';
 import { useAuth } from '../context/AuthContext';
 
@@ -31,6 +32,7 @@ const userMenuItems = [
 // Admin menu items
 const adminMenuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: ROUTES.ADMIN_DASHBOARD },
+  { text: 'Menü Yönetimi', icon: <RestaurantMenuIcon />, path: ROUTES.ADMIN_MENU_MANAGEMENT },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: ROUTES.ADMIN_USERS },
   { text: 'Profilim', icon: <PersonIcon />, path: ROUTES.SETTINGS },
 ];
@@ -79,7 +81,8 @@ const Sidebar = () => {
               const isActive = 
                 item.path === ROUTES.MY_RESERVATIONS || 
                 item.path === ROUTES.ADMIN_USERS ||
-                item.path === ROUTES.ADMIN_DASHBOARD
+                item.path === ROUTES.ADMIN_DASHBOARD ||
+                item.path === ROUTES.ADMIN_MENU_MANAGEMENT
                   ? location.pathname.startsWith(item.path)
                   : location.pathname === item.path;
               return (

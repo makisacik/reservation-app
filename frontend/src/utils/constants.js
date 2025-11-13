@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_MENU_MANAGEMENT: '/admin/menu-management',
   RESERVATIONS: '/reservations',
   MY_RESERVATIONS: '/reservations/my',
   USERS: '/users',
@@ -35,6 +36,11 @@ export const API_ENDPOINTS = {
     GENERAL: '/admin/settings/general',
     RESERVATION: '/admin/settings/reservation',
     NOTIFICATIONS: '/admin/settings/notifications',
+  },
+  MEALS: {
+    ALL: '/meals',
+    ADMIN_ALL: '/admin/meals',
+    BY_ID: '/admin/meals',
   },
 };
 
