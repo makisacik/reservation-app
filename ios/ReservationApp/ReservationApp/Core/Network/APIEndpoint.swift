@@ -13,6 +13,7 @@ enum APIEndpoint {
     case currentUser
     case allUsers
     case adminUsers
+    case homeStats
     
     var path: String {
         switch self {
@@ -26,6 +27,8 @@ enum APIEndpoint {
             return "/users"
         case .adminUsers:
             return "/admin/users"
+        case .homeStats:
+            return "/home/stats"
         }
     }
     
@@ -33,7 +36,7 @@ enum APIEndpoint {
         switch self {
         case .login, .register:
             return "POST"
-        case .currentUser, .allUsers, .adminUsers:
+        case .currentUser, .allUsers, .adminUsers, .homeStats:
             return "GET"
         }
     }

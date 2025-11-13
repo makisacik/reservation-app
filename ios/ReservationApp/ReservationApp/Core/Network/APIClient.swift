@@ -8,7 +8,7 @@
 import Foundation
 
 class APIClient {
-    static let shared = APIClient()
+    nonisolated static let shared = APIClient()
     
     private let baseURL: String
     private let session: URLSession

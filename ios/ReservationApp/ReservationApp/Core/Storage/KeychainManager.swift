@@ -9,12 +9,12 @@ import Foundation
 import Security
 
 class KeychainManager {
-    static let shared = KeychainManager()
+    nonisolated static let shared = KeychainManager()
     
     private let service = "com.reservationapp.token"
     private let tokenKey = "auth_token"
     
-    private init() {}
+    nonisolated private init() {}
     
     func saveToken(_ token: String) -> Bool {
         guard let data = token.data(using: .utf8) else {

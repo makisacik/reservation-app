@@ -11,7 +11,7 @@ class AuthRepository: AuthRepositoryProtocol {
     private let apiClient: APIClient
     private let keychainManager: KeychainManager
     
-    init(apiClient: APIClient = APIClient.shared, keychainManager: KeychainManager = KeychainManager.shared) {
+    nonisolated init(apiClient: APIClient = APIClient.shared, keychainManager: KeychainManager = KeychainManager.shared) {
         self.apiClient = apiClient
         self.keychainManager = keychainManager
     }
