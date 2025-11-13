@@ -14,11 +14,13 @@ namespace ReservationApp.API.Controllers;
 public class ReservationController : ControllerBase
 {
     private readonly IReservationService _reservationService;
+    private readonly ITimezoneService _timezoneService;
     private readonly ILogger<ReservationController> _logger;
 
-    public ReservationController(IReservationService reservationService, ILogger<ReservationController> logger)
+    public ReservationController(IReservationService reservationService, ITimezoneService timezoneService, ILogger<ReservationController> logger)
     {
         _reservationService = reservationService;
+        _timezoneService = timezoneService;
         _logger = logger;
     }
 
@@ -83,44 +85,11 @@ public class ReservationController : ControllerBase
             inputDate, inputDate.Kind, inputDate.Ticks, inputDate.Year, inputDate.Month, inputDate.Day, 
             inputDate.Hour, inputDate.Minute, inputDate.Second);
         
-        // Ensure the DateTime is in UTC with Kind=Utc
-        if (inputDate.Kind == DateTimeKind.Unspecified)
-        {
-            _logger.LogInformation("Controller - Date is Unspecified, converting from Turkey timezone to UTC");
-            // Frontend sends dates as "YYYY-MM-DDTHH:mm:ss" without timezone
-            // Treat it as midnight in Turkey timezone (Europe/Istanbul) and convert to UTC
-            var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-            // Create DateTimeOffset in Turkey timezone
-            var turkeyDateTimeOffset = new DateTimeOffset(
-                inputDate.Year, 
-                inputDate.Month, 
-                inputDate.Day, 
-                inputDate.Hour, 
-                inputDate.Minute, 
-                inputDate.Second, 
-                turkeyTz.GetUtcOffset(DateTimeOffset.UtcNow));
-            // Convert to UTC and get DateTime with Kind=Utc
-            createReservationDto.Date = turkeyDateTimeOffset.UtcDateTime;
-            
-            _logger.LogInformation("Controller - Date conversion: Input={InputDate}, Turkey time={TurkeyTime}, UTC={UtcTime}, UTC Kind={UtcKind}",
-                inputDate, turkeyDateTimeOffset.DateTime, createReservationDto.Date, createReservationDto.Date.Kind);
-        }
-        else if (inputDate.Kind == DateTimeKind.Local)
-        {
-            _logger.LogInformation("Controller - Date is Local, converting to UTC");
-            // If it's already local, convert to UTC
-            createReservationDto.Date = inputDate.ToUniversalTime();
-            _logger.LogInformation("Controller - Date converted: Original={OriginalDate}, UTC={UtcDate}, UTC Kind={UtcKind}",
-                inputDate, createReservationDto.Date, createReservationDto.Date.Kind);
-        }
-        else if (inputDate.Kind == DateTimeKind.Utc)
-        {
-            _logger.LogInformation("Controller - Date is already UTC, ensuring explicit UTC kind");
-            // Already UTC, ensure it's explicitly marked as UTC
-            createReservationDto.Date = DateTime.SpecifyKind(inputDate, DateTimeKind.Utc);
-            _logger.LogInformation("Controller - Date specified as UTC: Value={Value}, Kind={Kind}",
-                createReservationDto.Date, createReservationDto.Date.Kind);
-        }
+        // Convert date to UTC using application timezone
+        _logger.LogInformation("Controller - Converting date to UTC using application timezone");
+        createReservationDto.Date = await _timezoneService.ConvertToUtcAsync(inputDate, cancellationToken);
+        _logger.LogInformation("Controller - Date conversion: Input={InputDate}, UTC={UtcTime}, UTC Kind={UtcKind}",
+            inputDate, createReservationDto.Date, createReservationDto.Date.Kind);
 
         _logger.LogInformation("Controller - Final DTO before service call: Date={Date}, Date Kind={DateKind}",
             createReservationDto.Date, createReservationDto.Date.Kind);

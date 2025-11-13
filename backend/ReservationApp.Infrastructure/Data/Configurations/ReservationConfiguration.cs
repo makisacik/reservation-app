@@ -1,6 +1,6 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ReservationApp.Application.Helpers;
 using ReservationApp.Domain.Entities;
 using ReservationApp.Domain.Enums;
 
@@ -8,22 +8,6 @@ namespace ReservationApp.Infrastructure.Data.Configurations;
 
 public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
 {
-    private static DateTime ConvertToUtcDateTime(DateTime dateTime)
-    {
-        if (dateTime.Kind == DateTimeKind.Utc)
-        {
-            return dateTime;
-        }
-        
-        if (dateTime.Kind == DateTimeKind.Unspecified)
-        {
-            // Treat Unspecified as UTC (for date-only values)
-            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
-        }
-        
-        // Local time, convert to UTC
-        return dateTime.ToUniversalTime();
-    }
     public void Configure(EntityTypeBuilder<Reservation> builder)
     {
         builder.ToTable("Reservations");
@@ -49,7 +33,7 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
             .IsRequired()
             .HasConversion(
                 // Convert to UTC when writing to database
-                v => ConvertToUtcDateTime(v),
+                v => DateTimeConversionHelper.ConvertToUtc(v),
                 // Read as UTC from database
                 v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
@@ -68,13 +52,13 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
         builder.Property(r => r.CreatedAt)
             .IsRequired()
             .HasConversion(
-                v => ConvertToUtcDateTime(v),
+                v => DateTimeConversionHelper.ConvertToUtc(v),
                 v => new DateTime(v.Ticks, DateTimeKind.Utc));
 
         builder.Property(r => r.UpdatedAt)
             .IsRequired(false)
             .HasConversion(
-                v => v.HasValue ? ConvertToUtcDateTime(v.Value) : (DateTime?)null,
+                v => v.HasValue ? DateTimeConversionHelper.ConvertToUtc(v.Value) : (DateTime?)null,
                 v => v.HasValue ? new DateTime(v.Value.Ticks, DateTimeKind.Utc) : (DateTime?)null);
 
         // Indexes

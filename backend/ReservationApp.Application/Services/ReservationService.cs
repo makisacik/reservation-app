@@ -14,6 +14,7 @@ public class ReservationService : IReservationService
     private readonly ISettingService _settingService;
     private readonly IUserRepository _userRepository;
     private readonly IEmailNotificationService _emailNotificationService;
+    private readonly ITimezoneService _timezoneService;
     private readonly ILogger<ReservationService> _logger;
 
     public ReservationService(
@@ -21,12 +22,14 @@ public class ReservationService : IReservationService
         ISettingService settingService,
         IUserRepository userRepository,
         IEmailNotificationService emailNotificationService,
+        ITimezoneService timezoneService,
         ILogger<ReservationService> logger)
     {
         _reservationRepository = reservationRepository;
         _settingService = settingService;
         _userRepository = userRepository;
         _emailNotificationService = emailNotificationService;
+        _timezoneService = timezoneService;
         _logger = logger;
     }
 
@@ -135,41 +138,9 @@ public class ReservationService : IReservationService
             dto.Date, dto.Date.Kind, dto.Date.Ticks);
 
         // Ensure date is UTC before creating entity
-        var utcReservationDate = dto.Date;
-        _logger.LogInformation("Service - Initial date: Value={Value}, Kind={Kind}", utcReservationDate, utcReservationDate.Kind);
-        
-        if (utcReservationDate.Kind != DateTimeKind.Utc)
-        {
-            _logger.LogWarning("Service - Date is NOT UTC! Kind={Kind}, converting...", utcReservationDate.Kind);
-            if (utcReservationDate.Kind == DateTimeKind.Unspecified)
-            {
-                _logger.LogInformation("Service - Date is Unspecified, treating as Turkey timezone");
-                // Treat as Turkey timezone and convert to UTC
-                var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-                var turkeyDateTimeOffset = new DateTimeOffset(
-                    utcReservationDate.Year,
-                    utcReservationDate.Month,
-                    utcReservationDate.Day,
-                    utcReservationDate.Hour,
-                    utcReservationDate.Minute,
-                    utcReservationDate.Second,
-                    turkeyTz.GetUtcOffset(DateTimeOffset.UtcNow));
-                utcReservationDate = turkeyDateTimeOffset.UtcDateTime;
-                _logger.LogInformation("Service - Converted from Turkey timezone: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
-                    dto.Date, utcReservationDate, utcReservationDate.Kind);
-            }
-            else
-            {
-                _logger.LogInformation("Service - Date is Local, converting to UTC");
-                utcReservationDate = utcReservationDate.ToUniversalTime();
-                _logger.LogInformation("Service - Converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
-                    dto.Date, utcReservationDate, utcReservationDate.Kind);
-            }
-        }
-        else
-        {
-            _logger.LogInformation("Service - Date is already UTC, no conversion needed");
-        }
+        var utcReservationDate = await _timezoneService.ConvertToUtcAsync(dto.Date, cancellationToken);
+        _logger.LogInformation("Service - Date converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
+            dto.Date, utcReservationDate, utcReservationDate.Kind);
 
         _logger.LogInformation("Service - Final date before entity creation: Value={Value}, Kind={Kind}, Ticks={Ticks}",
             utcReservationDate, utcReservationDate.Kind, utcReservationDate.Ticks);

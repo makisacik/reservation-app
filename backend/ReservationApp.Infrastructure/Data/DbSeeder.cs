@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ReservationApp.Application.Helpers;
 using ReservationApp.Domain.Entities;
 using ReservationApp.Domain.Enums;
 
@@ -256,13 +257,11 @@ public static class DbSeeder
         }
 
         // Seed menus for the next 30 days
-        // Use Turkey timezone (UTC+3) for consistency
-        var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-        var turkeyNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, turkeyTz);
-        var today = turkeyNow.Date;
+        // Use application timezone for consistency (defaults to Europe/Istanbul)
+        var today = DateTimeConversionHelper.ConvertFromUtc(DateTime.UtcNow).Date;
         
         // Convert back to UTC for storage
-        var todayUtc = TimeZoneInfo.ConvertTimeToUtc(today, turkeyTz);
+        var todayUtc = DateTimeConversionHelper.ConvertToUtc(new DateTime(today.Year, today.Month, today.Day, 0, 0, 0, DateTimeKind.Unspecified));
         for (int i = 0; i < 30; i++)
         {
             var menuDate = todayUtc.AddDays(i);

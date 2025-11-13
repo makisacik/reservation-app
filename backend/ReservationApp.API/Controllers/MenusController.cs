@@ -10,11 +10,13 @@ namespace ReservationApp.API.Controllers;
 public class MenusController : ControllerBase
 {
     private readonly IMenuService _menuService;
+    private readonly ITimezoneService _timezoneService;
     private readonly ILogger<MenusController> _logger;
 
-    public MenusController(IMenuService menuService, ILogger<MenusController> logger)
+    public MenusController(IMenuService menuService, ITimezoneService timezoneService, ILogger<MenusController> logger)
     {
         _menuService = menuService;
+        _timezoneService = timezoneService;
         _logger = logger;
     }
 
@@ -26,22 +28,13 @@ public class MenusController : ControllerBase
     {
         _logger.LogInformation("Getting menus - Date: {Date}, RestaurantId: {RestaurantId}", date, restaurantId);
 
-        // Convert date to UTC using Turkey timezone (UTC+3)
+        // Convert date to UTC using application timezone
         DateTime? utcDate = null;
         if (date.HasValue)
         {
-            // Turkey timezone
-            var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-            var inputDate = date.Value;
-
-            // Treat the input date as midnight in Turkey timezone
-            var turkeyDateTime = new DateTime(inputDate.Year, inputDate.Month, inputDate.Day, 0, 0, 0, DateTimeKind.Unspecified);
-
-            // Convert from Turkey time to UTC
-            utcDate = TimeZoneInfo.ConvertTimeToUtc(turkeyDateTime, turkeyTz);
-
-            _logger.LogInformation("Date conversion - Input: {InputDate}, Turkey time: {TurkeyTime}, UTC: {UtcTime}",
-                inputDate, turkeyDateTime, utcDate);
+            utcDate = await _timezoneService.ConvertToUtcAsync(date.Value, cancellationToken);
+            _logger.LogInformation("Date conversion - Input: {InputDate}, UTC: {UtcTime}",
+                date.Value, utcDate);
         }
 
         var query = new MenuQueryParams

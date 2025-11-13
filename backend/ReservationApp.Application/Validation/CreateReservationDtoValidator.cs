@@ -1,14 +1,18 @@
 using FluentValidation;
 using ReservationApp.Application.DTOs;
+using ReservationApp.Application.Interfaces;
 
 namespace ReservationApp.Application.Validation;
 
 public class CreateReservationDtoValidator : AbstractValidator<CreateReservationDto>
 {
     private const int MaxAdvanceBookingDays = 365;
+    private readonly ITimezoneService _timezoneService;
 
-    public CreateReservationDtoValidator()
+    public CreateReservationDtoValidator(ITimezoneService timezoneService)
     {
+        _timezoneService = timezoneService;
+
         RuleFor(x => x.RestaurantId)
             .NotEmpty().WithMessage("Restaurant ID is required.");
 
@@ -22,43 +26,20 @@ public class CreateReservationDtoValidator : AbstractValidator<CreateReservation
             .NotEmpty().WithMessage("Date is required.")
             .Must(date => 
             {
-                var utcDate = ConvertToUtc(date);
+                var utcDate = _timezoneService.ConvertToUtc(date);
                 var utcNow = DateTime.UtcNow;
                 return utcDate.Date >= utcNow.Date;
             })
                 .WithMessage("Reservation date cannot be in the past.")
             .Must(date => 
             {
-                var utcDate = ConvertToUtc(date);
+                var utcDate = _timezoneService.ConvertToUtc(date);
                 var utcNow = DateTime.UtcNow;
                 return utcDate.Date <= utcNow.Date.AddDays(MaxAdvanceBookingDays);
             })
                 .WithMessage($"Reservation date cannot be more than {MaxAdvanceBookingDays} days in the future.");
 
         // Appetizer is optional boolean, no validation needed
-    }
-
-    private static DateTime ConvertToUtc(DateTime date)
-    {
-        // Convert to UTC for comparison
-        // Treat Unspecified dates as Turkey timezone (Europe/Istanbul)
-        if (date.Kind == DateTimeKind.Utc)
-        {
-            return date;
-        }
-        
-        if (date.Kind == DateTimeKind.Unspecified)
-        {
-            // Treat as Turkey timezone and convert to UTC
-            var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-            var turkeyDateTimeOffset = new DateTimeOffset(
-                date.Year, date.Month, date.Day, 
-                date.Hour, date.Minute, date.Second, 
-                turkeyTz.GetUtcOffset(DateTimeOffset.UtcNow));
-            return turkeyDateTimeOffset.UtcDateTime;
-        }
-        
-        return date.ToUniversalTime();
     }
 }
 

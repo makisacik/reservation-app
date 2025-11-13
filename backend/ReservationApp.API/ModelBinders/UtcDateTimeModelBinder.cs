@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ReservationApp.Application.Helpers;
 using System.Globalization;
 
 namespace ReservationApp.API.ModelBinders;
@@ -28,25 +29,8 @@ public class UtcDateTimeModelBinder : IModelBinder
 
         if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
         {
-            // If the DateTime is Unspecified, treat it as Turkey timezone and convert to UTC
-            if (dateTime.Kind == DateTimeKind.Unspecified)
-            {
-                var turkeyTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
-                var turkeyDateTimeOffset = new DateTimeOffset(
-                    dateTime.Year,
-                    dateTime.Month,
-                    dateTime.Day,
-                    dateTime.Hour,
-                    dateTime.Minute,
-                    dateTime.Second,
-                    turkeyTz.GetUtcOffset(DateTimeOffset.UtcNow));
-                dateTime = turkeyDateTimeOffset.UtcDateTime;
-            }
-            else if (dateTime.Kind == DateTimeKind.Local)
-            {
-                dateTime = dateTime.ToUniversalTime();
-            }
-
+            // Convert to UTC using application timezone
+            dateTime = DateTimeConversionHelper.ConvertToUtc(dateTime);
             bindingContext.Result = ModelBindingResult.Success(dateTime);
         }
         else

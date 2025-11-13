@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ReservationApp.API.Extensions;
 using ReservationApp.API.Middleware;
+using ReservationApp.Application.Helpers;
+using ReservationApp.Application.Interfaces;
 using ReservationApp.Application.Validation;
 using ReservationApp.Infrastructure.Data;
 using ReservationApp.Infrastructure.Extensions;
@@ -154,6 +156,12 @@ try
                 var context = services.GetRequiredService<ReservationDbContext>();
                 await DbSeeder.SeedAsync(context);
                 Log.Information("Database seeded successfully");
+                
+                // Initialize DateTimeConversionHelper with timezone from database
+                var timezoneService = services.GetRequiredService<ITimezoneService>();
+                var timezone = await timezoneService.GetApplicationTimezoneAsync();
+                DateTimeConversionHelper.Initialize(timezone);
+                Log.Information("DateTimeConversionHelper initialized with timezone: {Timezone}", timezone.Id);
             }
             catch (Exception ex)
             {
@@ -163,6 +171,25 @@ try
 
         app.UseSwagger();
         app.UseSwaggerUI();
+    }
+    else
+    {
+        // Initialize DateTimeConversionHelper in production as well
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var timezoneService = services.GetRequiredService<ITimezoneService>();
+                var timezone = await timezoneService.GetApplicationTimezoneAsync();
+                DateTimeConversionHelper.Initialize(timezone);
+                Log.Information("DateTimeConversionHelper initialized with timezone: {Timezone}", timezone.Id);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to initialize DateTimeConversionHelper, will use default timezone");
+            }
+        }
     }
 
     // Only use HTTPS redirection in production

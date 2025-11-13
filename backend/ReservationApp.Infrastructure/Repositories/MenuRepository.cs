@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ReservationApp.Application.DTOs;
+using ReservationApp.Application.Helpers;
 using ReservationApp.Application.Interfaces;
 using ReservationApp.Domain.Entities;
 using ReservationApp.Infrastructure.Data;
@@ -49,11 +50,7 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
         {
             // Query for menus on the given date (at any time on that date)
             // Ensure the date is explicitly UTC for PostgreSQL compatibility
-            var inputDate = query.Date.Value;
-            var utcDate = inputDate.Kind == DateTimeKind.Utc 
-                ? inputDate 
-                : new DateTime(inputDate.Year, inputDate.Month, inputDate.Day, inputDate.Hour, inputDate.Minute, inputDate.Second, DateTimeKind.Utc);
-            
+            var utcDate = DateTimeConversionHelper.ConvertToUtc(query.Date.Value);
             var dateOnly = new DateTime(utcDate.Year, utcDate.Month, utcDate.Day, 0, 0, 0, DateTimeKind.Utc);
             var nextDay = dateOnly.AddDays(1);
             q = q.Where(m => m.Date >= dateOnly && m.Date < nextDay);
