@@ -47,5 +47,21 @@ public class DashboardController : ControllerBase
         var trends = await _reportService.GetWeeklyTrendsAsync(startDate, endDate, cancellationToken);
         return Ok(trends);
     }
+
+    [HttpGet("today-reservations")]
+    public async Task<ActionResult> GetTodayReservations(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin getting today's reservations");
+        var todayReservations = await _reportService.GetTodayReservationsAsync(cancellationToken);
+        return Ok(todayReservations);
+    }
+
+    [HttpGet("daily-summary")]
+    public async Task<ActionResult> GetDailySummary(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin getting daily summary for current week");
+        var dailySummary = await _reportService.GetDailyReservationsForWeekAsync(cancellationToken);
+        return Ok(dailySummary);
+    }
 }
 

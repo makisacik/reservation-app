@@ -1,8 +1,14 @@
-import { Box, Grid, Card, CardContent, Typography, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../api/dashboardApi';
-import Chart from '../components/Chart';
-import { formatDate } from '../utils/helpers';
+import StatCard from '../components/common/StatCard';
+import TodayReservations from '../components/dashboard/TodayReservations';
+import PopularMenus from '../components/dashboard/PopularMenus';
+import WeeklySummary from '../components/dashboard/WeeklySummary';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import PeopleIcon from '@mui/icons-material/People';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 const Dashboard = () => {
   const { data: summary, isLoading: summaryLoading } = useQuery({
@@ -10,102 +16,95 @@ const Dashboard = () => {
     queryFn: () => dashboardApi.getSummary(),
   });
 
-  const { data: weeklyTrends, isLoading: trendsLoading } = useQuery({
-    queryKey: ['dashboard', 'weekly'],
-    queryFn: () => dashboardApi.getWeeklyTrends(),
+  const { data: todayReservations, isLoading: todayReservationsLoading } = useQuery({
+    queryKey: ['dashboard', 'today-reservations'],
+    queryFn: () => dashboardApi.getTodayReservations(),
   });
 
-  // Transform weekly trends data for chart
-  const chartData = weeklyTrends?.map((trend) => ({
-    name: formatDate(trend.weekStart, 'MMM DD'),
-    value: trend.reservationCount,
-    weekStart: trend.weekStart,
-    weekEnd: trend.weekEnd,
-  })) || [];
+  const { data: popularMeals, isLoading: popularMealsLoading } = useQuery({
+    queryKey: ['dashboard', 'popular-meals'],
+    queryFn: () => dashboardApi.getPopularMeals(4),
+  });
 
-  const StatCard = ({ title, value, loading }) => (
-    <Card>
-      <CardContent>
-        <Typography color="text.secondary" gutterBottom variant="body2">
-          {title}
-        </Typography>
-        {loading ? (
-          <CircularProgress size={24} />
-        ) : (
-          <Typography variant="h4" component="div">
-            {value || 0}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
-  );
+  const { data: dailySummary, isLoading: dailySummaryLoading } = useQuery({
+    queryKey: ['dashboard', 'daily-summary'],
+    queryFn: () => dashboardApi.getDailySummary(),
+  });
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
-        Dashboard
-      </Typography>
+    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#F6F7FB', minHeight: 'calc(100vh - 64px)' }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 600, color: '#333', mb: 0.5 }}>
+          Dashboard
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Yemek rezervasyon sistemi genel bakış
+        </Typography>
+      </Box>
 
+      {/* Top Metrics Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Toplam Rezervasyon"
+            value={summary?.totalReservations || 0}
+            icon={<CalendarTodayIcon />}
+            color="#1665d8"
+            changePercent={summary?.totalReservationsChangePercent}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Aktif Kullanıcı"
+            value={summary?.activeUsers || 0}
+            icon={<PeopleIcon />}
+            color="#1665d8"
+            changePercent={summary?.activeUsersChangePercent}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Bugünkü Yemek"
+            value={summary?.todayMeals || 0}
+            icon={<RestaurantIcon />}
+            color="#1665d8"
+            changePercent={summary?.todayMealsChangePercent}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Aylık Maliyet"
+            value={summary?.monthlyCost || 0}
+            icon={<AttachMoneyIcon />}
+            color="#1665d8"
+            changePercent={summary?.monthlyCostChangePercent}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Middle Row: Today's Reservations and Popular Menus */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <TodayReservations
+            reservations={todayReservations || []}
+            isLoading={todayReservationsLoading}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <PopularMenus
+            popularMeals={popularMeals || []}
+            isLoading={popularMealsLoading}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Bottom Row: Weekly Summary */}
       <Grid container spacing={3}>
-        {/* Summary Cards */}
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Reservations"
-            value={summary?.totalReservations}
-            loading={summaryLoading}
+        <Grid item xs={12}>
+          <WeeklySummary
+            dailyData={dailySummary || []}
+            isLoading={dailySummaryLoading}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Users"
-            value={summary?.totalUsers}
-            loading={summaryLoading}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Meals"
-            value={summary?.totalMeals}
-            loading={summaryLoading}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Restaurants"
-            value={summary?.totalRestaurants}
-            loading={summaryLoading}
-          />
-        </Grid>
-
-        {/* Weekly Trends Chart */}
-        <Grid item xs={12} md={8}>
-          <Chart
-            title="Weekly Reservation Trends"
-            data={chartData}
-            type="line"
-            dataKey="value"
-            xAxisKey="name"
-            loading={trendsLoading}
-            height={400}
-          />
-        </Grid>
-
-        {/* Popular Meals */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Popular Meals
-              </Typography>
-              {summaryLoading ? (
-                <CircularProgress />
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Coming soon
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
         </Grid>
       </Grid>
     </Box>
@@ -113,4 +112,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

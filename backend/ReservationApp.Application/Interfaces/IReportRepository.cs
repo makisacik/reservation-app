@@ -14,5 +14,14 @@ public interface IReportRepository
     Task<int> CountMealsByCategoryNameAsync(string categoryName, CancellationToken cancellationToken = default);
     Task<string> GetMostPopularMealNameAsync(CancellationToken cancellationToken = default);
     Task<int> CountTodayMenuMealsAsync(CancellationToken cancellationToken = default);
+    Task<int> CountActiveUsersAsync(CancellationToken cancellationToken = default);
+    Task<int> CountTodayMealsAsync(CancellationToken cancellationToken = default);
+    Task<decimal> CalculateMonthlyCostAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<TodayReservationsDto>> GetTodayReservationsByTimeSlotAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<DailyReservationDto>> GetDailyReservationsForWeekAsync(CancellationToken cancellationToken = default);
+    Task<int> CountReservationsPreviousPeriodAsync(CancellationToken cancellationToken = default);
+    Task<int> CountActiveUsersPreviousPeriodAsync(CancellationToken cancellationToken = default);
+    Task<int> CountTodayMealsPreviousPeriodAsync(CancellationToken cancellationToken = default);
+    Task<decimal> CalculateMonthlyCostPreviousPeriodAsync(CancellationToken cancellationToken = default);
 }
 
