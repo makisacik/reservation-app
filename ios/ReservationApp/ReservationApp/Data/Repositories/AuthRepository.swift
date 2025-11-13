@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class AuthRepository: AuthRepositoryProtocol {
     private let apiClient: APIClient
@@ -50,6 +51,18 @@ class AuthRepository: AuthRepositoryProtocol {
     func getCurrentUser() async throws -> User {
         let user: User = try await apiClient.request(
             endpoint: .currentUser,
+            responseType: User.self
+        )
+        return user
+    }
+    
+    func updateUserProfile(request: UpdateUserProfileRequest) async throws -> User {
+        // TODO: Implement once endpoint is ready
+        // Placeholder implementation
+        let user: User = try await apiClient.request(
+            endpoint: .updateUserProfile,
+            method: "PUT",
+            body: request,
             responseType: User.self
         )
         return user

@@ -10,15 +10,18 @@ import SwiftUI
 struct PersonalPanelView: View {
     @StateObject private var viewModel = PersonalPanelViewModel()
     @State private var showErrorAlert = false
+    @State private var showMakeReservation = false
     
     var body: some View {
         ScrollView {
             VStack(spacing: ThemeManager.shared.spacing.lg) {
                 // Header Section
                 PersonalHeaderView(
-                    user: viewModel.user,
-                    alertMessage: viewModel.alertMessage
+                    user: viewModel.user
                 )
+                
+                // Notification Card
+                NotificationCardView(alertMessage: viewModel.alertMessage)
                 
                 // Stats Section
                 StatsGridView(stats: viewModel.stats)
@@ -33,8 +36,8 @@ struct PersonalPanelView: View {
                         viewModel.selectCategory(category)
                     },
                     onReservationTap: {
-                        // Navigate to reservation screen (Phase 4)
-                        print("Navigate to reservation")
+                        // Navigate to reservation screen
+                        showMakeReservation = true
                     }
                 )
             }
@@ -68,6 +71,9 @@ struct PersonalPanelView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+        .sheet(isPresented: $showMakeReservation) {
+            MakeReservationView()
         }
     }
 }

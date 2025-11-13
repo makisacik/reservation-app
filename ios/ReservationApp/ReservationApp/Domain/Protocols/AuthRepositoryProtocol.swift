@@ -11,5 +11,6 @@ protocol AuthRepositoryProtocol {
     func login(email: String, password: String) async throws -> AuthResponse
     func register(request: RegisterRequest) async throws -> AuthResponse
     func getCurrentUser() async throws -> User
+    func updateUserProfile(request: UpdateUserProfileRequest) async throws -> User
 }
 

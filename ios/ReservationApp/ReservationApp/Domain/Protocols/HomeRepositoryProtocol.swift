@@ -12,5 +12,8 @@ protocol HomeRepositoryProtocol {
     func getCategories() async throws -> [MenuCategory]
     func getMeals(restaurantId: String?, categoryId: String?) async throws -> [Meal]
     func getTodayMenu() async throws -> [Menu]
+    func getRestaurants() async throws -> [Restaurant]
+    func getMealTimeSlots() async throws -> [MealTimeSlot]
+    func getMenus(date: String, restaurantId: String, menuType: MenuType) async throws -> [Menu]
 }
 

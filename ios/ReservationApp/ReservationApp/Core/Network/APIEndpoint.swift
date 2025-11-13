@@ -17,6 +17,11 @@ enum APIEndpoint {
     case menuCategories
     case meals
     case menus
+    case myReservations
+    case createReservation
+    case restaurants
+    case mealTimeSlots
+    case updateUserProfile
     
     var path: String {
         switch self {
@@ -38,14 +43,26 @@ enum APIEndpoint {
             return "/meals"
         case .menus:
             return "/menus"
+        case .myReservations:
+            return "/reservations/my"
+        case .createReservation:
+            return "/reservations"
+        case .restaurants:
+            return "/restaurants"
+        case .mealTimeSlots:
+            return "/mealtimes"
+        case .updateUserProfile:
+            return "/users/me"
         }
     }
     
     var method: String {
         switch self {
-        case .login, .register:
+        case .login, .register, .createReservation:
             return "POST"
-        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus:
+        case .updateUserProfile:
+            return "PUT"
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots:
             return "GET"
         }
     }

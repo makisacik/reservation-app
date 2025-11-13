@@ -28,3 +28,8 @@ struct RegisterRequest: Codable {
     let lastName: String?
 }
 
+struct UpdateUserProfileRequest: Codable {
+    let name: String
+    let department: String?
+}
+

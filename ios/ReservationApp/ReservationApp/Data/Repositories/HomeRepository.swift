@@ -58,5 +58,38 @@ class HomeRepository: HomeRepositoryProtocol {
             responseType: [Menu].self
         )
     }
+    
+    func getRestaurants() async throws -> [Restaurant] {
+        return try await apiClient.request(
+            endpoint: .restaurants,
+            responseType: [Restaurant].self
+        )
+    }
+    
+    func getMealTimeSlots() async throws -> [MealTimeSlot] {
+        return try await apiClient.request(
+            endpoint: .mealTimeSlots,
+            responseType: [MealTimeSlot].self
+        )
+    }
+    
+    func getMenus(date: String, restaurantId: String, menuType: MenuType) async throws -> [Menu] {
+        let queryParams: [String: String] = [
+            "date": date,
+            "restaurantId": restaurantId
+        ]
+        
+        // Fetch menus from API
+        let allMenus = try await apiClient.request(
+            endpoint: .menus,
+            queryParams: queryParams,
+            responseType: [Menu].self
+        )
+        
+        // Filter by menuType client-side (backend may not support menuType filter yet)
+        // Backend sends menuType as string: "Standard" or "Special"
+        let menuTypeString = menuType == .standard ? "Standard" : "Special"
+        return allMenus.filter { $0.menuType == menuTypeString }
+    }
 }
 
