@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { convertUtcToLocal } from './timezone';
 
 // Date formatting helpers
 export const formatDate = (date, format = 'YYYY-MM-DD') => {
@@ -14,6 +15,14 @@ export const formatDateTime = (date, format = 'YYYY-MM-DD HH:mm') => {
 export const formatTime = (date, format = 'HH:mm') => {
   if (!date) return '';
   return dayjs(date).format(format);
+};
+
+// Turkish date formatting with timezone conversion
+export const formatDateTurkish = (date, format = 'D MMMM YYYY') => {
+  if (!date) return '';
+  const localDate = convertUtcToLocal(date);
+  if (!localDate || !localDate.isValid()) return '';
+  return localDate.locale('tr').format(format);
 };
 
 // Error handling helpers
