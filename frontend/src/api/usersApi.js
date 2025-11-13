@@ -42,5 +42,17 @@ export const usersApi = {
     const response = await axiosClient.delete(`/admin/users/${id}`);
     return response.data;
   },
+
+  // Get user statistics (Admin only)
+  getUserStatistics: async () => {
+    const response = await axiosClient.get('/admin/users/statistics');
+    return response.data;
+  },
+
+  // Create user (Admin only)
+  createUser: async (userData) => {
+    const response = await axiosClient.post('/admin/users', userData);
+    return response.data;
+  },
 };
 

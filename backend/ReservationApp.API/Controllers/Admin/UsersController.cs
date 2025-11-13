@@ -19,6 +19,14 @@ public class UsersController : ControllerBase
         _logger = logger;
     }
 
+    [HttpGet("statistics")]
+    public async Task<ActionResult<UserStatisticsDto>> GetStatistics(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin getting user statistics");
+        var statistics = await _userService.GetUserStatisticsAsync(cancellationToken);
+        return Ok(statistics);
+    }
+
     [HttpGet]
     public async Task<ActionResult<PaginatedResult<UserDto>>> GetUsers(
         [FromQuery] UserFilterDto filter,
@@ -29,6 +37,16 @@ public class UsersController : ControllerBase
         
         var result = await _userService.GetFilteredAsync(filter, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<UserDto>> CreateUser(
+        [FromBody] AdminCreateUserDto dto,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin creating new user with email: {Email}", dto.Email);
+        var user = await _userService.CreateUserAsync(dto, cancellationToken);
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
     [HttpGet("{id}")]

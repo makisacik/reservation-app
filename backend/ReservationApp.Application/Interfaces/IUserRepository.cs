@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<PaginatedResult<User>> GetFilteredAsync(UserFilterDto filter, CancellationToken cancellationToken = default);
+    Task<Dictionary<Guid, int>> GetReservationCountsAsync(List<Guid> userIds, CancellationToken cancellationToken = default);
     Task<User> AddAsync(User user, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

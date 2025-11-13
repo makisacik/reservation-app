@@ -14,11 +14,13 @@ namespace ReservationApp.Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IReportRepository _reportRepository;
     private readonly IConfiguration _configuration;
 
-    public UserService(IUserRepository userRepository, IConfiguration configuration)
+    public UserService(IUserRepository userRepository, IReportRepository reportRepository, IConfiguration configuration)
     {
         _userRepository = userRepository;
+        _reportRepository = reportRepository;
         _configuration = configuration;
     }
 
@@ -63,7 +65,11 @@ public class UserService : IUserService
             throw new NotFoundException($"User with id {id} not found.");
         }
 
-        return MapToDto(user);
+        var dto = MapToDto(user);
+        // Get reservation count for this user
+        var counts = await _userRepository.GetReservationCountsAsync(new List<Guid> { id }, cancellationToken);
+        dto.TotalReservations = counts.GetValueOrDefault(id, 0);
+        return dto;
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync(CancellationToken cancellationToken = default)
@@ -76,13 +82,22 @@ public class UserService : IUserService
     {
         var paginatedResult = await _userRepository.GetFilteredAsync(filter, cancellationToken);
         
+        // Get reservation counts for each user
+        var userIds = paginatedResult.Data.Select(u => u.Id).ToList();
+        var reservationCounts = await _userRepository.GetReservationCountsAsync(userIds, cancellationToken);
+        
         return new PaginatedResult<UserDto>
         {
             Page = paginatedResult.Page,
             PageSize = paginatedResult.PageSize,
             TotalCount = paginatedResult.TotalCount,
             TotalPages = paginatedResult.TotalPages,
-            Data = paginatedResult.Data.Select(MapToDto)
+            Data = paginatedResult.Data.Select(u => 
+            {
+                var dto = MapToDto(u);
+                dto.TotalReservations = reservationCounts.GetValueOrDefault(u.Id, 0);
+                return dto;
+            })
         };
     }
 
@@ -140,6 +155,39 @@ public class UserService : IUserService
         }
 
         user.UpdateRole(newRole);
+        await _userRepository.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(user);
+    }
+
+    public async Task<UserStatisticsDto> GetUserStatisticsAsync(CancellationToken cancellationToken = default)
+    {
+        var totalUsers = await _reportRepository.CountUsersAsync(cancellationToken);
+        var activeUsers = await _reportRepository.CountActiveUsersAsync(cancellationToken);
+        var passiveUsers = await _reportRepository.CountPassiveUsersAsync(cancellationToken);
+        var newThisMonth = await _reportRepository.CountNewUsersThisMonthAsync(cancellationToken);
+
+        return new UserStatisticsDto
+        {
+            TotalUsers = totalUsers,
+            ActiveUsers = activeUsers,
+            PassiveUsers = passiveUsers,
+            NewThisMonth = newThisMonth
+        };
+    }
+
+    public async Task<UserDto> CreateUserAsync(AdminCreateUserDto request, CancellationToken cancellationToken = default)
+    {
+        if (await _userRepository.ExistsByEmailAsync(request.Email, cancellationToken))
+        {
+            throw new BadRequestException("User with this email already exists.");
+        }
+
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        // New users are created as Active by default
+        var user = new User(request.Name, request.Email, passwordHash, request.Role, request.Department, UserStatus.Active);
+
+        await _userRepository.AddAsync(user, cancellationToken);
         await _userRepository.SaveChangesAsync(cancellationToken);
 
         return MapToDto(user);

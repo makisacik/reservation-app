@@ -13,5 +13,7 @@ public interface IUserService
     Task<UserDto> UpdateAsync(Guid id, UserUpdateDto dto, CancellationToken cancellationToken = default);
     Task<UserDto> ToggleStatusAsync(Guid id, CancellationToken cancellationToken = default);
     Task<UserDto> UpdateUserRoleAsync(Guid userId, UserRole newRole, CancellationToken cancellationToken = default);
+    Task<UserStatisticsDto> GetUserStatisticsAsync(CancellationToken cancellationToken = default);
+    Task<UserDto> CreateUserAsync(AdminCreateUserDto request, CancellationToken cancellationToken = default);
 }
 

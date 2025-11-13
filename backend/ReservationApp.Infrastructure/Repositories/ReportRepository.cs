@@ -303,5 +303,23 @@ public class ReportRepository : IReportRepository
         const decimal pricePerReservation = 50m;
         return reservationCount * pricePerReservation;
     }
+
+    public async Task<int> CountPassiveUsersAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Users
+            .Where(u => u.Status == Domain.Enums.UserStatus.Passive)
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<int> CountNewUsersThisMonthAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+
+        return await _dbContext.Users
+            .Where(u => u.CreatedAt >= startOfMonth && u.CreatedAt <= endOfMonth)
+            .CountAsync(cancellationToken);
+    }
 }
 

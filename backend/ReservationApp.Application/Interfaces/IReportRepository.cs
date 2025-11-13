@@ -23,5 +23,7 @@ public interface IReportRepository
     Task<int> CountActiveUsersPreviousPeriodAsync(CancellationToken cancellationToken = default);
     Task<int> CountTodayMealsPreviousPeriodAsync(CancellationToken cancellationToken = default);
     Task<decimal> CalculateMonthlyCostPreviousPeriodAsync(CancellationToken cancellationToken = default);
+    Task<int> CountPassiveUsersAsync(CancellationToken cancellationToken = default);
+    Task<int> CountNewUsersThisMonthAsync(CancellationToken cancellationToken = default);
 }
 

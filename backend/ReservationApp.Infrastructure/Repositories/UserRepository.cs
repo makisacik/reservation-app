@@ -136,6 +136,24 @@ public class UserRepository : Repository<User>, IUserRepository
         }
     }
 
+    public async Task<Dictionary<Guid, int>> GetReservationCountsAsync(List<Guid> userIds, CancellationToken cancellationToken = default)
+    {
+        if (userIds == null || !userIds.Any())
+        {
+            return new Dictionary<Guid, int>();
+        }
+
+        var counts = await _dbContext.Reservations
+            .Where(r => userIds.Contains(r.UserId))
+            .GroupBy(r => r.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.UserId, x => x.Count, cancellationToken);
+
+        // Ensure all user IDs are in the dictionary (with 0 count if no reservations)
+        var result = userIds.ToDictionary(id => id, id => counts.GetValueOrDefault(id, 0));
+        return result;
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await _dbContext.SaveChangesAsync(cancellationToken);
