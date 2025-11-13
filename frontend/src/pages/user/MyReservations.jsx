@@ -89,6 +89,8 @@ const MyReservations = () => {
       return menuMap;
     },
     enabled: uniqueMenuKeys.length > 0,
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   // Create a map of menuId to menu data for quick lookup

@@ -1,6 +1,8 @@
 import { Box, Card, Typography, Button, Checkbox, FormControlLabel, CircularProgress, useTheme } from '@mui/material';
 import { menusApi } from '../../api/menusApi';
 import { useQuery } from '@tanstack/react-query';
+import { useImagePreload } from '../../hooks/useImagePreload';
+import CachedImage from '../common/CachedImage';
 
 const Step4MenuSelection = ({
   selectedDates,
@@ -27,12 +29,20 @@ const Step4MenuSelection = ({
         selectedMenuType
       ),
     enabled: !!firstDate && !!selectedRestaurant && selectedMenuType !== null,
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   // Get meals from the first menu (assuming one menu per date/restaurant/type)
   // Backend uses camelCase, so property is 'meals' not 'Meals'
   const menu = menus[0];
   const meals = menu?.meals || menu?.Meals || [];
+
+  // Preload all meal images when meals data is available
+  const imageUrls = meals
+    .map((meal) => meal.imageUrl)
+    .filter((url) => url && url.trim() !== '');
+  const { isLoaded: imagesPreloaded } = useImagePreload(imageUrls);
   
   console.log("Step 4 Debug:", { 
     menusLength: menus?.length, 
@@ -162,19 +172,17 @@ const Step4MenuSelection = ({
                     overflow: 'hidden',
                   }}
                 >
-                  {meal.imageUrl ? (
-                    <img
-                      src={meal.imageUrl}
-                      alt={meal.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                  ) : (
-                    <Typography color="text.secondary">Resim Yok</Typography>
-                  )}
+                  <CachedImage
+                    src={meal.imageUrl}
+                    alt={meal.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                    showLoadingPlaceholder={true}
+                    loadingPlaceholder="Resim Yok"
+                  />
                 </Box>
 
                 {/* Meal Info */}

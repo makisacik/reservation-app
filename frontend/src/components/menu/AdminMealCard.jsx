@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CachedImage from '../common/CachedImage';
 
 /**
  * AdminMealCard - Component for displaying meal cards in admin menu management
@@ -37,14 +38,33 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
       <Box
         sx={{
           height: 200,
-          backgroundImage: meal.imageUrl
-            ? `url(${meal.imageUrl})`
-            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           position: 'relative',
+          overflow: 'hidden',
+          background: meal.imageUrl
+            ? 'transparent'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }}
       >
+        {meal.imageUrl ? (
+          <CachedImage
+            src={meal.imageUrl}
+            alt={meal.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+            showLoadingPlaceholder={true}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            }}
+          />
+        )}
         <Chip
           label={meal.categoryName || 'Kategori'}
           size="small"

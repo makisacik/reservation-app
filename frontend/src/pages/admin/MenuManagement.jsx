@@ -40,6 +40,8 @@ const MenuManagement = () => {
   const { data: meals = [], isLoading: mealsLoading } = useQuery({
     queryKey: ['admin-meals', selectedRestaurantId],
     queryFn: () => mealsApi.getAdminMeals(selectedRestaurantId || null, null),
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for meal data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   const { data: restaurants = [], isLoading: restaurantsLoading } = useQuery({

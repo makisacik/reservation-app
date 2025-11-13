@@ -29,22 +29,9 @@
 		3251FF662EC66FED00225DA2 /* ReservationAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReservationAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3251FFB62EC6729100225DA2 /* Exceptions for "ReservationApp" folder in "ReservationApp" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 3251FF492EC66FEA00225DA2 /* ReservationApp */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3251FF4C2EC66FEA00225DA2 /* ReservationApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3251FFB62EC6729100225DA2 /* Exceptions for "ReservationApp" folder in "ReservationApp" target */,
-			);
 			path = ReservationApp;
 			sourceTree = "<group>";
 		};

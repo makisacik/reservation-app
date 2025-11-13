@@ -33,11 +33,15 @@ const HomePage = () => {
   const { data: menus, isLoading: menusLoading } = useQuery({
     queryKey: ["menus", "today"],
     queryFn: () => menusApi.getTodayMenu(),
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   const { data: allMeals, isLoading: mealsLoading } = useQuery({
     queryKey: ["meals"],
     queryFn: () => mealsApi.getMeals(),
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for meal data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   // Get default category (first category or "Aylık Menü")

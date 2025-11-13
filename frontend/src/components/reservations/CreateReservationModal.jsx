@@ -63,6 +63,8 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
       return menusApi.getMenus(formData.date, formData.restaurantId);
     },
     enabled: open && !!formData.restaurantId && !!formData.date,
+    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
+    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
   });
 
   // Create reservation mutation

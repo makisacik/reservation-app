@@ -1,4 +1,5 @@
 import { Card, CardContent, Typography, Box, Chip, useTheme } from '@mui/material';
+import CachedImage from '../common/CachedImage';
 
 /**
  * MealCard - Reusable component for displaying a meal card
@@ -23,12 +24,20 @@ const MealCard = ({ meal, onClick }) => {
       <Box
         sx={{
           height: 150,
-          backgroundImage: `url(${meal.imageUrl})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
           position: "relative",
+          overflow: "hidden",
         }}
       >
+        <CachedImage
+          src={meal.imageUrl}
+          alt={meal.name}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+          showLoadingPlaceholder={true}
+        />
         <Chip
           label={meal.categoryName}
           size="small"
