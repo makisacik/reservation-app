@@ -146,6 +146,7 @@ public class ReservationService : IReservationService
             utcReservationDate, utcReservationDate.Kind, utcReservationDate.Ticks);
 
         // Create reservation
+        // Note: All new reservations are created with Status = Pending by default
         _logger.LogInformation("Service - Creating Reservation entity...");
         var reservation = new Reservation(
             userId,
@@ -155,8 +156,8 @@ public class ReservationService : IReservationService
             utcReservationDate,
             dto.Appetizer
         );
-        _logger.LogInformation("Service - Entity created: Id={Id}, Date={Date}, Date Kind={DateKind}",
-            reservation.Id, reservation.Date, reservation.Date.Kind);
+        _logger.LogInformation("Service - Entity created: Id={Id}, Date={Date}, Date Kind={DateKind}, Status={Status}",
+            reservation.Id, reservation.Date, reservation.Date.Kind, reservation.Status);
 
         _logger.LogInformation("Service - Adding to repository...");
         await _reservationRepository.AddAsync(reservation, cancellationToken);
@@ -269,6 +270,83 @@ public class ReservationService : IReservationService
             ThisMonthCount = thisMonthCount,
             PendingCount = pendingCount
         };
+    }
+
+    public async Task<ReservationDto> AdminCreateAsync(AdminCreateReservationDto dto, CancellationToken cancellationToken = default)
+    {
+        // Verify user exists
+        var user = await _userRepository.GetByIdAsync(dto.UserId, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {dto.UserId} not found.");
+        }
+
+        // Admin can create reservations for any user, so we skip user-specific validations
+        // However, we still check for duplicates to prevent double-booking
+
+        // Check duplicate reservation (same user, date, meal time slot)
+        var reservationDate = DateOnly.FromDateTime(dto.Date);
+        var hasDuplicate = await _reservationRepository.HasReservationForDayAsync(dto.UserId, reservationDate, dto.MealTimeSlotId, cancellationToken);
+        if (hasDuplicate)
+        {
+            // Get meal time slot name for error message
+            var existingReservation = await _reservationRepository.GetUserReservationsAsync(dto.UserId, cancellationToken);
+            var duplicate = existingReservation.FirstOrDefault(r => 
+                DateOnly.FromDateTime(r.Date) == reservationDate && r.MealTimeSlotId == dto.MealTimeSlotId);
+            var mealTimeSlotName = duplicate?.MealTimeSlot?.Name ?? "the selected time slot";
+            throw new DuplicateReservationException(dto.Date, mealTimeSlotName);
+        }
+
+        _logger.LogInformation("=== SERVICE: AdminCreateAsync START ===");
+        _logger.LogInformation("Service - Received DTO: UserId={UserId}, RestaurantId={RestaurantId}, MenuId={MenuId}, MealTimeSlotId={MealTimeSlotId}, Date={Date}, Appetizer={Appetizer}",
+            dto.UserId, dto.RestaurantId, dto.MenuId, dto.MealTimeSlotId, dto.Date, dto.Appetizer);
+
+        // Ensure date is UTC before creating entity
+        var utcReservationDate = await _timezoneService.ConvertToUtcAsync(dto.Date, cancellationToken);
+        _logger.LogInformation("Service - Date converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
+            dto.Date, utcReservationDate, utcReservationDate.Kind);
+
+        // Create reservation
+        _logger.LogInformation("Service - Creating Reservation entity...");
+        var reservation = new Reservation(
+            dto.UserId,
+            dto.RestaurantId,
+            dto.MenuId,
+            dto.MealTimeSlotId,
+            utcReservationDate,
+            dto.Appetizer
+        );
+        _logger.LogInformation("Service - Entity created: Id={Id}, Date={Date}, Date Kind={DateKind}, Status={Status}",
+            reservation.Id, reservation.Date, reservation.Date.Kind, reservation.Status);
+
+        _logger.LogInformation("Service - Adding to repository...");
+        await _reservationRepository.AddAsync(reservation, cancellationToken);
+        _logger.LogInformation("Service - Saving changes to database...");
+        await _reservationRepository.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Service - Changes saved successfully");
+
+        // Reload with navigation properties
+        var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
+        if (createdReservation == null)
+        {
+            throw new DomainException("Failed to retrieve created reservation.");
+        }
+
+        // Send confirmation email (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
+            }
+            catch
+            {
+                // Log but don't throw - email failures shouldn't break reservation creation
+                // EmailNotificationService handles its own logging
+            }
+        }, cancellationToken);
+
+        return MapToDto(createdReservation);
     }
 
     private static ReservationDto MapToDto(Reservation reservation)

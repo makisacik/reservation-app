@@ -38,9 +38,27 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
     ? `${timeSlotName} • ${timeRange}`
     : timeSlotName;
 
-  // Status badge text
-  const statusText = reservation.status === 1 ? 'Aktif' : 'İptal Edildi';
-  const isActive = reservation.status === 1 && !isPast;
+  // Status badge text - handle both numeric and string status values
+  // Note: Pending/Confirmed system only affects admin section.
+  // Users should see their reservations regardless of status (Pending, Active, etc.)
+  const getStatusInfo = () => {
+    const status = reservation.status;
+    // Handle both numeric (1, 2, 3) and string ("Active", "Pending", "Cancelled") status values
+    const isPending = status === 3 || status === 'Pending';
+    const isActive = status === 1 || status === 'Active';
+    const isCancelled = status === 2 || status === 'Cancelled';
+    
+    if (isCancelled) {
+      return { text: 'İptal Edildi', color: '#757575', show: true };
+    } else if (isPending) {
+      return { text: 'Beklemede', color: '#1976d2', show: true };
+    } else if (isActive && !isPast) {
+      return { text: 'Onaylandı', color: '#0A1C59', show: true };
+    }
+    return { text: '', color: '', show: false };
+  };
+  
+  const statusInfo = getStatusInfo();
 
   return (
     <Card
@@ -56,15 +74,15 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
     >
       <CardContent sx={{ p: 3, flexGrow: 1 }}>
         {/* Status Badge */}
-        {isActive && (
+        {statusInfo.show && (
           <Chip
-            label={statusText}
+            label={statusInfo.text}
             size="small"
             sx={{
               position: 'absolute',
               top: 16,
               right: 16,
-              bgcolor: '#0A1C59',
+              bgcolor: statusInfo.color,
               color: 'white',
               fontWeight: 500,
               fontSize: '0.75rem',
@@ -81,7 +99,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
             fontWeight: 600,
             color: '#0A1C59',
             mb: 1,
-            pr: isActive ? 8 : 0, // Make room for status badge
+            pr: statusInfo.show ? 8 : 0, // Make room for status badge
           }}
         >
           {mealName || 'Menü'}

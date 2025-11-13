@@ -6,7 +6,18 @@ import { Chip } from '@mui/material';
  */
 const StatusBadge = ({ status }) => {
   const getStatusConfig = (status) => {
-    switch (status) {
+    // Normalize status to handle both string and numeric values, and both camelCase and PascalCase
+    let normalizedStatus = status;
+    
+    // Handle numeric values (fallback for old data)
+    if (typeof status === 'number') {
+      normalizedStatus = status === 1 ? 'Active' : status === 2 ? 'Cancelled' : status === 3 ? 'Pending' : String(status);
+    } else if (typeof status === 'string') {
+      // Normalize string to PascalCase (handle both "Active" and "active")
+      normalizedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    }
+
+    switch (normalizedStatus) {
       case 'Active':
         return {
           label: 'Onaylandı',
@@ -30,7 +41,7 @@ const StatusBadge = ({ status }) => {
         };
       default:
         return {
-          label: status || 'Bilinmiyor',
+          label: String(status) || 'Bilinmiyor',
           color: '#757575',
           bgColor: '#757575',
           textColor: '#ffffff',

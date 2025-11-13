@@ -41,6 +41,8 @@ try
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.WriteIndented = true;
+            // Serialize enums as strings instead of numbers
+            options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
             // Add custom DateTime converter to handle Unspecified dates
             options.JsonSerializerOptions.Converters.Add(new ReservationApp.Application.Converters.UtcDateTimeJsonConverter());
         });

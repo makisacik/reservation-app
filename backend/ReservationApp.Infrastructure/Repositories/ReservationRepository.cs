@@ -267,7 +267,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             .AnyAsync(r => r.UserId == userId 
                 && r.Date.Date == dateTime.Date 
                 && r.MealTimeSlotId == mealTimeSlotId
-                && r.Status == ReservationStatus.Active, 
+                && (r.Status == ReservationStatus.Active || r.Status == ReservationStatus.Pending), 
                 cancellationToken);
     }
 

@@ -54,5 +54,17 @@ public class ReservationsController : ControllerBase
         var summary = await _reservationService.GetReservationSummaryAsync(cancellationToken);
         return Ok(summary);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<ReservationDto>> CreateReservation(
+        [FromBody] AdminCreateReservationDto dto,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin creating reservation - UserId: {UserId}, RestaurantId: {RestaurantId}, MenuId: {MenuId}, MealTimeSlotId: {MealTimeSlotId}, Date: {Date}",
+            dto.UserId, dto.RestaurantId, dto.MenuId, dto.MealTimeSlotId, dto.Date);
+        
+        var reservation = await _reservationService.AdminCreateAsync(dto, cancellationToken);
+        return CreatedAtAction(nameof(GetReservations), new { id = reservation.Id }, reservation);
+    }
 }
 

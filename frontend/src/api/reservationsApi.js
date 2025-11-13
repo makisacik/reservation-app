@@ -71,5 +71,11 @@ export const reservationsApi = {
     const response = await axiosClient.get('/admin/reservations/summary');
     return response.data;
   },
+
+  // Admin create reservation
+  adminCreateReservation: async (reservationData) => {
+    const response = await axiosClient.post('/admin/reservations', reservationData);
+    return response.data;
+  },
 };
 

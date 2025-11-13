@@ -32,6 +32,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reservationsApi } from '../api/reservationsApi';
 import StatusBadge from '../components/reservations/StatusBadge';
+import CreateReservationModal from '../components/reservations/CreateReservationModal';
+import ReservationDetailModal from '../components/reservations/ReservationDetailModal';
+import ConfirmApprovalDialog from '../components/reservations/ConfirmApprovalDialog';
 
 // Turkish day names and months
 const TURKISH_DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
@@ -75,6 +78,11 @@ const AdminReservations = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
+  const [reservationToApprove, setReservationToApprove] = useState(null);
 
   // Default date range: current month
   const today = new Date();
@@ -123,6 +131,9 @@ const AdminReservations = () => {
       queryClient.invalidateQueries(['admin-reservations']);
       queryClient.invalidateQueries(['reservation-summary']);
       setSnackbar({ open: true, message: 'Rezervasyon başarıyla onaylandı', severity: 'success' });
+      // Close dialog after successful approval
+      setApprovalDialogOpen(false);
+      setReservationToApprove(null);
     },
     onError: (error) => {
       setSnackbar({
@@ -130,18 +141,49 @@ const AdminReservations = () => {
         message: error.response?.data?.message || 'Rezervasyon onaylanırken bir hata oluştu',
         severity: 'error',
       });
+      // Keep dialog open on error so user can try again or cancel
     },
   });
 
-  const handleApprove = (id) => {
-    if (window.confirm('Bu rezervasyonu onaylamak istediğinize emin misiniz?')) {
-      approveMutation.mutate(id);
+  const handleApproveClick = (reservation) => {
+    setReservationToApprove(reservation);
+    setApprovalDialogOpen(true);
+  };
+
+  const handleConfirmApproval = () => {
+    if (reservationToApprove) {
+      approveMutation.mutate(reservationToApprove.id);
+    }
+  };
+
+  const handleCloseApprovalDialog = () => {
+    if (!approveMutation.isPending) {
+      setApprovalDialogOpen(false);
+      setReservationToApprove(null);
     }
   };
 
   const handleExport = () => {
     // TODO: Implement export functionality
     setSnackbar({ open: true, message: 'Dışa aktarma özelliği yakında eklenecek', severity: 'info' });
+  };
+
+  const handleOpenCreateModal = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setCreateModalOpen(false);
+  };
+
+  const handleOpenDetailModal = (reservationId) => {
+    setSelectedReservationId(reservationId);
+    setDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setDetailModalOpen(false);
+    setSelectedReservationId(null);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -171,6 +213,7 @@ const AdminReservations = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={handleOpenCreateModal}
           sx={{
             bgcolor: '#0A1C59',
             color: 'white',
@@ -410,10 +453,7 @@ const AdminReservations = () => {
                       <Link
                         component="button"
                         variant="body2"
-                        onClick={() => {
-                          // TODO: Navigate to detail page
-                          setSnackbar({ open: true, message: 'Detay sayfası yakında eklenecek', severity: 'info' });
-                        }}
+                        onClick={() => handleOpenDetailModal(reservation.id)}
                         sx={{ color: '#0A1C59', textDecoration: 'none', cursor: 'pointer' }}
                       >
                         Detay
@@ -422,7 +462,7 @@ const AdminReservations = () => {
                         <Button
                           size="small"
                           variant="contained"
-                          onClick={() => handleApprove(reservation.id)}
+                          onClick={() => handleApproveClick(reservation)}
                           disabled={approveMutation.isPending}
                           sx={{
                             bgcolor: '#1976d2',
@@ -473,6 +513,31 @@ const AdminReservations = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Create Reservation Modal */}
+      <CreateReservationModal
+        open={createModalOpen}
+        onClose={handleCloseCreateModal}
+        onSuccess={() => {
+          setSnackbar({ open: true, message: 'Rezervasyon başarıyla oluşturuldu', severity: 'success' });
+        }}
+      />
+
+      {/* Reservation Detail Modal */}
+      <ReservationDetailModal
+        open={detailModalOpen}
+        onClose={handleCloseDetailModal}
+        reservationId={selectedReservationId}
+      />
+
+      {/* Confirm Approval Dialog */}
+      <ConfirmApprovalDialog
+        open={approvalDialogOpen}
+        onClose={handleCloseApprovalDialog}
+        onConfirm={handleConfirmApproval}
+        reservationNumber={reservationToApprove?.reservationNumber}
+        isLoading={approveMutation.isPending}
+      />
     </Box>
   );
 };

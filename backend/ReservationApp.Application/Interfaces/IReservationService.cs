@@ -14,5 +14,6 @@ public interface IReservationService
     Task AdminCancelAsync(Guid id, CancellationToken cancellationToken = default);
     Task AdminApproveAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ReservationSummaryDto> GetReservationSummaryAsync(CancellationToken cancellationToken = default);
+    Task<ReservationDto> AdminCreateAsync(AdminCreateReservationDto dto, CancellationToken cancellationToken = default);
 }
 

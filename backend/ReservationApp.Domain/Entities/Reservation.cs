@@ -49,6 +49,7 @@ public class Reservation
         // Store only date part, explicitly as UTC for PostgreSQL compatibility
         Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
+        // All new reservations default to Pending status - must be approved by admin
         Status = ReservationStatus.Pending;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;

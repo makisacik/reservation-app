@@ -118,14 +118,23 @@ const MyReservations = () => {
   };
 
   // Filter and sort reservations based on active tab
+  // Note: Pending/Confirmed system only affects admin section.
+  // Users should see all their reservations (Pending, Active, and past ones) in their personal section.
   const filteredReservations = useMemo(() => {
     let filtered = enrichedReservations.filter((reservation) => {
       if (activeTab === 'active') {
-        // Active: Status is Active (1) AND date is today or future
-        return reservation.status === 1 && !reservation.isPastReservation;
+        // Active: Show all non-cancelled reservations (Pending=3 or Active=1) that are not in the past
+        // This ensures users see their pending reservations that are waiting for admin approval
+        const isPending = reservation.status === 3 || reservation.status === 'Pending';
+        const isActive = reservation.status === 1 || reservation.status === 'Active';
+        const isCancelled = reservation.status === 2 || reservation.status === 'Cancelled';
+        
+        // Show if (Pending OR Active) AND not cancelled AND not past
+        return (isPending || isActive) && !isCancelled && !reservation.isPastReservation;
       } else {
-        // Past: Status is Cancelled (2) OR date is in the past
-        return reservation.status === 2 || reservation.isPastReservation;
+        // Past: Show cancelled reservations OR reservations that are in the past (regardless of status)
+        const isCancelled = reservation.status === 2 || reservation.status === 'Cancelled';
+        return isCancelled || reservation.isPastReservation;
       }
     });
 
