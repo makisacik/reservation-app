@@ -28,12 +28,11 @@ class ProfileViewModel: ObservableObject {
     
     init(
         authRepository: AuthRepositoryProtocol = AuthRepository(),
-        keychainManager: KeychainManager = KeychainManager.shared,
-        authStateManager: AuthStateManager = AuthStateManager.shared
+        keychainManager: KeychainManager = KeychainManager.shared
     ) {
         self.authRepository = authRepository
         self.keychainManager = keychainManager
-        self.authStateManager = authStateManager
+        self.authStateManager = AuthStateManager.shared
     }
     
     func loadProfile() async {
@@ -88,8 +87,8 @@ class ProfileViewModel: ObservableObject {
         self.email = ""
         self.department = ""
         
-        // Update authentication state - this will trigger RootView to show OnboardingView
-        authStateManager.setAuthenticated(false)
+        // Clear user from AuthStateManager - this will trigger RootView to show OnboardingView
+        authStateManager.clearUser()
     }
 }
 

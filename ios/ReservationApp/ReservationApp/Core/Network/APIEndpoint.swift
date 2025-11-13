@@ -23,6 +23,20 @@ enum APIEndpoint {
     case mealTimeSlots
     case updateUserProfile
     
+    // Admin Dashboard
+    case adminDashboardSummary
+    case adminPopularMeals
+    case adminTodayReservations
+    case adminWeeklyTrends
+    case adminDailySummary
+    
+    // Admin Reservations
+    case adminReservations
+    case adminApproveReservation(id: String)
+    case adminCancelReservation(id: String)
+    case reservationSummary
+    case getReservationById(id: String)
+    
     var path: String {
         switch self {
         case .login:
@@ -53,6 +67,26 @@ enum APIEndpoint {
             return "/mealtimes"
         case .updateUserProfile:
             return "/users/me"
+        case .adminDashboardSummary:
+            return "/admin/dashboard/summary"
+        case .adminPopularMeals:
+            return "/admin/dashboard/popular-meals"
+        case .adminTodayReservations:
+            return "/admin/dashboard/today-reservations"
+        case .adminWeeklyTrends:
+            return "/admin/dashboard/weekly"
+        case .adminDailySummary:
+            return "/admin/dashboard/daily-summary"
+        case .adminReservations:
+            return "/admin/reservations"
+        case .adminApproveReservation(let id):
+            return "/admin/reservations/\(id)/approve"
+        case .adminCancelReservation(let id):
+            return "/admin/reservations/\(id)/cancel"
+        case .reservationSummary:
+            return "/admin/reservations/summary"
+        case .getReservationById(let id):
+            return "/reservations/\(id)"
         }
     }
     
@@ -60,9 +94,9 @@ enum APIEndpoint {
         switch self {
         case .login, .register, .createReservation:
             return "POST"
-        case .updateUserProfile:
+        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation:
             return "PUT"
-        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots:
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById:
             return "GET"
         }
     }

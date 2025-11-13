@@ -14,6 +14,7 @@ enum NetworkError: LocalizedError {
     case serverError(Int, String?)
     case unauthorized
     case networkError(Error)
+    case timeout
     case unknown
     
     var errorDescription: String? {
@@ -30,6 +31,8 @@ enum NetworkError: LocalizedError {
             return "Yetkisiz erişim. Lütfen tekrar giriş yapın."
         case .networkError(let error):
             return "Ağ hatası: \(error.localizedDescription)"
+        case .timeout:
+            return "İstek zaman aşımına uğradı. Lütfen tekrar deneyin."
         case .unknown:
             return "Bilinmeyen bir hata oluştu"
         }

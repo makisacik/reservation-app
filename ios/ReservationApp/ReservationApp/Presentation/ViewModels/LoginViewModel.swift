@@ -89,6 +89,11 @@ class LoginViewModel: ObservableObject {
             // Success - set user and notify
             currentUser = user
             isAuthenticated = true
+            
+            // Set user in AuthStateManager immediately so RootView can route correctly
+            let authState = AuthStateManager.shared
+            authState.setCurrentUser(user)
+            
             onLoginSuccess?(user)
             
         } catch let error as NetworkError {

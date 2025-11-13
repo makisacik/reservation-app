@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class APIClient {
     nonisolated static let shared = APIClient()
@@ -21,8 +22,9 @@ class APIClient {
         self.keychainManager = keychainManager
         
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
+        // Increased timeout for admin endpoints that may process large datasets
+        configuration.timeoutIntervalForRequest = 60
+        configuration.timeoutIntervalForResource = 120
         self.session = URLSession(configuration: configuration)
     }
     
@@ -74,6 +76,8 @@ class APIClient {
             // Handle 401 Unauthorized
             if httpResponse.statusCode == 401 {
                 keychainManager.deleteToken()
+                // Clear user from AuthStateManager
+                AuthStateManager.shared.clearUser()
                 onUnauthorized?()
                 throw NetworkError.unauthorized
             }
@@ -104,6 +108,12 @@ class APIClient {
             }
         } catch let error as NetworkError {
             throw error
+        } catch let urlError as URLError {
+            // Handle specific URL errors, especially timeouts
+            if urlError.code == .timedOut {
+                throw NetworkError.timeout
+            }
+            throw NetworkError.networkError(urlError)
         } catch {
             throw NetworkError.networkError(error)
         }

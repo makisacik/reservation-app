@@ -28,12 +28,15 @@ struct StatCardView: View {
                 Text(value)
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                 Spacer()
                 Image(systemName: icon)
                     .font(.system(size: 24))
                     .foregroundColor(color)
             }
         }
+        .frame(height: 120)
         .padding(ThemeManager.shared.spacing.md)
         .background(AppColors.backgroundPaper)
         .cornerRadius(ThemeManager.shared.borderRadius.card.value)
