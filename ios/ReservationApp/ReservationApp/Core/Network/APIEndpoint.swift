@@ -37,6 +37,13 @@ enum APIEndpoint {
     case reservationSummary
     case getReservationById(id: String)
     
+    // Admin Meals
+    case adminMeals
+    case adminMeal(id: String)
+    case adminCreateMeal
+    case adminUpdateMeal(id: String)
+    case adminDeleteMeal(id: String)
+    
     var path: String {
         switch self {
         case .login:
@@ -87,16 +94,28 @@ enum APIEndpoint {
             return "/admin/reservations/summary"
         case .getReservationById(let id):
             return "/reservations/\(id)"
+        case .adminMeals:
+            return "/admin/meals"
+        case .adminMeal(let id):
+            return "/admin/meals/\(id)"
+        case .adminCreateMeal:
+            return "/admin/meals"
+        case .adminUpdateMeal(let id):
+            return "/admin/meals/\(id)"
+        case .adminDeleteMeal(let id):
+            return "/admin/meals/\(id)"
         }
     }
     
     var method: String {
         switch self {
-        case .login, .register, .createReservation:
+        case .login, .register, .createReservation, .adminCreateMeal:
             return "POST"
-        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation:
+        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation, .adminUpdateMeal:
             return "PUT"
-        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById:
+        case .adminDeleteMeal:
+            return "DELETE"
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById, .adminMeals, .adminMeal:
             return "GET"
         }
     }

@@ -40,16 +40,6 @@ struct AdminTabView: View {
 }
 
 // Placeholder views for other tabs (to be implemented in later phases)
-struct MenuManagementView: View {
-    var body: some View {
-        VStack {
-            Text("Menu Management")
-                .font(AppTypography.h4())
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.backgroundPage)
-    }
-}
 
 struct UsersManagementView: View {
     var body: some View {

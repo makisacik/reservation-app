@@ -78,11 +78,22 @@ struct UpdateUserRequest: Codable {
 }
 
 struct CreateMealRequest: Codable {
-    // Will be implemented when meal management is added
+    let name: String
+    let categoryId: String
+    let restaurantId: String
+    let description: String?
+    let price: Double?
+    let kcal: Int?
+    let imageUrl: String?
 }
 
 struct UpdateMealRequest: Codable {
-    // Will be implemented when meal management is added
+    let name: String
+    let categoryId: String
+    let description: String?
+    let price: Double?
+    let kcal: Int?
+    let imageUrl: String?
 }
 
 struct AdminCreateReservationRequest: Codable {

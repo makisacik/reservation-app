@@ -155,26 +155,49 @@ class AdminRepository: AdminRepositoryProtocol {
         throw NetworkError.unknown
     }
     
-    // MARK: - Meals methods (to be implemented in later phases)
+    // MARK: - Meals methods
     
     func getAdminMeals(restaurantId: String?, categoryId: String?) async throws -> [Meal] {
-        // TODO: Implement when menu management view is added
-        throw NetworkError.unknown
+        var queryParams: [String: String] = [:]
+
+        if let restaurantId = restaurantId {
+            queryParams["restaurantId"] = restaurantId
+        }
+        if let categoryId = categoryId {
+            queryParams["categoryId"] = categoryId
+        }
+
+        return try await apiClient.request(
+            endpoint: .adminMeals,
+            queryParams: queryParams.isEmpty ? nil : queryParams,
+            responseType: [Meal].self
+        )
     }
     
     func createMeal(mealData: CreateMealRequest) async throws -> Meal {
-        // TODO: Implement when menu management view is added
-        throw NetworkError.unknown
+        return try await apiClient.request(
+            endpoint: .adminCreateMeal,
+            method: "POST",
+            body: mealData,
+            responseType: Meal.self
+        )
     }
     
     func updateMeal(id: String, mealData: UpdateMealRequest) async throws -> Meal {
-        // TODO: Implement when menu management view is added
-        throw NetworkError.unknown
+        return try await apiClient.request(
+            endpoint: .adminUpdateMeal(id: id),
+            method: "PUT",
+            body: mealData,
+            responseType: Meal.self
+        )
     }
     
     func deleteMeal(id: String) async throws {
-        // TODO: Implement when menu management view is added
-        throw NetworkError.unknown
+        _ = try await apiClient.request(
+            endpoint: .adminDeleteMeal(id: id),
+            method: "DELETE",
+            responseType: EmptyResponse.self
+        )
     }
 }
 
