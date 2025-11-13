@@ -21,8 +21,9 @@ public class ReservationControllerTests
     public ReservationControllerTests()
     {
         _serviceMock = new Mock<IReservationService>();
+        var timezoneServiceMock = new Mock<ITimezoneService>();
         _loggerMock = new Mock<ILogger<ReservationController>>();
-        _controller = new ReservationController(_serviceMock.Object, _loggerMock.Object);
+        _controller = new ReservationController(_serviceMock.Object, timezoneServiceMock.Object, _loggerMock.Object);
         
         // Setup controller context with user claims
         var userId = Guid.NewGuid();

@@ -59,5 +59,17 @@ export const reservationsApi = {
     const response = await axiosClient.put(`/admin/reservations/${id}/cancel`);
     return response.data;
   },
+
+  // Admin approve reservation
+  approveReservation: async (id) => {
+    const response = await axiosClient.put(`/admin/reservations/${id}/approve`);
+    return response.data;
+  },
+
+  // Get reservation summary statistics
+  getReservationSummary: async () => {
+    const response = await axiosClient.get('/admin/reservations/summary');
+    return response.data;
+  },
 };
 

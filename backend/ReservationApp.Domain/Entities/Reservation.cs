@@ -12,7 +12,7 @@ public class Reservation
     public int MealTimeSlotId { get; private set; }
     public DateTime Date { get; private set; }
     public bool Appetizer { get; private set; }
-    public ReservationStatus Status { get; private set; } = ReservationStatus.Active;
+    public ReservationStatus Status { get; private set; } = ReservationStatus.Pending;
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
@@ -49,7 +49,7 @@ public class Reservation
         // Store only date part, explicitly as UTC for PostgreSQL compatibility
         Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
-        Status = ReservationStatus.Active;
+        Status = ReservationStatus.Pending;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
 
@@ -71,6 +71,17 @@ public class Reservation
         UpdatedAt = DateTime.UtcNow;
 
         Validate();
+    }
+
+    public void Approve()
+    {
+        if (Status != ReservationStatus.Pending)
+        {
+            throw new DomainException("Only pending reservations can be approved.");
+        }
+
+        Status = ReservationStatus.Active;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Cancel()

@@ -243,16 +243,56 @@ public class ReservationService : IReservationService
         await _reservationRepository.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AdminApproveAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
+        if (reservation == null)
+        {
+            throw new NotFoundException($"Reservation with id {id} not found.");
+        }
+
+        reservation.Approve();
+        await _reservationRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<ReservationSummaryDto> GetReservationSummaryAsync(CancellationToken cancellationToken = default)
+    {
+        var todayCount = await _reservationRepository.CountTodayReservationsAsync(cancellationToken);
+        var thisWeekCount = await _reservationRepository.CountThisWeekReservationsAsync(cancellationToken);
+        var thisMonthCount = await _reservationRepository.CountThisMonthReservationsAsync(cancellationToken);
+        var pendingCount = await _reservationRepository.CountPendingReservationsAsync(cancellationToken);
+
+        return new ReservationSummaryDto
+        {
+            TodayCount = todayCount,
+            ThisWeekCount = thisWeekCount,
+            ThisMonthCount = thisMonthCount,
+            PendingCount = pendingCount
+        };
+    }
+
     private static ReservationDto MapToDto(Reservation reservation)
     {
+        // Generate reservation number from Guid (REZ + first 8 chars uppercase, no dashes)
+        var reservationNumber = "REZ" + reservation.Id.ToString("N").Substring(0, 8).ToUpperInvariant();
+
+        // Get menu name - join all meal names with " & " or use first meal name
+        var menuName = string.Empty;
+        if (reservation.Menu?.Meals != null && reservation.Menu.Meals.Any())
+        {
+            menuName = string.Join(" & ", reservation.Menu.Meals.Select(m => m.Name));
+        }
+
         return new ReservationDto
         {
             Id = reservation.Id,
+            ReservationNumber = reservationNumber,
             UserId = reservation.UserId,
             UserName = reservation.User?.Name ?? string.Empty,
             RestaurantId = reservation.RestaurantId,
             RestaurantName = reservation.Restaurant?.Name ?? string.Empty,
             MenuId = reservation.MenuId,
+            MenuName = menuName,
             MenuDate = reservation.Menu?.Date ?? reservation.Date,
             MealTimeSlotId = reservation.MealTimeSlotId,
             MealTimeSlotName = reservation.MealTimeSlot?.Name ?? string.Empty,

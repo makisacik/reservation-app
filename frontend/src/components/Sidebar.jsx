@@ -33,6 +33,7 @@ const userMenuItems = [
 const adminMenuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: ROUTES.ADMIN_DASHBOARD },
   { text: 'Menü Yönetimi', icon: <RestaurantMenuIcon />, path: ROUTES.ADMIN_MENU_MANAGEMENT },
+  { text: 'Rezervasyonlar', icon: <CalendarTodayIcon />, path: ROUTES.ADMIN_RESERVATIONS },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: ROUTES.ADMIN_USERS },
   { text: 'Profilim', icon: <PersonIcon />, path: ROUTES.SETTINGS },
 ];
@@ -82,7 +83,8 @@ const Sidebar = () => {
                 item.path === ROUTES.MY_RESERVATIONS || 
                 item.path === ROUTES.ADMIN_USERS ||
                 item.path === ROUTES.ADMIN_DASHBOARD ||
-                item.path === ROUTES.ADMIN_MENU_MANAGEMENT
+                item.path === ROUTES.ADMIN_MENU_MANAGEMENT ||
+                item.path === ROUTES.ADMIN_RESERVATIONS
                   ? location.pathname.startsWith(item.path)
                   : location.pathname === item.path;
               return (

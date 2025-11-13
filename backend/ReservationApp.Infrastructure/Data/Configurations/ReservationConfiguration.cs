@@ -47,7 +47,7 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
                 v => v.ToString(),
                 v => (ReservationStatus)Enum.Parse(typeof(ReservationStatus), v))
             .HasMaxLength(50)
-            .HasDefaultValue(ReservationStatus.Active);
+            .HasDefaultValue(ReservationStatus.Pending);
 
         builder.Property(r => r.CreatedAt)
             .IsRequired()

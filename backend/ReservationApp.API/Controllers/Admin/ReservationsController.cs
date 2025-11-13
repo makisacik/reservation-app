@@ -38,5 +38,21 @@ public class ReservationsController : ControllerBase
         await _reservationService.AdminCancelAsync(id, cancellationToken);
         return NoContent();
     }
+
+    [HttpPut("{id}/approve")]
+    public async Task<IActionResult> ApproveReservation(Guid id, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin approving reservation with id: {Id}", id);
+        await _reservationService.AdminApproveAsync(id, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpGet("summary")]
+    public async Task<ActionResult<ReservationSummaryDto>> GetReservationSummary(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Admin getting reservation summary");
+        var summary = await _reservationService.GetReservationSummaryAsync(cancellationToken);
+        return Ok(summary);
+    }
 }
 

@@ -4,6 +4,7 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_MENU_MANAGEMENT: '/admin/menu-management',
+  ADMIN_RESERVATIONS: '/admin/reservations',
   RESERVATIONS: '/reservations',
   MY_RESERVATIONS: '/reservations/my',
   USERS: '/users',

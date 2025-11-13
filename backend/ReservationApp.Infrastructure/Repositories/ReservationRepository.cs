@@ -36,6 +36,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                 .Include(r => r.User)
                 .Include(r => r.Restaurant)
                 .Include(r => r.Menu)
+                    .ThenInclude(m => m.Meals)
                 .Include(r => r.MealTimeSlot)
                 .AsQueryable();
 
@@ -137,6 +138,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                 .Include(r => r.User)
                 .Include(r => r.Restaurant)
                 .Include(r => r.Menu)
+                    .ThenInclude(m => m.Meals)
                 .Include(r => r.MealTimeSlot)
                 .AsQueryable();
 
@@ -162,6 +164,36 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             if (query.Status.HasValue)
             {
                 q = q.Where(r => r.Status == query.Status.Value);
+            }
+
+            // Search filter - search by user name, menu meal names, or reservation number (partial Guid match)
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var searchTerm = query.Search.Trim();
+                var searchLower = searchTerm.ToLower();
+                
+                // Extract Guid part from search if it starts with "REZ"
+                string? searchGuidPart = null;
+                if (searchLower.StartsWith("rez") && searchLower.Length > 3)
+                {
+                    var guidPart = searchLower.Substring(3).Replace("-", "").Replace(" ", "");
+                    if (guidPart.Length > 0)
+                    {
+                        searchGuidPart = guidPart.Length > 8 ? guidPart.Substring(0, 8) : guidPart;
+                    }
+                }
+
+                var finalSearchTerm = searchTerm;
+                var finalSearchGuidPart = searchGuidPart;
+
+                q = q.Where(r =>
+                    // Search by user name
+                    EF.Functions.ILike(r.User.Name, $"%{finalSearchTerm}%") ||
+                    // Search by menu meal names
+                    r.Menu.Meals.Any(meal => EF.Functions.ILike(meal.Name, $"%{finalSearchTerm}%")) ||
+                    // Search by reservation number (first 8 chars of Guid)
+                    (finalSearchGuidPart != null && r.Id.ToString("N").ToLower().StartsWith(finalSearchGuidPart))
+                );
             }
 
             // Order by date descending (most recent first)
@@ -206,6 +238,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
+                .ThenInclude(m => m.Meals)
             .Include(r => r.MealTimeSlot)
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
@@ -216,6 +249,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
+                .ThenInclude(m => m.Meals)
             .Include(r => r.MealTimeSlot)
             .OrderByDescending(r => r.Date)
             .ToListAsync(cancellationToken);
@@ -256,6 +290,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
+                .ThenInclude(m => m.Meals)
             .Include(r => r.MealTimeSlot)
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.Date)
@@ -269,6 +304,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
             .Include(r => r.User)
             .Include(r => r.Restaurant)
             .Include(r => r.Menu)
+                .ThenInclude(m => m.Meals)
             .Include(r => r.MealTimeSlot)
             .FirstOrDefaultAsync(r => r.Id == reservationId && r.UserId == userId, cancellationToken);
     }
@@ -277,6 +313,43 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
     {
         _dbContext.Reservations.Remove(reservation);
         await Task.CompletedTask;
+    }
+
+    public async Task<int> CountTodayReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+
+        return await _dbContext.Reservations
+            .CountAsync(r => r.Date >= today && r.Date < tomorrow, cancellationToken);
+    }
+
+    public async Task<int> CountThisWeekReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+        var dayOfWeek = (int)today.DayOfWeek;
+        var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1; // Sunday = 0, convert to Monday = 0
+        var weekStart = today.AddDays(-daysFromMonday);
+        var weekEnd = weekStart.AddDays(7);
+
+        return await _dbContext.Reservations
+            .CountAsync(r => r.Date >= weekStart && r.Date < weekEnd, cancellationToken);
+    }
+
+    public async Task<int> CountThisMonthReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+        var monthStart = new DateTime(today.Year, today.Month, 1);
+        var monthEnd = monthStart.AddMonths(1);
+
+        return await _dbContext.Reservations
+            .CountAsync(r => r.Date >= monthStart && r.Date < monthEnd, cancellationToken);
+    }
+
+    public async Task<int> CountPendingReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Reservations
+            .CountAsync(r => r.Status == ReservationStatus.Pending, cancellationToken);
     }
 }
 

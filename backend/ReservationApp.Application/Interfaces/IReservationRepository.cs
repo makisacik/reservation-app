@@ -16,5 +16,9 @@ public interface IReservationRepository
     Task<IEnumerable<Reservation>> GetUserReservationsAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Reservation?> GetUserReservationByIdAsync(Guid reservationId, Guid userId, CancellationToken cancellationToken = default);
     Task DeleteAsync(Reservation reservation, CancellationToken cancellationToken = default);
+    Task<int> CountTodayReservationsAsync(CancellationToken cancellationToken = default);
+    Task<int> CountThisWeekReservationsAsync(CancellationToken cancellationToken = default);
+    Task<int> CountThisMonthReservationsAsync(CancellationToken cancellationToken = default);
+    Task<int> CountPendingReservationsAsync(CancellationToken cancellationToken = default);
 }
 

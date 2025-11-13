@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using ReservationApp.Application.DTOs;
 using ReservationApp.Application.Interfaces;
@@ -24,7 +25,9 @@ public class ReservationServiceTests
         _settingServiceMock = new Mock<ISettingService>();
         _userRepositoryMock = new Mock<IUserRepository>();
         _emailNotificationServiceMock = new Mock<IEmailNotificationService>();
-        _service = new ReservationService(_repositoryMock.Object, _settingServiceMock.Object, _userRepositoryMock.Object, _emailNotificationServiceMock.Object);
+        var timezoneServiceMock = new Mock<ITimezoneService>();
+        var loggerMock = new Mock<ILogger<ReservationService>>();
+        _service = new ReservationService(_repositoryMock.Object, _settingServiceMock.Object, _userRepositoryMock.Object, _emailNotificationServiceMock.Object, timezoneServiceMock.Object, loggerMock.Object);
     }
 
     [Fact]

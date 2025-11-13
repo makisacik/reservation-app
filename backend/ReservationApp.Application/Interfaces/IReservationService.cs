@@ -12,5 +12,7 @@ public interface IReservationService
     Task<IEnumerable<ReservationDto>> GetMyReservationsAsync(Guid userId, CancellationToken cancellationToken = default);
     Task CancelAsync(Guid reservationId, Guid userId, CancellationToken cancellationToken = default);
     Task AdminCancelAsync(Guid id, CancellationToken cancellationToken = default);
+    Task AdminApproveAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ReservationSummaryDto> GetReservationSummaryAsync(CancellationToken cancellationToken = default);
 }
 

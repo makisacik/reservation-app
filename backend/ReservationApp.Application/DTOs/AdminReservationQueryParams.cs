@@ -11,5 +11,6 @@ public class AdminReservationQueryParams
     public Guid? RestaurantId { get; set; }
     public string? Department { get; set; }
     public ReservationStatus? Status { get; set; }
+    public string? Search { get; set; }
 }
 
