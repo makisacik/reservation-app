@@ -63,14 +63,13 @@ struct LoginView: View {
                             .font(AppTypography.body2())
                             .foregroundColor(AppColors.textSecondary)
                             .multilineTextAlignment(.center)
-                        
                         // Role Picker
                         Picker("Role", selection: $viewModel.selectedRole) {
                             ForEach(LoginRole.allCases, id: \.self) { role in
                                 Text(role.rawValue).tag(role)
                             }
                         }
-                        .pickerStyle(.menu)
+                        .pickerStyle(.segmented)
                         .padding(.vertical, AppSpacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         

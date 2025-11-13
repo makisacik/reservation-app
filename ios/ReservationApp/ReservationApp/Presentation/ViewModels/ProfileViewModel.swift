@@ -23,9 +23,17 @@ class ProfileViewModel: ObservableObject {
     @Published var department: String = ""
     
     private let authRepository: AuthRepositoryProtocol
+    private let keychainManager: KeychainManager
+    private let authStateManager: AuthStateManager
     
-    init(authRepository: AuthRepositoryProtocol = AuthRepository()) {
+    init(
+        authRepository: AuthRepositoryProtocol = AuthRepository(),
+        keychainManager: KeychainManager = KeychainManager.shared,
+        authStateManager: AuthStateManager = AuthStateManager.shared
+    ) {
         self.authRepository = authRepository
+        self.keychainManager = keychainManager
+        self.authStateManager = authStateManager
     }
     
     func loadProfile() async {
@@ -68,6 +76,20 @@ class ProfileViewModel: ObservableObject {
         }
         
         isSaving = false
+    }
+    
+    func logout() {
+        // Delete token from keychain (following frontend pattern - no API call needed)
+        keychainManager.deleteToken()
+        
+        // Clear user data
+        self.user = nil
+        self.name = ""
+        self.email = ""
+        self.department = ""
+        
+        // Update authentication state - this will trigger RootView to show OnboardingView
+        authStateManager.setAuthenticated(false)
     }
 }
 

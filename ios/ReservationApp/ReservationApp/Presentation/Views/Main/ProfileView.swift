@@ -11,68 +11,98 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var showErrorAlert = false
     @State private var showSuccessAlert = false
+    @State private var showLogoutConfirmation = false
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: ThemeManager.shared.spacing.lg) {
-                // Profile Card
-                ProfileCardView(user: viewModel.user)
-                
-                // Form
-                ProfileFormView(
-                    name: $viewModel.name,
-                    email: $viewModel.email,
-                    department: $viewModel.department
-                )
-                
-                // Action Buttons
-                HStack(spacing: ThemeManager.shared.spacing.md) {
-                    Button("İptal") {
-                        // Reset form
-                        Task {
-                            await viewModel.loadProfile()
-                        }
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: ThemeManager.shared.spacing.lg) {
+                    // Profile Card
+                    ProfileCardView(user: viewModel.user)
                     
-                    Button("Kaydet") {
-                        Task {
-                            await viewModel.saveProfile()
+                    // Form
+                    ProfileFormView(
+                        name: $viewModel.name,
+                        email: $viewModel.email,
+                        department: $viewModel.department
+                    )
+                    
+                    // Action Buttons
+                    HStack(spacing: ThemeManager.shared.spacing.md) {
+                        Button("İptal") {
+                            // Reset form
+                            Task {
+                                await viewModel.loadProfile()
+                            }
                         }
+                        .buttonStyle(SecondaryButtonStyle())
+                        
+                        Button("Kaydet") {
+                            Task {
+                                await viewModel.saveProfile()
+                            }
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isSaving)
                     }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .disabled(viewModel.isSaving)
+                    .padding(.horizontal, ThemeManager.shared.spacing.lg)
                 }
-                .padding(.horizontal, ThemeManager.shared.spacing.lg)
+                .padding(ThemeManager.shared.spacing.md)
             }
-            .padding(ThemeManager.shared.spacing.md)
-        }
-        .background(AppColors.backgroundPage)
-        .task {
-            await viewModel.loadProfile()
-        }
-        .onChange(of: viewModel.errorMessage) { _, newValue in
-            showErrorAlert = newValue != nil
-        }
-        .onChange(of: viewModel.successMessage) { _, newValue in
-            showSuccessAlert = newValue != nil
-        }
-        .alert("Hata", isPresented: $showErrorAlert) {
-            Button("Tamam") {
-                viewModel.errorMessage = nil
+            .background(AppColors.backgroundPage)
+            .navigationTitle("Profil")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showLogoutConfirmation = true
+                    }) {
+                        Text("Çıkış")
+                            .foregroundColor(AppColors.errorMain)
+                            .font(AppTypography.button())
+                    }
+                }
             }
-        } message: {
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
+            .task {
+                await viewModel.loadProfile()
             }
-        }
-        .alert("Başarılı", isPresented: $showSuccessAlert) {
-            Button("Tamam") {
-                viewModel.successMessage = nil
+            .onChange(of: viewModel.errorMessage) { _, newValue in
+                showErrorAlert = newValue != nil
             }
-        } message: {
-            if let successMessage = viewModel.successMessage {
-                Text(successMessage)
+            .onChange(of: viewModel.successMessage) { _, newValue in
+                showSuccessAlert = newValue != nil
+            }
+            .alert("Hata", isPresented: $showErrorAlert) {
+                Button("Tamam") {
+                    viewModel.errorMessage = nil
+                }
+            } message: {
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                }
+            }
+            .alert("Başarılı", isPresented: $showSuccessAlert) {
+                Button("Tamam") {
+                    viewModel.successMessage = nil
+                }
+            } message: {
+                if let successMessage = viewModel.successMessage {
+                    Text(successMessage)
+                }
+            }
+            .confirmationDialog(
+                "Çıkış Yap",
+                isPresented: $showLogoutConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Çıkış Yap", role: .destructive) {
+                    viewModel.logout()
+                }
+                Button("İptal", role: .cancel) {
+                    // Cancel action
+                }
+            } message: {
+                Text("Çıkış yapmak istediğinizden emin misiniz?")
             }
         }
     }
