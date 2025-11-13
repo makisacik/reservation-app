@@ -34,9 +34,9 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to={ROUTES.LOGIN} replace />;
 };
 
-// Public route component (redirects to dashboard if already authenticated)
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+// Admin-only route component
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -53,7 +53,75 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated ? <Navigate to={ROUTES.DASHBOARD} replace /> : children;
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />;
+  }
+
+  return children;
+};
+
+// User-only route component (non-admin)
+const UserRoute = ({ children }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (isAdmin) {
+    return <Navigate to={ROUTES.ADMIN_DASHBOARD} replace />;
+  }
+
+  return children;
+};
+
+// Public route component (redirects based on role if already authenticated)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isAuthenticated) {
+    return isAdmin ? (
+      <Navigate to={ROUTES.ADMIN_DASHBOARD} replace />
+    ) : (
+      <Navigate to={ROUTES.DASHBOARD} replace />
+    );
+  }
+
+  return children;
 };
 
 // Layout component that wraps protected routes with Navbar and Sidebar
@@ -100,41 +168,61 @@ const AppRoutes = () => {
       <Route
         path={ROUTES.DASHBOARD}
         element={
-          <ProtectedRoute>
+          <UserRoute>
             <AppLayout>
               <HomePage />
             </AppLayout>
-          </ProtectedRoute>
+          </UserRoute>
+        }
+      />
+      <Route
+        path={ROUTES.ADMIN_DASHBOARD}
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <Dashboard />
+            </AppLayout>
+          </AdminRoute>
         }
       />
       <Route
         path={ROUTES.RESERVATIONS}
         element={
-          <ProtectedRoute>
+          <UserRoute>
             <AppLayout>
               <MakeReservation />
             </AppLayout>
-          </ProtectedRoute>
+          </UserRoute>
         }
       />
       <Route
         path={ROUTES.MY_RESERVATIONS}
         element={
-          <ProtectedRoute>
+          <UserRoute>
             <AppLayout>
               <MyReservations />
             </AppLayout>
-          </ProtectedRoute>
+          </UserRoute>
         }
       />
       <Route
         path={ROUTES.USERS}
         element={
-          <ProtectedRoute>
+          <UserRoute>
             <AppLayout>
               <Users />
             </AppLayout>
-          </ProtectedRoute>
+          </UserRoute>
+        }
+      />
+      <Route
+        path={ROUTES.ADMIN_USERS}
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <Users />
+            </AppLayout>
+          </AdminRoute>
         }
       />
       <Route

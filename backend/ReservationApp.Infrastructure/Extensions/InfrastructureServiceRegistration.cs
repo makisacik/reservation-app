@@ -28,6 +28,7 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IMealTimeSlotRepository, MealTimeSlotRepository>();
         services.AddScoped<ISettingRepository, SettingRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<IMenuCategoryRepository, MenuCategoryRepository>();
 
         return services;
     }

@@ -55,9 +55,16 @@ public static class DbSeeder
         }
 
         // Reservation settings
-        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "MaxWeeklyReservations"))
+        var maxWeeklyReservationsSetting = await context.SystemSettings.FirstOrDefaultAsync(s => s.Category == "Reservation" && s.Key == "MaxWeeklyReservations");
+        if (maxWeeklyReservationsSetting == null)
         {
-            settingsToSeed.Add(new SystemSetting("Reservation", "MaxWeeklyReservations", "2", SettingType.Int, "Maximum number of reservations a user can make per week"));
+            settingsToSeed.Add(new SystemSetting("Reservation", "MaxWeeklyReservations", "5", SettingType.Int, "Maximum number of reservations a user can make per week"));
+        }
+        else if (int.TryParse(maxWeeklyReservationsSetting.Value, out var currentValue) && currentValue < 5)
+        {
+            // Update existing setting if it's lower than the new default
+            maxWeeklyReservationsSetting.UpdateValue("5");
+            await context.SaveChangesAsync();
         }
         if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "AllowPastReservations"))
         {

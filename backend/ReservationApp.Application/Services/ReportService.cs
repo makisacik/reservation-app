@@ -43,5 +43,27 @@ public class ReportService : IReportService
 
         return await _reportRepository.GetWeeklyTrendsAsync(start, end, ReservationStatus.Active, cancellationToken);
     }
+
+    public async Task<HomePageStatsDto> GetHomePageStatsAsync(CancellationToken cancellationToken = default)
+    {
+        var totalMeals = await _reportRepository.CountMealsAsync(cancellationToken);
+        var mostPopular = await _reportRepository.GetMostPopularMealNameAsync(cancellationToken);
+        var todayMenuMealsCount = await _reportRepository.CountTodayMenuMealsAsync(cancellationToken);
+        var aperatifCount = await _reportRepository.CountMealsByCategoryNameAsync("Mesai Aperatif", cancellationToken);
+
+        // Calculate preference rate: (meals in today's menu / total meals) * 100
+        // If totalMeals is 0, we should still show 0% instead of dividing by zero
+        var preferenceRate = totalMeals > 0 
+            ? (int)Math.Round((double)todayMenuMealsCount / totalMeals * 100) 
+            : 0;
+
+        return new HomePageStatsDto
+        {
+            TotalMeals = totalMeals,
+            MostPopular = mostPopular,
+            PreferenceRate = preferenceRate,
+            AperatifCount = aperatifCount
+        };
+    }
 }
 

@@ -13,20 +13,35 @@ import HomeIcon from '@mui/icons-material/Home';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import HistoryIcon from '@mui/icons-material/History';
 import PersonIcon from '@mui/icons-material/Person';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
 import { ROUTES } from '../utils/constants';
+import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 240;
 
-const menuItems = [
+// User menu items (non-admin)
+const userMenuItems = [
   { text: 'Ana Sayfa', icon: <HomeIcon />, path: ROUTES.DASHBOARD },
   { text: 'Rezervasyon Yap', icon: <CalendarTodayIcon />, path: ROUTES.RESERVATIONS },
   { text: 'Rezervasyonlarım', icon: <HistoryIcon />, path: ROUTES.MY_RESERVATIONS },
   { text: 'Profilim', icon: <PersonIcon />, path: ROUTES.SETTINGS },
 ];
 
+// Admin menu items
+const adminMenuItems = [
+  { text: 'Dashboard', icon: <DashboardIcon />, path: ROUTES.ADMIN_DASHBOARD },
+  { text: 'Kullanıcılar', icon: <PeopleIcon />, path: ROUTES.ADMIN_USERS },
+  { text: 'Profilim', icon: <PersonIcon />, path: ROUTES.SETTINGS },
+];
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin } = useAuth();
+
+  // Select menu items based on role
+  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
 
   return (
     <Drawer
@@ -59,11 +74,14 @@ const Sidebar = () => {
           <List sx={{ p: 0 }}>
             {menuItems.map((item) => {
               // Use exact match for active state to prevent multiple items highlighting
-              // For MY_RESERVATIONS, check if pathname starts with it (to handle nested routes)
+              // For routes that might have nested paths, check if pathname starts with it
               // For other routes, use exact match
-              const isActive = item.path === ROUTES.MY_RESERVATIONS
-                ? location.pathname.startsWith(ROUTES.MY_RESERVATIONS)
-                : location.pathname === item.path;
+              const isActive = 
+                item.path === ROUTES.MY_RESERVATIONS || 
+                item.path === ROUTES.ADMIN_USERS ||
+                item.path === ROUTES.ADMIN_DASHBOARD
+                  ? location.pathname.startsWith(item.path)
+                  : location.pathname === item.path;
               return (
                 <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                   <ListItemButton

@@ -145,6 +145,8 @@ const MakeReservation = () => {
       // Invalidate and refetch reservations query to update the list
       queryClient.invalidateQueries({ queryKey: ['myReservations'] });
       queryClient.invalidateQueries({ queryKey: ['reservationMenus'] });
+      // Invalidate home page stats to refresh statistics
+      queryClient.invalidateQueries({ queryKey: ['home', 'stats'] });
 
       // Show success message
       const dayCount = reservations.length;

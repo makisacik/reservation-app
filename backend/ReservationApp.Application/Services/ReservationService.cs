@@ -93,7 +93,7 @@ public class ReservationService : IReservationService
         var allowPastReservationsResult = await _settingService.GetValueAsync<bool?>("Reservation", "AllowPastReservations", null, cancellationToken);
         var allowPastReservations = allowPastReservationsResult ?? false;
         var maxWeeklyReservationsResult = await _settingService.GetValueAsync<int?>("Reservation", "MaxWeeklyReservations", null, cancellationToken);
-        var maxWeeklyReservations = maxWeeklyReservationsResult ?? 2;
+        var maxWeeklyReservations = maxWeeklyReservationsResult ?? 5;
 
         // Check past date (unless admin or setting allows)
         if (!isAdmin && !allowPastReservations && dto.Date.Date < DateTime.UtcNow.Date)

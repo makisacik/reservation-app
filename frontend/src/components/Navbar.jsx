@@ -66,7 +66,7 @@ const Navbar = () => {
                 lineHeight: 1.2,
               }}
             >
-              Personel Paneli
+              {user?.role === 'Admin' || user?.role === 1 ? 'Admin Paneli' : 'Personel Paneli'}
             </Typography>
           </Box>
         </Box>

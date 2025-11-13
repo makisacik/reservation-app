@@ -12,8 +12,9 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { useAuth } from '../context/AuthContext';
-import { ROUTES } from '../utils/constants';
+import { ROUTES, STORAGE_KEYS } from '../utils/constants';
 
 const Login = () => {
   const [role, setRole] = useState('personel');
@@ -21,7 +22,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, setAuthState } = useAuth();
   const navigate = useNavigate();
 
   const handleRoleChange = (event, newRole) => {
@@ -42,8 +43,35 @@ const Login = () => {
 
     try {
       const result = await login(email, password);
-      if (result.success) {
-        navigate(ROUTES.DASHBOARD);
+      if (result.success && result.user && result.token) {
+        const userData = result.user;
+        const userRole = userData?.role;
+        const isUserAdmin = userRole === 'Admin' || userRole === 1;
+        const selectedIsAdmin = role === 'admin';
+
+        // Check if selected role matches user's actual role BEFORE setting auth state
+        if (isUserAdmin && !selectedIsAdmin) {
+          // Clear the token that was temporarily set
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          setError('Bu hesap Admin hesabıdır. Admin bölümünden giriş yapmalısınız.');
+          setLoading(false);
+          return;
+        } else if (!isUserAdmin && selectedIsAdmin) {
+          // Clear the token that was temporarily set
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          setError('Bu hesap Personel hesabıdır. Personel bölümünden giriş yapmalısınız.');
+          setLoading(false);
+          return;
+        }
+
+        // Roles match - set auth state and navigate
+        setAuthState(result.token, userData);
+
+        if (isUserAdmin) {
+          navigate(ROUTES.ADMIN_DASHBOARD);
+        } else {
+          navigate(ROUTES.DASHBOARD);
+        }
       } else {
         setError(result.error || 'Giriş başarısız. Email ve şifrenizi kontrol edin.');
       }
@@ -86,11 +114,21 @@ const Login = () => {
         >
           {/* App Icon */}
           <Box
-            component="img"
-            src="/icon.png"
-            alt="App Icon"
-            sx={{ width: 60, height: 60, borderRadius: 2, mb: 2, mx: 'auto' }}
-          />
+            sx={{
+              width: 60,
+              height: 60,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #6B2C91 0%, #C94B4B 50%, #FF6B35 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(107, 44, 145, 0.3)',
+              mb: 2,
+              mx: 'auto',
+            }}
+          >
+            <RestaurantIcon sx={{ fontSize: 32, color: 'white' }} />
+          </Box>
 
           <Typography variant="h6" fontWeight={600} color="primary" gutterBottom>
             Yemek Rezervasyon Sistemi

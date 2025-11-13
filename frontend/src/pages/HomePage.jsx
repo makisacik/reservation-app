@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { menusApi } from '../api/menusApi';
 import { mealsApi } from '../api/mealsApi';
+import { categoriesApi } from '../api/categoriesApi';
+import { homeApi } from '../api/homeApi';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
-import { CATEGORIES, DEFAULT_CATEGORY } from '../constants/homePageConstants';
-import { generateAlertMessage, calculateStats, filterMealsByCategory } from '../utils/homePageUtils';
+import { generateAlertMessage, filterMealsByCategory } from '../utils/homePageUtils';
 import UserHeaderCard from '../components/home/UserHeaderCard';
 import StatsSection from '../components/home/StatsSection';
 import MenuSection from '../components/home/MenuSection';
@@ -15,7 +16,19 @@ import MenuSection from '../components/home/MenuSection';
 const HomePage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
+
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => categoriesApi.getCategories(),
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["home", "stats"],
+    queryFn: () => homeApi.getStats(),
+    staleTime: 0, // Always consider data stale, so it refetches when component mounts
+    gcTime: 1 * 60 * 1000, // Keep in cache for 1 minute
+    refetchOnMount: true, // Refetch when component mounts
+  });
 
   const { data: menus, isLoading: menusLoading } = useQuery({
     queryKey: ["menus", "today"],
@@ -27,19 +40,43 @@ const HomePage = () => {
     queryFn: () => mealsApi.getMeals(),
   });
 
+  // Get default category (first category or "Aylık Menü")
+  const defaultCategory = useMemo(() => {
+    if (categories && categories.length > 0) {
+      // Try to find "Aylık Menü" or use first category
+      return categories.find(c => c.name === "Aylık Menü")?.name || categories[0].name;
+    }
+    return "";
+  }, [categories]);
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  // Update selected category when defaultCategory changes
+  useEffect(() => {
+    if (defaultCategory && !selectedCategory) {
+      setSelectedCategory(defaultCategory);
+    }
+  }, [defaultCategory, selectedCategory]);
+
   const todayMenu = menus?.[0];
   const menuMeals = todayMenu?.meals || todayMenu?.Meals || [];
 
-  // Calculate stats and generate alert message
-  const stats = calculateStats(allMeals || [], menuMeals);
+  // Generate alert message
   const alertMessage = generateAlertMessage(menuMeals);
 
   // Filter meals based on selected category
   const displayedMeals = filterMealsByCategory(
     selectedCategory,
     allMeals || [],
-    menuMeals
+    menuMeals,
+    categories || []
   );
+
+  // Prepare category names for display
+  const categoryNames = useMemo(() => {
+    if (!categories) return [];
+    return categories.map(c => c.name);
+  }, [categories]);
 
   const handleReservationClick = () => {
     navigate(ROUTES.RESERVATIONS);
@@ -50,14 +87,14 @@ const HomePage = () => {
       <Box sx={{ maxWidth: "1300px", margin: "0 auto" }}>
         <UserHeaderCard user={user} alertMessage={alertMessage} />
         
-        <StatsSection stats={stats} />
+        <StatsSection stats={stats} isLoading={statsLoading} />
 
         <MenuSection
-          categories={CATEGORIES}
+          categories={categoryNames}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           meals={displayedMeals}
-          isLoading={menusLoading || mealsLoading}
+          isLoading={menusLoading || mealsLoading || categoriesLoading}
           onReservationClick={handleReservationClick}
         />
       </Box>

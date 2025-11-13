@@ -87,5 +87,49 @@ public class ReportRepository : IReportRepository
 
         return trends;
     }
+
+    public async Task<int> CountMealsByCategoryNameAsync(string categoryName, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Meals
+            .Include(m => m.Category)
+            .Where(m => m.Category.Name == categoryName)
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<string> GetMostPopularMealNameAsync(CancellationToken cancellationToken = default)
+    {
+        // Get the most popular meal from ACTUAL RESERVATIONS only
+        // This ensures the stat is calculated from real reservation data, not hardcoded or seeded
+        var popularMeals = await GetPopularMealsAsync(1, ReservationStatus.Active, cancellationToken);
+        var mostPopular = popularMeals.FirstOrDefault();
+        
+        if (mostPopular != null)
+        {
+            // Return first word of meal name (e.g., "Izgara" from "Izgara Köfte")
+            return mostPopular.MealName.Split(' ')[0];
+        }
+
+        // If no reservations exist, return empty string
+        // The stat should only show data from actual reservations, not fallback to menus or meals
+        return string.Empty;
+    }
+
+    public async Task<int> CountTodayMenuMealsAsync(CancellationToken cancellationToken = default)
+    {
+        var today = DateTime.UtcNow.Date;
+        var todayMenus = await _dbContext.Menus
+            .Include(m => m.Meals)
+            .Where(m => m.Date == today)
+            .ToListAsync(cancellationToken);
+
+        // Count unique meals across all today's menus
+        var uniqueMealIds = todayMenus
+            .SelectMany(m => m.Meals)
+            .Select(m => m.Id)
+            .Distinct()
+            .Count();
+
+        return uniqueMealIds;
+    }
 }
 

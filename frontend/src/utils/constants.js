@@ -2,9 +2,11 @@
 export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
+  ADMIN_DASHBOARD: '/admin/dashboard',
   RESERVATIONS: '/reservations',
   MY_RESERVATIONS: '/reservations/my',
   USERS: '/users',
+  ADMIN_USERS: '/admin/users',
   SETTINGS: '/settings',
 };
 

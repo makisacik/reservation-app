@@ -37,50 +37,40 @@ export const generateAlertMessage = (menuMeals = []) => {
 };
 
 /**
- * Calculate statistics from meals data
- * @param {Array} allMeals - All available meals
- * @param {Array} menuMeals - Meals in today's menu
- * @returns {Object} Stats object
- */
-export const calculateStats = (allMeals = [], menuMeals = []) => {
-  const totalMeals = allMeals.length;
-  const aperatifCount = allMeals.filter((m) => m.categoryName === "Mesai Aperatif").length;
-  
-  const mostPopularMeal = menuMeals.length > 0 
-    ? menuMeals[0]?.name?.split(" ")[0] || "Izgara"
-    : allMeals[0]?.name?.split(" ")[0] || "Izgara";
-  
-  const preferenceRate = totalMeals > 0 
-    ? Math.round((menuMeals.length / totalMeals) * 100) 
-    : 0;
-
-  return {
-    totalMeals,
-    mostPopular: mostPopularMeal,
-    preferenceRate,
-    aperatifCount,
-  };
-};
-
-/**
  * Filter meals based on selected category
- * @param {string} category - Selected category
+ * @param {string} categoryName - Selected category name
  * @param {Array} allMeals - All available meals
  * @param {Array} menuMeals - Meals in today's menu
+ * @param {Array} categories - Available categories from backend
  * @returns {Array} Filtered meals
  */
-export const filterMealsByCategory = (category, allMeals = [], menuMeals = []) => {
-  switch (category) {
-    case "Aylık Menü":
-      return menuMeals.length > 0 ? menuMeals : allMeals.slice(0, 4);
-    case "Vejetaryen & Özel":
-      return allMeals.filter((m) => m.categoryName === "Vejetaryen & Özel");
-    case "Mesai Aperatif":
-      return allMeals.filter((m) => m.categoryName === "Mesai Aperatif");
-    case "Japon Restoran":
-      return allMeals.filter((m) => m.restaurantName === "Japon Restoran");
-    default:
-      return menuMeals;
+export const filterMealsByCategory = (categoryName, allMeals = [], menuMeals = [], categories = []) => {
+  if (!categoryName) {
+    return menuMeals.length > 0 ? menuMeals : allMeals.slice(0, 4);
   }
+
+  // Find category by name
+  const category = categories.find(c => c.name === categoryName);
+  
+  if (!category) {
+    // If category not found, return today's menu meals or first 4 meals
+    return menuMeals.length > 0 ? menuMeals : allMeals.slice(0, 4);
+  }
+
+  // Special handling for "Aylık Menü" - show today's menu meals
+  if (categoryName === "Aylık Menü") {
+    return menuMeals.length > 0 ? menuMeals : allMeals.slice(0, 4);
+  }
+
+  // Filter by category ID
+  const categoryId = category.id;
+  const filteredByCategory = allMeals.filter((m) => m.categoryId === categoryId);
+
+  // If filtering by restaurant name (e.g., "Japon Restoran"), filter by restaurant name
+  if (categoryName === "Japon Restoran") {
+    return allMeals.filter((m) => m.restaurantName === "Japon Restoran");
+  }
+
+  return filteredByCategory;
 };
 

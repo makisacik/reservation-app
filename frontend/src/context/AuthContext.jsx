@@ -57,17 +57,39 @@ export const AuthProvider = ({ children }) => {
       const authToken = response.token || response.Token;
       
       if (authToken) {
-        await fetchCurrentUser(authToken);
-        return { success: true };
+        // Temporarily set token in localStorage so axios interceptor can use it
+        // This will be cleared if role doesn't match, or kept if it does
+        localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
+        
+        try {
+          // Fetch user data first without setting auth state
+          const userData = await usersApi.getCurrentUser();
+          return { success: true, user: userData, token: authToken };
+        } catch (userError) {
+          // If fetching user fails, remove the token we just set
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          throw userError;
+        }
       }
       return { success: false, error: 'Invalid credentials - no token received' };
     } catch (error) {
       console.error('Login error:', error);
       console.error('Error response:', error.response?.data); // Debug log
+      // Make sure token is cleared on error
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Login failed',
       };
+    }
+  };
+
+  const setAuthState = (authToken, userData) => {
+    if (authToken && userData) {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      setToken(authToken);
+      setUser(userData);
     }
   };
 
@@ -91,12 +113,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const isAdmin = user?.role === 'Admin' || user?.role === 1;
+
   const value = {
     user,
     token,
     isAuthenticated: !!token,
+    isAdmin,
     loading,
     login,
+    setAuthState,
     register,
     logout,
   };

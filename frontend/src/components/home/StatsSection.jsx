@@ -9,9 +9,13 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
  * StatsSection - Component for displaying statistics cards
  * 
  * @param {Object} stats - Stats object with totalMeals, mostPopular, preferenceRate, aperatifCount
+ * @param {boolean} isLoading - Loading state
  */
-const StatsSection = ({ stats }) => {
-  const { totalMeals, mostPopular, preferenceRate, aperatifCount } = stats;
+const StatsSection = ({ stats, isLoading = false }) => {
+  const { totalMeals = 0, mostPopular = "", preferenceRate = 0, aperatifCount = 0 } = stats || {};
+  
+  // Display "N/A" if mostPopular is empty (no reservations yet)
+  const displayMostPopular = mostPopular || "N/A";
 
   const statItems = [
     { 
@@ -22,7 +26,7 @@ const StatsSection = ({ stats }) => {
     },
     { 
       title: "En Popüler", 
-      value: mostPopular, 
+      value: displayMostPopular, 
       icon: <PeopleIcon />, 
       color: "#1665d8" 
     },

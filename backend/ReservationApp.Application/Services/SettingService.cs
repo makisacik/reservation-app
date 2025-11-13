@@ -125,7 +125,7 @@ public class SettingService : ISettingService
     public async Task<int> GetMaxWeeklyReservationsAsync(CancellationToken cancellationToken = default)
     {
         var result = await GetValueAsync<int?>("Reservation", "MaxWeeklyReservations", null, cancellationToken);
-        return result ?? 2;
+        return result ?? 5;
     }
 
     public async Task<bool> GetAllowPastReservationsAsync(CancellationToken cancellationToken = default)

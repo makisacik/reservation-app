@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITimezoneService, TimezoneService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+        services.AddScoped<IMenuCategoryService, MenuCategoryService>();
         services.AddHostedService<EmailNotificationWorker>();
         
         return services;
