@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 /**
@@ -12,25 +12,29 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 const AlertBanner = ({ 
   title, 
   message, 
-  bgColor = "#ffca28", 
-  textColor = "#000" 
+  bgColor, 
+  textColor 
 }) => {
+  const theme = useTheme();
+  const defaultBgColor = bgColor || theme.palette.warning.main;
+  const defaultTextColor = textColor || theme.palette.custom.text.primary;
+  
   return (
     <Box
       sx={{
-        bgcolor: bgColor,
-        color: textColor,
+        bgcolor: defaultBgColor,
+        color: defaultTextColor,
         p: 2,
         px: 3,
-        borderRadius: "20px",
+        borderRadius: theme.custom.borderRadius.card,
         maxWidth: "450px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: theme.custom.shadows.button,
       }}
     >
       <Box sx={{ display: "flex", gap: 1 }}>
         <WarningAmberIcon sx={{ mt: 0.5 }} />
         <Box>
-          <Typography sx={{ fontWeight: "bold" }}>{title}</Typography>
+          <Typography sx={{ fontWeight: theme.custom.typography.fontWeight.bold }}>{title}</Typography>
           <Typography>{message}</Typography>
         </Box>
       </Box>

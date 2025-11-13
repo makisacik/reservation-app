@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  useTheme,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
@@ -23,6 +24,7 @@ import { usersApi } from '../api/usersApi';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
+  const theme = useTheme();
   const { user: authUser, setAuthState } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -191,7 +193,7 @@ const Profile = () => {
       sx={{
         flexGrow: 1,
         p: 3,
-        bgcolor: '#F6F7FB',
+        bgcolor: theme.palette.custom.background.page,
         minHeight: 'calc(100vh - 64px)',
       }}
     >
@@ -200,8 +202,8 @@ const Profile = () => {
         <Grid item xs={12} md={6}>
           <Card
             sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.cardElevated,
               bgcolor: 'white',
               height: '100%',
             }}
@@ -210,8 +212,8 @@ const Profile = () => {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
+                  fontWeight: theme.custom.typography.fontWeight.semibold,
+                  color: theme.palette.primary.main,
                   mb: 0.5,
                 }}
               >
@@ -220,7 +222,7 @@ const Profile = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  color: '#9E9E9E',
+                  color: theme.palette.custom.text.tertiary,
                   mb: 3,
                   fontSize: '0.875rem',
                 }}
@@ -235,9 +237,9 @@ const Profile = () => {
                     width: 120,
                     height: 120,
                     bgcolor: 'transparent',
-                    background: 'linear-gradient(135deg, #FF6B35 0%, #C94B4B 100%)',
+                    background: theme.palette.custom.gradients.primary,
                     fontSize: '2.5rem',
-                    fontWeight: 600,
+                    fontWeight: theme.custom.typography.fontWeight.semibold,
                     color: 'white',
                   }}
                 >
@@ -250,8 +252,8 @@ const Profile = () => {
                 variant="h6"
                 sx={{
                   textAlign: 'center',
-                  fontWeight: 600,
-                  color: '#0A1C59',
+                  fontWeight: theme.custom.typography.fontWeight.semibold,
+                  color: theme.palette.primary.main,
                   mb: 0.5,
                 }}
               >
@@ -263,7 +265,7 @@ const Profile = () => {
                 variant="body2"
                 sx={{
                   textAlign: 'center',
-                  color: '#666',
+                  color: theme.palette.custom.text.secondary,
                   mb: 2,
                 }}
               >
@@ -275,9 +277,9 @@ const Profile = () => {
                 <Chip
                   label={getRoleDisplayName(displayUser.role)}
                   sx={{
-                    bgcolor: '#1665d8',
+                    bgcolor: theme.palette.primary.light,
                     color: 'white',
-                    fontWeight: 500,
+                    fontWeight: theme.custom.typography.fontWeight.medium,
                     fontSize: '0.75rem',
                     height: '24px',
                   }}
@@ -286,9 +288,9 @@ const Profile = () => {
                   <Chip
                     label={displayUser.department}
                     sx={{
-                      bgcolor: '#E0E0E0',
-                      color: '#666',
-                      fontWeight: 500,
+                      bgcolor: theme.palette.custom.border.default,
+                      color: theme.palette.custom.text.secondary,
+                      fontWeight: theme.custom.typography.fontWeight.medium,
                       fontSize: '0.75rem',
                       height: '24px',
                     }}
@@ -307,11 +309,11 @@ const Profile = () => {
                     mb: 1.5,
                   }}
                 >
-                  <CalendarTodayIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
+                  <CalendarTodayIcon sx={{ fontSize: 18, color: theme.palette.custom.text.tertiary }} />
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#666',
+                      color: theme.palette.custom.text.secondary,
                       fontSize: '0.875rem',
                     }}
                   >
@@ -329,11 +331,11 @@ const Profile = () => {
                   gap: 1,
                 }}
               >
-                <LocationOnIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
+                <LocationOnIcon sx={{ fontSize: 18, color: theme.palette.custom.text.tertiary }} />
                 <Typography
                   variant="body2"
                   sx={{
-                    color: '#666',
+                    color: theme.palette.custom.text.secondary,
                     fontSize: '0.875rem',
                   }}
                 >
@@ -348,8 +350,8 @@ const Profile = () => {
         <Grid item xs={12} md={6}>
           <Card
             sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.cardElevated,
               bgcolor: 'white',
               height: '100%',
             }}
@@ -358,8 +360,8 @@ const Profile = () => {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
+                  fontWeight: theme.custom.typography.fontWeight.semibold,
+                  color: theme.palette.primary.main,
                   mb: 3,
                 }}
               >
@@ -379,7 +381,7 @@ const Profile = () => {
                         edge="start"
                         sx={{
                           mr: 1,
-                          color: '#9E9E9E',
+                          color: theme.palette.custom.text.tertiary,
                         }}
                         disabled
                       >
@@ -389,19 +391,19 @@ const Profile = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
+                      borderRadius: theme.custom.borderRadius.input,
                       '& fieldset': {
-                        borderColor: '#E0E0E0',
+                        borderColor: theme.palette.custom.border.default,
                       },
                       '&:hover fieldset': {
-                        borderColor: '#0A1C59',
+                        borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
+                        borderColor: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
+                      color: theme.palette.primary.main,
                     },
                   }}
                 />
@@ -420,7 +422,7 @@ const Profile = () => {
                         edge="start"
                         sx={{
                           mr: 1,
-                          color: '#9E9E9E',
+                          color: theme.palette.custom.text.tertiary,
                         }}
                         disabled
                       >
@@ -430,10 +432,10 @@ const Profile = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      bgcolor: '#F5F5F5',
+                      borderRadius: theme.custom.borderRadius.input,
+                      bgcolor: theme.palette.custom.background.light,
                       '& fieldset': {
-                        borderColor: '#E0E0E0',
+                        borderColor: theme.palette.custom.border.default,
                       },
                     },
                   }}
@@ -453,7 +455,7 @@ const Profile = () => {
                         edge="start"
                         sx={{
                           mr: 1,
-                          color: '#9E9E9E',
+                          color: theme.palette.custom.text.tertiary,
                         }}
                         disabled
                       >
@@ -463,19 +465,19 @@ const Profile = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
+                      borderRadius: theme.custom.borderRadius.input,
                       '& fieldset': {
-                        borderColor: '#E0E0E0',
+                        borderColor: theme.palette.custom.border.default,
                       },
                       '&:hover fieldset': {
-                        borderColor: '#0A1C59',
+                        borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
+                        borderColor: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
+                      color: theme.palette.primary.main,
                     },
                   }}
                 />
@@ -488,15 +490,15 @@ const Profile = () => {
                   onClick={handleCancel}
                   disabled={saving}
                   sx={{
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.button,
                     textTransform: 'none',
-                    color: '#666',
-                    borderColor: '#E0E0E0',
+                    color: theme.palette.custom.text.secondary,
+                    borderColor: theme.palette.custom.border.default,
                     px: 3,
                     py: 1,
                     '&:hover': {
-                      borderColor: '#9E9E9E',
-                      bgcolor: '#F5F5F5',
+                      borderColor: theme.palette.custom.border.dark,
+                      bgcolor: theme.palette.custom.background.light,
                     },
                   }}
                 >
@@ -507,14 +509,14 @@ const Profile = () => {
                   onClick={handleSave}
                   disabled={saving}
                   sx={{
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.button,
                     textTransform: 'none',
-                    bgcolor: '#0A1C59',
+                    bgcolor: theme.palette.primary.main,
                     px: 3,
                     py: 1,
-                    fontWeight: 500,
+                    fontWeight: theme.custom.typography.fontWeight.medium,
                     '&:hover': {
-                      bgcolor: '#0d2569',
+                      bgcolor: theme.palette.primary.dark,
                     },
                   }}
                 >

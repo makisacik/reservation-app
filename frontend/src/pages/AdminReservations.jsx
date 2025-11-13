@@ -24,6 +24,7 @@ import {
   Link,
   IconButton,
   TablePagination,
+  useTheme,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -72,6 +73,7 @@ const formatDateTimeTurkish = (dateStr, timeSlotName) => {
 };
 
 const AdminReservations = () => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -199,11 +201,11 @@ const AdminReservations = () => {
   const totalCount = reservationsData?.totalCount || 0;
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#F6F7FB', minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ flexGrow: 1, p: 3, bgcolor: theme.palette.custom.background.page, minHeight: 'calc(100vh - 64px)' }}>
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59', mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, mb: 0.5 }}>
             Rezervasyon Yönetimi
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -215,13 +217,13 @@ const AdminReservations = () => {
           startIcon={<AddIcon />}
           onClick={handleOpenCreateModal}
           sx={{
-            bgcolor: '#0A1C59',
+            bgcolor: theme.palette.primary.main,
             color: 'white',
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             textTransform: 'none',
             px: 3,
             '&:hover': {
-              bgcolor: '#0d2a7a',
+              bgcolor: theme.palette.primary.dark,
             },
           }}
         >
@@ -246,7 +248,7 @@ const AdminReservations = () => {
             flex: 1,
             minWidth: 200,
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             },
           }}
@@ -260,7 +262,7 @@ const AdminReservations = () => {
           sx={{
             minWidth: 150,
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             },
           }}
@@ -274,7 +276,7 @@ const AdminReservations = () => {
           sx={{
             minWidth: 150,
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             },
           }}
@@ -286,7 +288,7 @@ const AdminReservations = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             label="Durum"
             sx={{
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             }}
           >
@@ -301,12 +303,12 @@ const AdminReservations = () => {
           startIcon={<DownloadIcon />}
           onClick={handleExport}
           sx={{
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             textTransform: 'none',
-            borderColor: '#0A1C59',
-            color: '#0A1C59',
+            borderColor: theme.palette.primary.main,
+            color: theme.palette.primary.main,
             '&:hover': {
-              borderColor: '#0d2a7a',
+              borderColor: theme.palette.primary.dark,
               bgcolor: 'rgba(10, 28, 89, 0.04)',
             },
           }}
@@ -321,8 +323,8 @@ const AdminReservations = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
@@ -338,8 +340,8 @@ const AdminReservations = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
@@ -355,8 +357,8 @@ const AdminReservations = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
@@ -372,8 +374,8 @@ const AdminReservations = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >

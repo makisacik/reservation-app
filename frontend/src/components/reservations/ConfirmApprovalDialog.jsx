@@ -6,10 +6,12 @@ import {
   Button,
   Typography,
   Box,
+  useTheme,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, isLoading }) => {
+  const theme = useTheme();
   return (
     <Dialog
       open={open}
@@ -18,12 +20,12 @@ const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, is
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '20px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+          borderRadius: theme.custom.borderRadius.card,
+          boxShadow: theme.custom.shadows.modal,
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: 600, color: '#0A1C59', pb: 2 }}>
+      <DialogTitle sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, pb: 2 }}>
         Rezervasyon Onaylama
       </DialogTitle>
       <DialogContent>
@@ -32,8 +34,8 @@ const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, is
             sx={{
               width: 80,
               height: 80,
-              borderRadius: '50%',
-              bgcolor: '#E3F2FD',
+              borderRadius: theme.custom.borderRadius.circular,
+              bgcolor: theme.palette.info.light,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -43,33 +45,33 @@ const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, is
             <CheckCircleIcon
               sx={{
                 fontSize: 48,
-                color: '#1976d2',
+                color: theme.palette.info.main,
               }}
             />
           </Box>
-          <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', color: '#333', fontWeight: 600 }}>
+          <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', color: theme.palette.custom.text.primary, fontWeight: theme.custom.typography.fontWeight.semibold }}>
             Rezervasyonu Onaylamak İstiyor musunuz?
           </Typography>
           {reservationNumber && (
             <Box
               sx={{
                 p: 2,
-                borderRadius: '12px',
-                bgcolor: '#F6F7FB',
+                borderRadius: theme.custom.borderRadius.button,
+                bgcolor: theme.palette.custom.background.page,
                 mb: 2,
                 width: '100%',
                 textAlign: 'center',
               }}
             >
-              <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+              <Typography variant="body2" sx={{ color: theme.palette.custom.text.secondary, mb: 0.5 }}>
                 Rezervasyon No
               </Typography>
-              <Typography variant="body1" sx={{ color: '#0A1C59', fontWeight: 600 }}>
+              <Typography variant="body1" sx={{ color: theme.palette.primary.main, fontWeight: theme.custom.typography.fontWeight.semibold }}>
                 {reservationNumber}
               </Typography>
             </Box>
           )}
-          <Typography variant="body2" sx={{ color: '#666', textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ color: theme.palette.custom.text.secondary, textAlign: 'center' }}>
             Onaylandıktan sonra rezervasyon durumu <strong>"Onaylandı"</strong> olarak güncellenecektir.
           </Typography>
         </Box>
@@ -79,10 +81,10 @@ const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, is
           onClick={onClose}
           disabled={isLoading}
           sx={{
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             textTransform: 'none',
             px: 3,
-            color: '#666',
+            color: theme.palette.custom.text.secondary,
             '&:hover': {
               bgcolor: 'rgba(0,0,0,0.04)',
             },
@@ -96,13 +98,13 @@ const ConfirmApprovalDialog = ({ open, onClose, onConfirm, reservationNumber, is
           disabled={isLoading}
           startIcon={<CheckCircleIcon />}
           sx={{
-            bgcolor: '#1976d2',
+            bgcolor: theme.palette.info.main,
             color: 'white',
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             textTransform: 'none',
             px: 3,
             '&:hover': {
-              bgcolor: '#1565c0',
+              bgcolor: theme.palette.info.dark,
             },
           }}
         >

@@ -1,26 +1,52 @@
 import { createTheme } from '@mui/material/styles';
+import { colors } from './colors';
+import { borderRadius } from './borderRadius';
+import { shadows } from './shadows';
+import { typography as typographyConfig } from './typography';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
-      contrastText: '#fff',
+      main: colors.primary.main,
+      light: colors.primary.light,
+      dark: colors.primary.dark,
+      contrastText: colors.primary.contrastText,
     },
     secondary: {
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036',
-      contrastText: '#fff',
+      main: colors.secondary.main,
+      light: colors.secondary.light,
+      dark: colors.secondary.dark,
+      contrastText: colors.secondary.contrastText,
+    },
+    success: {
+      main: colors.success.main,
+      light: colors.success.light,
+    },
+    error: {
+      main: colors.error.main,
+    },
+    warning: {
+      main: colors.warning.main,
+    },
+    info: {
+      main: colors.info.main,
+      light: colors.info.light,
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#fff',
+      default: colors.background.default,
+      paper: colors.background.paper,
     },
     text: {
-      primary: 'rgba(0, 0, 0, 0.87)',
-      secondary: 'rgba(0, 0, 0, 0.6)',
+      primary: colors.text.primary,
+      secondary: colors.text.secondary,
+    },
+    // Extend palette with custom colors
+    custom: {
+      background: colors.background,
+      text: colors.text,
+      border: colors.border,
+      gradients: colors.gradients,
+      onboarding: colors.onboarding,
     },
   },
   typography: {
@@ -35,37 +61,37 @@ const theme = createTheme({
     ].join(','),
     h1: {
       fontSize: '2.5rem',
-      fontWeight: 600,
-      lineHeight: 1.2,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.tight,
     },
     h2: {
       fontSize: '2rem',
-      fontWeight: 600,
-      lineHeight: 1.3,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.normal,
     },
     h3: {
       fontSize: '1.75rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.relaxed,
     },
     h4: {
       fontSize: '1.5rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.relaxed,
     },
     h5: {
       fontSize: '1.25rem',
-      fontWeight: 600,
-      lineHeight: 1.5,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.loose,
     },
     h6: {
       fontSize: '1rem',
-      fontWeight: 600,
-      lineHeight: 1.5,
+      fontWeight: typographyConfig.fontWeight.semibold,
+      lineHeight: typographyConfig.lineHeight.loose,
     },
     body1: {
       fontSize: '1rem',
-      lineHeight: 1.5,
+      lineHeight: typographyConfig.lineHeight.loose,
     },
     body2: {
       fontSize: '0.875rem',
@@ -73,18 +99,35 @@ const theme = createTheme({
     },
     button: {
       textTransform: 'none',
-      fontWeight: 500,
+      fontWeight: typographyConfig.fontWeight.medium,
     },
   },
   shape: {
     borderRadius: 8,
   },
   spacing: 8,
+  shadows: [
+    'none',
+    shadows.card,
+    shadows.cardElevated,
+    shadows.button,
+    shadows.input,
+    shadows.modal,
+    shadows.cardHover,
+    shadows.buttonHover,
+    shadows.inputHover,
+    shadows.buttonActive,
+    shadows.onboardingCard,
+    shadows.onboardingCardHover,
+    shadows.icon,
+    // ... add more shadow levels as needed
+    ...Array(11).fill('none'), // Fill remaining shadow slots
+  ],
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: borderRadius.button,
           padding: '8px 16px',
         },
       },
@@ -92,18 +135,24 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          borderRadius: borderRadius.card,
+          boxShadow: shadows.card,
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: borderRadius.large,
         },
       },
     },
+  },
+  // Extend theme with custom properties
+  custom: {
+    borderRadius,
+    shadows,
+    typography: typographyConfig,
   },
 });
 

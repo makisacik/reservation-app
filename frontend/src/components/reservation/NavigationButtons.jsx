@@ -1,6 +1,7 @@
-import { Box, Button } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 
 const NavigationButtons = ({ currentStep, onBack, onNext, canGoNext = true, nextLabel = 'İleri', backLabel = 'Geri' }) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -15,15 +16,15 @@ const NavigationButtons = ({ currentStep, onBack, onNext, canGoNext = true, next
           onClick={onBack}
           variant="outlined"
           sx={{
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             px: 4,
             py: 1.5,
-            borderColor: '#E0E0E0',
-            color: '#333',
+            borderColor: theme.palette.custom.border.default,
+            color: theme.palette.custom.text.primary,
             textTransform: 'none',
-            fontWeight: 500,
+            fontWeight: theme.custom.typography.fontWeight.medium,
             '&:hover': {
-              borderColor: '#0A1C59',
+              borderColor: theme.palette.primary.main,
               bgcolor: 'rgba(10, 28, 89, 0.04)',
             },
           }}
@@ -37,19 +38,19 @@ const NavigationButtons = ({ currentStep, onBack, onNext, canGoNext = true, next
         disabled={!canGoNext}
         variant="contained"
         sx={{
-          borderRadius: '12px',
+          borderRadius: theme.custom.borderRadius.button,
           px: 4,
           py: 1.5,
-          bgcolor: '#0A1C59',
+          bgcolor: theme.palette.primary.main,
           color: 'white',
           textTransform: 'none',
-          fontWeight: 500,
+          fontWeight: theme.custom.typography.fontWeight.medium,
           '&:hover': {
-            bgcolor: '#0d2569',
+            bgcolor: theme.palette.primary.dark,
           },
           '&:disabled': {
-            bgcolor: '#E0E0E0',
-            color: '#999',
+            bgcolor: theme.palette.custom.border.default,
+            color: theme.palette.custom.text.quaternary,
           },
         }}
       >

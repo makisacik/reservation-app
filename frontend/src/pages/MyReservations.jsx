@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Box, Typography, Button, Grid, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Button, Grid, CircularProgress, Alert, useTheme } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { reservationsApi } from '../api/reservationsApi';
 import { menusApi } from '../api/menusApi';
@@ -7,6 +7,7 @@ import ReservationCard from '../components/reservations/ReservationCard';
 import { convertUtcToLocal, isPast } from '../utils/timezone';
 
 const MyReservations = () => {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'past'
 
   // Fetch reservations
@@ -162,8 +163,8 @@ const MyReservations = () => {
       <Typography
         variant="h4"
         sx={{
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
           mb: 1,
           fontSize: '2rem',
         }}
@@ -173,7 +174,7 @@ const MyReservations = () => {
       <Typography
         variant="body2"
         sx={{
-          color: '#9E9E9E',
+          color: theme.palette.custom.text.tertiary,
           mb: 4,
           fontSize: '0.875rem',
         }}
@@ -186,17 +187,17 @@ const MyReservations = () => {
         <Button
           onClick={() => setActiveTab('active')}
           sx={{
-            bgcolor: activeTab === 'active' ? '#F5F2EF' : 'white',
-            color: activeTab === 'active' ? '#0A1C59' : '#666',
-            border: activeTab === 'active' ? 'none' : '1px solid #E0E0E0',
-            borderRadius: '12px',
+            bgcolor: activeTab === 'active' ? theme.palette.custom.background.activeTab : 'white',
+            color: activeTab === 'active' ? theme.palette.primary.main : theme.palette.custom.text.secondary,
+            border: activeTab === 'active' ? 'none' : `1px solid ${theme.palette.custom.border.default}`,
+            borderRadius: theme.custom.borderRadius.button,
             px: 3,
             py: 1.5,
             textTransform: 'none',
-            fontWeight: activeTab === 'active' ? 600 : 400,
+            fontWeight: activeTab === 'active' ? theme.custom.typography.fontWeight.semibold : theme.custom.typography.fontWeight.regular,
             fontSize: '0.95rem',
             '&:hover': {
-              bgcolor: activeTab === 'active' ? '#F5F2EF' : '#F8F9FA',
+              bgcolor: activeTab === 'active' ? theme.palette.custom.background.activeTab : theme.palette.custom.background.inactiveTab,
             },
           }}
         >
@@ -205,17 +206,17 @@ const MyReservations = () => {
         <Button
           onClick={() => setActiveTab('past')}
           sx={{
-            bgcolor: activeTab === 'past' ? '#F5F2EF' : 'white',
-            color: activeTab === 'past' ? '#0A1C59' : '#666',
-            border: activeTab === 'past' ? 'none' : '1px solid #E0E0E0',
-            borderRadius: '12px',
+            bgcolor: activeTab === 'past' ? theme.palette.custom.background.activeTab : 'white',
+            color: activeTab === 'past' ? theme.palette.primary.main : theme.palette.custom.text.secondary,
+            border: activeTab === 'past' ? 'none' : `1px solid ${theme.palette.custom.border.default}`,
+            borderRadius: theme.custom.borderRadius.button,
             px: 3,
             py: 1.5,
             textTransform: 'none',
-            fontWeight: activeTab === 'past' ? 600 : 400,
+            fontWeight: activeTab === 'past' ? theme.custom.typography.fontWeight.semibold : theme.custom.typography.fontWeight.regular,
             fontSize: '0.95rem',
             '&:hover': {
-              bgcolor: activeTab === 'past' ? '#F5F2EF' : '#F8F9FA',
+              bgcolor: activeTab === 'past' ? theme.palette.custom.background.activeTab : theme.palette.custom.background.inactiveTab,
             },
           }}
         >
@@ -226,7 +227,7 @@ const MyReservations = () => {
       {/* Loading State */}
       {isOverallLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress sx={{ color: '#0A1C59' }} />
+          <CircularProgress sx={{ color: theme.palette.primary.main }} />
         </Box>
       )}
 
@@ -243,7 +244,7 @@ const MyReservations = () => {
           sx={{
             textAlign: 'center',
             py: 8,
-            color: '#9E9E9E',
+            color: theme.palette.custom.text.tertiary,
           }}
         >
           <Typography variant="body1">

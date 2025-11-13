@@ -1,8 +1,6 @@
-import { Card, Box } from '@mui/material';
+import { Card, Box, useTheme } from '@mui/material';
 import UserInfo from './UserInfo';
 import AlertBanner from '../common/AlertBanner';
-
-const RADIUS = "20px";
 
 /**
  * UserHeaderCard - Header card component with user info and alert banner
@@ -11,15 +9,16 @@ const RADIUS = "20px";
  * @param {Object} alertMessage - Alert message object with title and message
  */
 const UserHeaderCard = ({ user, alertMessage }) => {
+  const theme = useTheme();
   return (
     <Card
       sx={{
-        bgcolor: "#1665d8",
+        bgcolor: theme.palette.primary.light,
         color: "white",
-        borderRadius: RADIUS,
+        borderRadius: theme.custom.borderRadius.card,
         p: 3,
         mb: 3,
-        boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+        boxShadow: theme.custom.shadows.cardElevated,
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

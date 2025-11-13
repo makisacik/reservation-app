@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, Typography, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
+import { Box, Card, Typography, Radio, RadioGroup, FormControlLabel, FormControl, useTheme } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import Calendar from './Calendar';
 import { mealTimeSlotsApi } from '../../api/mealTimeSlotsApi';
@@ -21,6 +21,7 @@ const formatDateTurkish = (dateStr) => {
 };
 
 const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
+  const theme = useTheme();
   const { data: mealTimeSlots = [] } = useQuery({
     queryKey: ['mealTimeSlots'],
     queryFn: () => mealTimeSlotsApi.getMealTimeSlots(),
@@ -53,19 +54,19 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
     <Box>
       <Card
         sx={{
-          borderRadius: '20px',
+          borderRadius: theme.custom.borderRadius.card,
           p: 4,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+          boxShadow: theme.custom.shadows.card,
           mb: 3,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <CalendarTodayIcon sx={{ color: '#0A1C59', mr: 1.5, fontSize: '28px' }} />
+          <CalendarTodayIcon sx={{ color: theme.palette.primary.main, mr: 1.5, fontSize: '28px' }} />
           <Typography
             variant="h5"
             sx={{
-              fontWeight: 600,
-              color: '#0A1C59',
+              fontWeight: theme.custom.typography.fontWeight.semibold,
+              color: theme.palette.primary.main,
               fontSize: '20px',
             }}
           >
@@ -75,7 +76,7 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
         <Typography
           variant="body2"
           sx={{
-            color: '#666',
+            color: theme.palette.custom.text.secondary,
             mb: 3,
             ml: 5,
           }}
@@ -93,17 +94,17 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
       {selectedDates.length > 0 && (
         <Card
           sx={{
-            borderRadius: '20px',
+            borderRadius: theme.custom.borderRadius.card,
             p: 4,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-            bgcolor: '#FFF8E1',
+            boxShadow: theme.custom.shadows.card,
+            bgcolor: theme.palette.warning.main,
           }}
         >
           <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
-              color: '#0A1C59',
+              color: theme.palette.primary.main,
               mb: 3,
             }}
           >
@@ -120,8 +121,8 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
                   <Typography
                     variant="subtitle1"
                     sx={{
-                      fontWeight: 500,
-                      color: '#333',
+                      fontWeight: theme.custom.typography.fontWeight.medium,
+                      color: theme.palette.custom.text.primary,
                       fontSize: '16px',
                     }}
                   >
@@ -132,11 +133,11 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
                       ml: 2,
                       px: 2,
                       py: 0.5,
-                      borderRadius: '20px',
-                      bgcolor: '#0A1C59',
+                      borderRadius: theme.custom.borderRadius.card,
+                      bgcolor: theme.palette.primary.main,
                       color: 'white',
                       fontSize: '12px',
-                      fontWeight: 600,
+                      fontWeight: theme.custom.typography.fontWeight.semibold,
                     }}
                   >
                     {index + 1}. Gün
@@ -155,9 +156,9 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
                         control={
                           <Radio
                             sx={{
-                              color: '#0A1C59',
+                              color: theme.palette.primary.main,
                               '&.Mui-checked': {
-                                color: '#0A1C59',
+                                color: theme.palette.primary.main,
                               },
                             }}
                           />
@@ -170,7 +171,7 @@ const Step1DateSelection = ({ selectedDates, onDatesChange }) => {
                         sx={{
                           mb: 1.5,
                           bgcolor: 'white',
-                          borderRadius: '12px',
+                          borderRadius: theme.custom.borderRadius.button,
                           px: 2,
                           py: 1.5,
                           '&:hover': {

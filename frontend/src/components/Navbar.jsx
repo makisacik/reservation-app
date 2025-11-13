@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, useTheme } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
@@ -6,6 +6,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const Navbar = () => {
+  const theme = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -20,9 +21,9 @@ const Navbar = () => {
       sx={{ 
         zIndex: (theme) => theme.zIndex.drawer + 1,
         bgcolor: 'white',
-        color: '#0A1C59',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-        borderBottom: '1px solid rgba(0,0,0,0.05)',
+        color: theme.palette.primary.main,
+        boxShadow: theme.custom.shadows.input,
+        borderBottom: `1px solid ${theme.palette.custom.border.default}`,
       }}
     >
       <Toolbar>
@@ -32,12 +33,12 @@ const Navbar = () => {
             sx={{
               width: 40,
               height: 40,
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #6B2C91 0%, #C94B4B 50%, #FF6B35 100%)',
+              borderRadius: theme.custom.borderRadius.medium,
+              background: theme.palette.custom.gradients.loginIcon,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(107, 44, 145, 0.3)',
+              boxShadow: theme.custom.shadows.icon,
             }}
           >
             <RestaurantIcon sx={{ fontSize: 24, color: 'white' }} />
@@ -49,9 +50,9 @@ const Navbar = () => {
               variant="h6" 
               component="div" 
               sx={{ 
-                fontWeight: 'bold', 
+                fontWeight: theme.custom.typography.fontWeight.bold, 
                 lineHeight: 1.2,
-                color: '#0A1C59',
+                color: theme.palette.primary.main,
                 fontSize: '1.1rem',
               }}
             >
@@ -62,7 +63,7 @@ const Navbar = () => {
               component="div" 
               sx={{ 
                 fontSize: '0.75rem', 
-                color: '#9E9E9E',
+                color: theme.palette.custom.text.tertiary,
                 lineHeight: 1.2,
               }}
             >
@@ -76,9 +77,9 @@ const Navbar = () => {
             onClick={handleLogout}
             startIcon={<ExitToAppIcon />}
             sx={{
-              color: '#0A1C59',
+              color: theme.palette.primary.main,
               textTransform: 'none',
-              fontWeight: 500,
+              fontWeight: theme.custom.typography.fontWeight.medium,
               fontSize: '0.95rem',
               '&:hover': {
                 bgcolor: 'rgba(10, 28, 89, 0.05)',

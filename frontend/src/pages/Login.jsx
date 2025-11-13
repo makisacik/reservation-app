@@ -11,12 +11,14 @@ import {
   CircularProgress,
   ToggleButtonGroup,
   ToggleButton,
+  useTheme,
 } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES, STORAGE_KEYS } from '../utils/constants';
 
 const Login = () => {
+  const theme = useTheme();
   const [role, setRole] = useState('personel');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -106,7 +108,7 @@ const Login = () => {
           elevation={3}
           sx={{
             p: 4,
-            borderRadius: 3,
+            borderRadius: theme.custom.borderRadius.large,
             textAlign: 'center',
             width: '100%',
             maxWidth: 480,
@@ -117,12 +119,12 @@ const Login = () => {
             sx={{
               width: 60,
               height: 60,
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #6B2C91 0%, #C94B4B 50%, #FF6B35 100%)',
+              borderRadius: theme.custom.borderRadius.button,
+              background: theme.palette.custom.gradients.loginIcon,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(107, 44, 145, 0.3)',
+              boxShadow: theme.custom.shadows.icon,
               mb: 2,
               mx: 'auto',
             }}
@@ -130,7 +132,7 @@ const Login = () => {
             <RestaurantIcon sx={{ fontSize: 32, color: 'white' }} />
           </Box>
 
-          <Typography variant="h6" fontWeight={600} color="primary" gutterBottom>
+          <Typography variant="h6" fontWeight={theme.custom.typography.fontWeight.semibold} color="primary" gutterBottom>
             Yemek Rezervasyon Sistemi
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -145,18 +147,18 @@ const Login = () => {
             fullWidth
             sx={{
               mb: 3,
-              backgroundColor: '#f5f2ef',
-              borderRadius: 2,
+              backgroundColor: theme.palette.custom.background.tan,
+              borderRadius: theme.custom.borderRadius.medium,
               '& .MuiToggleButton-root': {
                 textTransform: 'none',
-                fontWeight: 500,
+                fontWeight: theme.custom.typography.fontWeight.medium,
                 border: 'none',
                 flex: 1,
               },
               '& .Mui-selected': {
                 backgroundColor: '#fff',
                 color: '#000',
-                boxShadow: '0px 1px 3px rgba(0,0,0,0.1)',
+                boxShadow: theme.custom.shadows.input,
               },
             }}
           >
@@ -195,12 +197,12 @@ const Login = () => {
               sx={{
                 mt: 3,
                 mb: 2,
-                bgcolor: '#0A1445',
+                bgcolor: theme.palette.custom.onboarding.primary,
                 color: 'white',
                 textTransform: 'none',
                 py: 1.2,
-                borderRadius: 2,
-                '&:hover': { bgcolor: '#091234' },
+                borderRadius: theme.custom.borderRadius.medium,
+                '&:hover': { bgcolor: theme.palette.custom.onboarding.primaryDark },
               }}
               disabled={loading}
             >

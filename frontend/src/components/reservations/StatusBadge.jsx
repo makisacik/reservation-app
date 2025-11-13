@@ -1,10 +1,11 @@
-import { Chip } from '@mui/material';
+import { Chip, useTheme } from '@mui/material';
 
 /**
  * StatusBadge - Component for displaying reservation status badges
  * @param {string} status - Reservation status (Active, Pending, Cancelled)
  */
 const StatusBadge = ({ status }) => {
+  const theme = useTheme();
   const getStatusConfig = (status) => {
     // Normalize status to handle both string and numeric values, and both camelCase and PascalCase
     let normalizedStatus = status;
@@ -21,29 +22,29 @@ const StatusBadge = ({ status }) => {
       case 'Active':
         return {
           label: 'Onaylandı',
-          color: '#0A1C59',
-          bgColor: '#0A1C59',
+          color: theme.palette.primary.main,
+          bgColor: theme.palette.primary.main,
           textColor: '#ffffff',
         };
       case 'Pending':
         return {
           label: 'Beklemede',
-          color: '#1976d2',
-          bgColor: '#1976d2',
+          color: theme.palette.info.main,
+          bgColor: theme.palette.info.main,
           textColor: '#ffffff',
         };
       case 'Cancelled':
         return {
           label: 'İptal',
-          color: '#757575',
-          bgColor: '#757575',
+          color: theme.palette.custom.text.secondary,
+          bgColor: theme.palette.custom.text.secondary,
           textColor: '#ffffff',
         };
       default:
         return {
           label: String(status) || 'Bilinmiyor',
-          color: '#757575',
-          bgColor: '#757575',
+          color: theme.palette.custom.text.secondary,
+          bgColor: theme.palette.custom.text.secondary,
           textColor: '#ffffff',
         };
     }
@@ -57,10 +58,10 @@ const StatusBadge = ({ status }) => {
       sx={{
         bgcolor: config.bgColor,
         color: config.textColor,
-        fontWeight: 600,
+        fontWeight: theme.custom.typography.fontWeight.semibold,
         fontSize: '0.75rem',
         height: '28px',
-        borderRadius: '20px',
+        borderRadius: theme.custom.borderRadius.card,
         '& .MuiChip-label': {
           px: 1.5,
         },

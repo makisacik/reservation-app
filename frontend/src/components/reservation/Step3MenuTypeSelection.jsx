@@ -1,30 +1,31 @@
-import { Box, Card, Typography } from '@mui/material';
+import { Box, Card, Typography, useTheme } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 
-// MenuType enum: Standard = 1, Special = 2
-const MENU_TYPES = [
-  {
-    id: 1,
-    name: 'Standart Menü',
-    displayName: 'Menü Seçimi',
-    color: '#3498DB', // Blue
-  },
-  {
-    id: 2,
-    name: 'Özel Menü',
-    displayName: 'Özel Menü Seçimi',
-    color: '#9B59B6', // Purple
-  },
-];
-
 const Step3MenuTypeSelection = ({ selectedMenuType, onMenuTypeSelect }) => {
+  const theme = useTheme();
+  
+  // MenuType enum: Standard = 1, Special = 2
+  const MENU_TYPES = [
+    {
+      id: 1,
+      name: 'Standart Menü',
+      displayName: 'Menü Seçimi',
+      color: theme.palette.info.light, // Blue
+    },
+    {
+      id: 2,
+      name: 'Özel Menü',
+      displayName: 'Özel Menü Seçimi',
+      color: theme.palette.secondary.main, // Purple
+    },
+  ];
   return (
     <Box>
       <Typography
         variant="h5"
         sx={{
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
           mb: 1,
         }}
       >
@@ -33,7 +34,7 @@ const Step3MenuTypeSelection = ({ selectedMenuType, onMenuTypeSelect }) => {
       <Typography
         variant="body2"
         sx={{
-          color: '#666',
+          color: theme.palette.custom.text.secondary,
           mb: 4,
         }}
       >
@@ -55,17 +56,17 @@ const Step3MenuTypeSelection = ({ selectedMenuType, onMenuTypeSelect }) => {
               key={menuType.id}
               onClick={() => onMenuTypeSelect(menuType.id)}
               sx={{
-                borderRadius: '20px',
+                borderRadius: theme.custom.borderRadius.card,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: isSelected ? '3px solid #0A1C59' : 'none',
+                border: isSelected ? `3px solid ${theme.palette.primary.main}` : 'none',
                 boxShadow: isSelected
-                  ? '0 6px 20px rgba(10, 28, 89, 0.2)'
-                  : '0 4px 16px rgba(0,0,0,0.06)',
+                  ? theme.custom.shadows.buttonHover
+                  : theme.custom.shadows.card,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  boxShadow: theme.custom.shadows.cardHover,
                 },
               }}
             >
@@ -95,7 +96,7 @@ const Step3MenuTypeSelection = ({ selectedMenuType, onMenuTypeSelect }) => {
                     fontWeight: 600,
                     color: 'white',
                     bgcolor: menuType.color,
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.button,
                     py: 2,
                     px: 3,
                     display: 'inline-block',

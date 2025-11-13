@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 /**
  * CategoryTabs - Reusable component for category/option tabs
@@ -8,6 +8,7 @@ import { Box } from '@mui/material';
  * @param {function} onCategoryChange - Callback when category is selected
  */
 const CategoryTabs = ({ categories, selectedCategory, onCategoryChange }) => {
+  const theme = useTheme();
   return (
     <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
       {categories.map((category) => {
@@ -20,15 +21,15 @@ const CategoryTabs = ({ categories, selectedCategory, onCategoryChange }) => {
               cursor: "pointer",
               px: 3,
               py: 1.4,
-              borderRadius: "25px",
-              fontWeight: 600,
+              borderRadius: theme.custom.borderRadius.pill,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
               fontSize: "0.95rem",
               transition: "0.25s",
-              border: isActive ? "none" : "1px solid #E1E4EC",
-              bgcolor: isActive ? "#0A1C59" : "#F8F9FD",
-              color: isActive ? "#fff" : "#6F6F6F",
+              border: isActive ? "none" : `1px solid ${theme.palette.custom.border.light}`,
+              bgcolor: isActive ? theme.palette.primary.main : theme.palette.custom.background.inactiveTab,
+              color: isActive ? "#fff" : theme.palette.custom.text.secondary,
               "&:hover": {
-                bgcolor: isActive ? "#0A1C59" : "#ECEEF5",
+                bgcolor: isActive ? theme.palette.primary.main : theme.palette.custom.background.lighter,
               },
             }}
           >

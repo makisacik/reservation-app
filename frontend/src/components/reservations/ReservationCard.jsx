@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, useTheme } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
  * @param {boolean} isPast - Whether this is a past reservation
  */
 const ReservationCard = ({ reservation, mealName, isPast = false }) => {
+  const theme = useTheme();
   const { data: mealTimeSlots = [] } = useQuery({
     queryKey: ['mealTimeSlots'],
     queryFn: () => mealTimeSlotsApi.getMealTimeSlots(),
@@ -49,11 +50,11 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
     const isCancelled = status === 2 || status === 'Cancelled';
     
     if (isCancelled) {
-      return { text: 'İptal Edildi', color: '#757575', show: true };
+      return { text: 'İptal Edildi', color: theme.palette.custom.text.secondary, show: true };
     } else if (isPending) {
-      return { text: 'Beklemede', color: '#1976d2', show: true };
+      return { text: 'Beklemede', color: theme.palette.info.main, show: true };
     } else if (isActive && !isPast) {
-      return { text: 'Onaylandı', color: '#0A1C59', show: true };
+      return { text: 'Onaylandı', color: theme.palette.primary.main, show: true };
     }
     return { text: '', color: '', show: false };
   };
@@ -63,8 +64,8 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
   return (
     <Card
       sx={{
-        borderRadius: '20px',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        borderRadius: theme.custom.borderRadius.card,
+        boxShadow: theme.custom.shadows.card,
         bgcolor: 'white',
         position: 'relative',
         height: '100%',
@@ -84,10 +85,10 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
               right: 16,
               bgcolor: statusInfo.color,
               color: 'white',
-              fontWeight: 500,
+              fontWeight: theme.custom.typography.fontWeight.medium,
               fontSize: '0.75rem',
               height: 24,
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
             }}
           />
         )}
@@ -96,8 +97,8 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 600,
-            color: '#0A1C59',
+            fontWeight: theme.custom.typography.fontWeight.semibold,
+            color: theme.palette.primary.main,
             mb: 1,
             pr: statusInfo.show ? 8 : 0, // Make room for status badge
           }}
@@ -109,7 +110,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
         <Typography
           variant="body2"
           sx={{
-            color: '#9E9E9E',
+            color: theme.palette.custom.text.tertiary,
             mb: 2,
             fontSize: '0.875rem',
           }}
@@ -121,7 +122,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
           <CalendarTodayIcon
             sx={{
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               fontSize: '18px',
               mr: 1.5,
             }}
@@ -129,7 +130,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
           <Typography
             variant="body2"
             sx={{
-              color: '#333',
+              color: theme.palette.custom.text.primary,
               fontSize: '0.875rem',
             }}
           >
@@ -141,7 +142,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
           <AccessTimeIcon
             sx={{
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               fontSize: '18px',
               mr: 1.5,
             }}
@@ -149,7 +150,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
           <Typography
             variant="body2"
             sx={{
-              color: '#333',
+              color: theme.palette.custom.text.primary,
               fontSize: '0.875rem',
             }}
           >
@@ -161,7 +162,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <LocationOnIcon
             sx={{
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               fontSize: '18px',
               mr: 1.5,
             }}
@@ -169,7 +170,7 @@ const ReservationCard = ({ reservation, mealName, isPast = false }) => {
           <Typography
             variant="body2"
             sx={{
-              color: '#333',
+              color: theme.palette.custom.text.primary,
               fontSize: '0.875rem',
             }}
           >

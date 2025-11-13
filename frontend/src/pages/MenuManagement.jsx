@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  useTheme,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +27,7 @@ import AdminMealCard from '../components/menu/AdminMealCard';
 import MealModal from '../components/menu/MealModal';
 
 const MenuManagement = () => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState('');
@@ -191,7 +193,7 @@ const MenuManagement = () => {
             flex: 1,
             minWidth: 200,
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             },
           }}
@@ -205,7 +207,7 @@ const MenuManagement = () => {
             onChange={(e) => setSelectedRestaurantId(e.target.value)}
             label="Restoran"
             sx={{
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             }}
           >
@@ -224,13 +226,13 @@ const MenuManagement = () => {
           startIcon={<AddIcon />}
           onClick={handleAddNew}
           sx={{
-            bgcolor: '#0A1C59',
+            bgcolor: theme.palette.primary.main,
             color: 'white',
             borderRadius: '12px',
             textTransform: 'none',
             px: 3,
             '&:hover': {
-              bgcolor: '#0d2a7a',
+              bgcolor: theme.palette.primary.dark,
             },
           }}
         >
@@ -246,14 +248,14 @@ const MenuManagement = () => {
           sx={{
             '& .MuiTab-root': {
               textTransform: 'none',
-              fontWeight: 500,
+              fontWeight: theme.custom.typography.fontWeight.medium,
               minHeight: 48,
               borderRadius: '12px 12px 0 0',
               mr: 1,
             },
             '& .Mui-selected': {
-              color: '#0A1C59',
-              fontWeight: 600,
+              color: theme.palette.primary.main,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
             },
           }}
         >

@@ -12,11 +12,13 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  useTheme,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { settingsApi } from '../api/settingsApi';
 
 const Settings = () => {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -151,7 +153,7 @@ const Settings = () => {
       sx={{
         flexGrow: 1,
         p: 3,
-        bgcolor: '#F6F7FB',
+        bgcolor: theme.palette.custom.background.page,
         minHeight: 'calc(100vh - 64px)',
       }}
     >
@@ -159,8 +161,8 @@ const Settings = () => {
       <Typography
         variant="h4"
         sx={{
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
           mb: 0.5,
         }}
       >
@@ -169,7 +171,7 @@ const Settings = () => {
       <Typography
         variant="body2"
         sx={{
-          color: '#9E9E9E',
+          color: theme.palette.custom.text.tertiary,
           mb: 3,
           fontSize: '0.875rem',
         }}
@@ -178,7 +180,7 @@ const Settings = () => {
       </Typography>
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: '#E0E0E0', mb: 3 }}>
+      <Box sx={{ borderBottom: 1, borderColor: theme.palette.custom.border.default, mb: 3 }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -189,15 +191,15 @@ const Settings = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontSize: '0.95rem',
-              fontWeight: 500,
-              color: '#666',
+              fontWeight: theme.custom.typography.fontWeight.medium,
+              color: theme.palette.custom.text.secondary,
               minHeight: 48,
               px: 3,
-              borderRadius: '8px 8px 0 0',
+              borderRadius: theme.custom.borderRadius.tab,
               '&.Mui-selected': {
-                color: '#0A1C59',
-                fontWeight: 600,
-                bgcolor: '#F5E6D3',
+                color: theme.palette.primary.main,
+                fontWeight: theme.custom.typography.fontWeight.semibold,
+                bgcolor: theme.palette.custom.background.beige,
               },
               '&:hover:not(.Mui-selected)': {
                 bgcolor: 'rgba(10, 28, 89, 0.04)',
@@ -218,8 +220,8 @@ const Settings = () => {
       {activeTab === 0 && (
         <Card
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.cardElevated,
             bgcolor: 'white',
           }}
         >
@@ -227,8 +229,8 @@ const Settings = () => {
             <Typography
               variant="h5"
               sx={{
-                fontWeight: 600,
-                color: '#0A1C59',
+                fontWeight: theme.custom.typography.fontWeight.semibold,
+                color: theme.palette.primary.main,
                 mb: 0.5,
               }}
             >
@@ -237,7 +239,7 @@ const Settings = () => {
             <Typography
               variant="body2"
               sx={{
-                color: '#9E9E9E',
+                color: theme.palette.custom.text.tertiary,
                 mb: 3,
                 fontSize: '0.875rem',
               }}
@@ -249,8 +251,8 @@ const Settings = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  fontWeight: 500,
-                  color: '#333',
+                  fontWeight: theme.custom.typography.fontWeight.medium,
+                  color: theme.palette.custom.text.primary,
                   mb: 1,
                 }}
               >
@@ -268,19 +270,19 @@ const Settings = () => {
                 }
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.input,
                     '& fieldset': {
-                      borderColor: '#E0E0E0',
+                      borderColor: theme.palette.custom.border.default,
                     },
                     '&:hover fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
-                    color: '#0A1C59',
+                    color: theme.palette.primary.main,
                   },
                 }}
               />
@@ -290,8 +292,8 @@ const Settings = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  fontWeight: 500,
-                  color: '#333',
+                  fontWeight: theme.custom.typography.fontWeight.medium,
+                  color: theme.palette.custom.text.primary,
                   mb: 1,
                 }}
               >
@@ -305,10 +307,10 @@ const Settings = () => {
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    bgcolor: '#F5F5F5',
+                    borderRadius: theme.custom.borderRadius.input,
+                    bgcolor: theme.palette.custom.background.light,
                     '& fieldset': {
-                      borderColor: '#E0E0E0',
+                      borderColor: theme.palette.custom.border.default,
                     },
                   },
                 }}
@@ -321,14 +323,14 @@ const Settings = () => {
               onClick={handleSaveGeneral}
               disabled={saving}
               sx={{
-                borderRadius: '12px',
+                borderRadius: theme.custom.borderRadius.button,
                 textTransform: 'none',
-                bgcolor: '#0A1C59',
+                bgcolor: theme.palette.primary.main,
                 px: 3,
                 py: 1.5,
-                fontWeight: 500,
+                fontWeight: theme.custom.typography.fontWeight.medium,
                 '&:hover': {
-                  bgcolor: '#0d2569',
+                  bgcolor: theme.palette.primary.dark,
                 },
               }}
             >
@@ -342,8 +344,8 @@ const Settings = () => {
       {activeTab === 1 && (
         <Card
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.cardElevated,
             bgcolor: 'white',
           }}
         >
@@ -351,8 +353,8 @@ const Settings = () => {
             <Typography
               variant="h5"
               sx={{
-                fontWeight: 600,
-                color: '#0A1C59',
+                fontWeight: theme.custom.typography.fontWeight.semibold,
+                color: theme.palette.primary.main,
                 mb: 0.5,
               }}
             >
@@ -361,7 +363,7 @@ const Settings = () => {
             <Typography
               variant="body2"
               sx={{
-                color: '#9E9E9E',
+                color: theme.palette.custom.text.tertiary,
                 mb: 3,
                 fontSize: '0.875rem',
               }}
@@ -373,8 +375,8 @@ const Settings = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  fontWeight: 500,
-                  color: '#333',
+                  fontWeight: theme.custom.typography.fontWeight.medium,
+                  color: theme.palette.custom.text.primary,
                   mb: 1,
                 }}
               >
@@ -392,19 +394,19 @@ const Settings = () => {
                 }
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.input,
                     '& fieldset': {
-                      borderColor: '#E0E0E0',
+                      borderColor: theme.palette.custom.border.default,
                     },
                     '&:hover fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
-                    color: '#0A1C59',
+                    color: theme.palette.primary.main,
                   },
                 }}
               />
@@ -414,8 +416,8 @@ const Settings = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  fontWeight: 500,
-                  color: '#333',
+                  fontWeight: theme.custom.typography.fontWeight.medium,
+                  color: theme.palette.custom.text.primary,
                   mb: 1,
                 }}
               >
@@ -433,19 +435,19 @@ const Settings = () => {
                 }
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
+                    borderRadius: theme.custom.borderRadius.input,
                     '& fieldset': {
-                      borderColor: '#E0E0E0',
+                      borderColor: theme.palette.custom.border.default,
                     },
                     '&:hover fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#0A1C59',
+                      borderColor: theme.palette.primary.main,
                     },
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
-                    color: '#0A1C59',
+                    color: theme.palette.primary.main,
                   },
                 }}
               />
@@ -463,8 +465,8 @@ const Settings = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      fontWeight: 500,
-                      color: '#333',
+                      fontWeight: theme.custom.typography.fontWeight.medium,
+                      color: theme.palette.custom.text.primary,
                       mb: 0.5,
                     }}
                   >
@@ -473,7 +475,7 @@ const Settings = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#9E9E9E',
+                      color: theme.palette.custom.text.tertiary,
                       fontSize: '0.875rem',
                     }}
                   >
@@ -490,10 +492,10 @@ const Settings = () => {
                   }
                   sx={{
                     '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#0A1C59',
+                      color: theme.palette.primary.main,
                     },
                     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#0A1C59',
+                      backgroundColor: theme.palette.primary.main,
                     },
                   }}
                 />
@@ -508,12 +510,12 @@ const Settings = () => {
               sx={{
                 borderRadius: '12px',
                 textTransform: 'none',
-                bgcolor: '#0A1C59',
+                bgcolor: theme.palette.primary.main,
                 px: 3,
                 py: 1.5,
                 fontWeight: 500,
                 '&:hover': {
-                  bgcolor: '#0d2569',
+                  bgcolor: theme.palette.primary.dark,
                 },
               }}
             >
@@ -527,8 +529,8 @@ const Settings = () => {
       {activeTab === 2 && (
         <Card
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.cardElevated,
             bgcolor: 'white',
           }}
         >
@@ -536,8 +538,8 @@ const Settings = () => {
             <Typography
               variant="h5"
               sx={{
-                fontWeight: 600,
-                color: '#0A1C59',
+                fontWeight: theme.custom.typography.fontWeight.semibold,
+                color: theme.palette.primary.main,
                 mb: 0.5,
               }}
             >
@@ -546,7 +548,7 @@ const Settings = () => {
             <Typography
               variant="body2"
               sx={{
-                color: '#9E9E9E',
+                color: theme.palette.custom.text.tertiary,
                 mb: 3,
                 fontSize: '0.875rem',
               }}
@@ -566,8 +568,8 @@ const Settings = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      fontWeight: 500,
-                      color: '#333',
+                      fontWeight: theme.custom.typography.fontWeight.medium,
+                      color: theme.palette.custom.text.primary,
                       mb: 0.5,
                     }}
                   >
@@ -576,7 +578,7 @@ const Settings = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#9E9E9E',
+                      color: theme.palette.custom.text.tertiary,
                       fontSize: '0.875rem',
                     }}
                   >
@@ -593,10 +595,10 @@ const Settings = () => {
                   }
                   sx={{
                     '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#0A1C59',
+                      color: theme.palette.primary.main,
                     },
                     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#0A1C59',
+                      backgroundColor: theme.palette.primary.main,
                     },
                   }}
                 />
@@ -611,12 +613,12 @@ const Settings = () => {
               sx={{
                 borderRadius: '12px',
                 textTransform: 'none',
-                bgcolor: '#0A1C59',
+                bgcolor: theme.palette.primary.main,
                 px: 3,
                 py: 1.5,
                 fontWeight: 500,
                 '&:hover': {
-                  bgcolor: '#0d2569',
+                  bgcolor: theme.palette.primary.dark,
                 },
               }}
             >

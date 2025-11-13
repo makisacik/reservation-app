@@ -1,9 +1,10 @@
-import { Box, Card, Typography, Button } from '@mui/material';
+import { Box, Card, Typography, Button, useTheme } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { restaurantsApi } from '../../api/restaurantsApi';
 import { useQuery } from '@tanstack/react-query';
 
 const Step2RestaurantSelection = ({ selectedRestaurant, onRestaurantSelect }) => {
+  const theme = useTheme();
   const { data: restaurants = [], isLoading } = useQuery({
     queryKey: ['restaurants'],
     queryFn: () => restaurantsApi.getRestaurants(),
@@ -28,8 +29,8 @@ const Step2RestaurantSelection = ({ selectedRestaurant, onRestaurantSelect }) =>
       <Typography
         variant="h5"
         sx={{
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
           mb: 1,
         }}
       >
@@ -38,7 +39,7 @@ const Step2RestaurantSelection = ({ selectedRestaurant, onRestaurantSelect }) =>
       <Typography
         variant="body2"
         sx={{
-          color: '#666',
+          color: theme.palette.custom.text.secondary,
           mb: 4,
         }}
       >
@@ -61,17 +62,17 @@ const Step2RestaurantSelection = ({ selectedRestaurant, onRestaurantSelect }) =>
               key={restaurant.id}
               onClick={() => onRestaurantSelect(restaurant)}
               sx={{
-                borderRadius: '20px',
+                borderRadius: theme.custom.borderRadius.card,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: isSelected ? '3px solid #0A1C59' : 'none',
+                border: isSelected ? `3px solid ${theme.palette.primary.main}` : 'none',
                 boxShadow: isSelected
-                  ? '0 6px 20px rgba(10, 28, 89, 0.2)'
-                  : '0 4px 16px rgba(0,0,0,0.06)',
+                  ? theme.custom.shadows.buttonHover
+                  : theme.custom.shadows.card,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  boxShadow: theme.custom.shadows.cardHover,
                 },
               }}
             >

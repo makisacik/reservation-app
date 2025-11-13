@@ -1,6 +1,7 @@
-import { Avatar } from '@mui/material';
+import { Avatar, useTheme } from '@mui/material';
 
 const UserAvatar = ({ name, size = 40 }) => {
+  const theme = useTheme();
   // Get initials from name
   const getInitials = (name) => {
     if (!name) return '?';
@@ -16,10 +17,10 @@ const UserAvatar = ({ name, size = 40 }) => {
       sx={{
         width: size,
         height: size,
-        bgcolor: '#0A1C59',
+        bgcolor: theme.palette.primary.main,
         color: 'white',
         fontSize: size * 0.4,
-        fontWeight: 600,
+        fontWeight: theme.custom.typography.fontWeight.semibold,
       }}
     >
       {getInitials(name)}

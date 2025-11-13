@@ -1,9 +1,7 @@
-import { Card, CardContent, Typography } from '@mui/material';
+import { Card, CardContent, Typography, useTheme } from '@mui/material';
 import CategoryTabs from '../common/CategoryTabs';
 import MealGrid from '../meals/MealGrid';
 import ReservationButton from '../common/ReservationButton';
-
-const RADIUS = "20px";
 
 /**
  * MenuSection - Component for displaying menu with categories and meals
@@ -24,10 +22,11 @@ const MenuSection = ({
   isLoading,
   onReservationClick,
 }) => {
+  const theme = useTheme();
   return (
-    <Card sx={{ borderRadius: RADIUS, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+    <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card }}>
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.bold }}>
           Bugünün Menüsü
         </Typography>
         <Typography sx={{ color: "text.secondary", mb: 2 }}>

@@ -1,4 +1,4 @@
-import { Box, Card, Typography, Button, Checkbox, FormControlLabel, CircularProgress } from '@mui/material';
+import { Box, Card, Typography, Button, Checkbox, FormControlLabel, CircularProgress, useTheme } from '@mui/material';
 import { menusApi } from '../../api/menusApi';
 import { useQuery } from '@tanstack/react-query';
 
@@ -12,6 +12,7 @@ const Step4MenuSelection = ({
   onMenuSelect,
   onAppetizerChange,
 }) => {
+  const theme = useTheme();
   // Get the first selected date for menu fetching
   // Note: We use the first date's menu for all reservations
   // The backend will validate that menus exist for all dates
@@ -61,8 +62,8 @@ const Step4MenuSelection = ({
       <Typography
         variant="h5"
         sx={{
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
           mb: 1,
         }}
       >
@@ -71,7 +72,7 @@ const Step4MenuSelection = ({
       <Typography
         variant="body2"
         sx={{
-          color: '#666',
+          color: theme.palette.custom.text.secondary,
           mb: 4,
         }}
       >
@@ -81,14 +82,14 @@ const Step4MenuSelection = ({
       {hasMultipleDates && (
         <Box
           sx={{
-            bgcolor: '#E3F2FD',
-            borderRadius: '12px',
+            bgcolor: theme.palette.info.light,
+            borderRadius: theme.custom.borderRadius.button,
             p: 2,
             mb: 3,
-            border: '1px solid #4A90E2',
+            border: `1px solid ${theme.palette.info.main}`,
           }}
         >
-          <Typography sx={{ color: '#0A1C59', fontSize: '14px' }}>
+          <Typography sx={{ color: theme.palette.primary.main, fontSize: '14px' }}>
             Not: Seçilen menü tüm seçili tarihler için kullanılacaktır.
           </Typography>
         </Box>
@@ -132,12 +133,12 @@ const Step4MenuSelection = ({
               <Card
                 key={meal.id}
                 sx={{
-                  borderRadius: '20px',
+                  borderRadius: theme.custom.borderRadius.card,
                   overflow: 'hidden',
-                  border: isSelected ? '3px solid #0A1C59' : 'none',
+                  border: isSelected ? `3px solid ${theme.palette.primary.main}` : 'none',
                   boxShadow: isSelected
-                    ? '0 6px 20px rgba(10, 28, 89, 0.2)'
-                    : '0 4px 16px rgba(0,0,0,0.06)',
+                    ? theme.custom.shadows.buttonHover
+                    : theme.custom.shadows.card,
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
                   '&:hover': {
@@ -154,7 +155,7 @@ const Step4MenuSelection = ({
                 <Box
                   sx={{
                     height: '200px',
-                    bgcolor: '#f5f5f5',
+                    bgcolor: theme.palette.custom.background.light,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -182,7 +183,7 @@ const Step4MenuSelection = ({
                     variant="h6"
                     sx={{
                       fontWeight: 600,
-                      color: '#0A1C59',
+                      color: theme.palette.primary.main,
                       mb: 1,
                     }}
                   >
@@ -191,7 +192,7 @@ const Step4MenuSelection = ({
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#666',
+                      color: theme.palette.custom.text.secondary,
                       mb: 2,
                       minHeight: '40px',
                     }}
@@ -204,16 +205,16 @@ const Step4MenuSelection = ({
                       variant="contained"
                       disabled
                       sx={{
-                        borderRadius: '12px',
-                        bgcolor: '#0A1C59',
+                        borderRadius: theme.custom.borderRadius.button,
+                        bgcolor: theme.palette.primary.main,
                         color: 'white',
                         textTransform: 'none',
-                        fontWeight: 500,
+                        fontWeight: theme.custom.typography.fontWeight.medium,
                         px: 3,
                         py: 1,
                         width: '100%',
                         '&.Mui-disabled': {
-                          bgcolor: '#0A1C59',
+                          bgcolor: theme.palette.primary.main,
                           color: 'white',
                         },
                       }}
@@ -231,10 +232,10 @@ const Step4MenuSelection = ({
       {/* Appetizer Checkbox */}
       <Card
         sx={{
-          borderRadius: '20px',
+          borderRadius: theme.custom.borderRadius.card,
           p: 3,
-          bgcolor: '#FFF8E1',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+          bgcolor: theme.palette.warning.light,
+          boxShadow: theme.custom.shadows.card,
         }}
       >
         <FormControlLabel

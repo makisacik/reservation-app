@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, LinearProgress, CircularProgress } from '@mui/material';
+import { Card, CardContent, Typography, Box, LinearProgress, CircularProgress, useTheme } from '@mui/material';
 
 /**
  * PopularMenus - Component for displaying popular meals with progress bars
@@ -7,9 +7,10 @@ import { Card, CardContent, Typography, Box, LinearProgress, CircularProgress } 
  * @param {boolean} isLoading - Loading state
  */
 const PopularMenus = ({ popularMeals = [], isLoading = false }) => {
+  const theme = useTheme();
   if (isLoading) {
     return (
-      <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white' }}>
+      <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white' }}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
             <CircularProgress />
@@ -25,9 +26,9 @@ const PopularMenus = ({ popularMeals = [], isLoading = false }) => {
     : 1;
 
   return (
-    <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white' }}>
+    <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white' }}>
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#333' }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, mb: 2, color: theme.palette.custom.text.primary }}>
           En Popüler Menüler
         </Typography>
         {popularMeals.length === 0 ? (
@@ -41,7 +42,7 @@ const PopularMenus = ({ popularMeals = [], isLoading = false }) => {
               return (
                 <Box key={meal.mealId || index}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 500, color: '#333' }}>
+                    <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium, color: theme.palette.custom.text.primary }}>
                       {meal.mealName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -53,11 +54,11 @@ const PopularMenus = ({ popularMeals = [], isLoading = false }) => {
                     value={progress}
                     sx={{
                       height: 8,
-                      borderRadius: 4,
-                      bgcolor: '#e0e0e0',
+                      borderRadius: theme.custom.borderRadius.small,
+                      bgcolor: theme.palette.custom.border.default,
                       '& .MuiLinearProgress-bar': {
-                        bgcolor: '#1665d8',
-                        borderRadius: 4,
+                        bgcolor: theme.palette.primary.light,
+                        borderRadius: theme.custom.borderRadius.small,
                       },
                     }}
                   />

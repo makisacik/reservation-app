@@ -19,6 +19,7 @@ import {
   Alert,
   Link,
   TablePagination,
+  useTheme,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -33,6 +34,7 @@ import EditUserModal from '../components/users/EditUserModal';
 import CreateUserModal from '../components/users/CreateUserModal';
 
 const Users = () => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -114,11 +116,11 @@ const Users = () => {
   const totalCount = usersData?.totalCount || 0;
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#F6F7FB', minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ flexGrow: 1, p: 3, bgcolor: theme.palette.custom.background.page, minHeight: 'calc(100vh - 64px)' }}>
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59', mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, mb: 0.5 }}>
             Kullanıcı Yönetimi
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -130,13 +132,13 @@ const Users = () => {
           startIcon={<PersonAddIcon />}
           onClick={handleOpenCreateModal}
           sx={{
-            bgcolor: '#0A1C59',
+            bgcolor: theme.palette.primary.main,
             color: 'white',
-            borderRadius: '12px',
+            borderRadius: theme.custom.borderRadius.button,
             textTransform: 'none',
             px: 3,
             '&:hover': {
-              bgcolor: '#0d2a7a',
+              bgcolor: theme.palette.primary.dark,
             },
           }}
         >
@@ -156,7 +158,7 @@ const Users = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: '#999' }} />
+                <SearchIcon sx={{ color: theme.palette.custom.text.quaternary }} />
               </InputAdornment>
             ),
           }}
@@ -164,7 +166,7 @@ const Users = () => {
             width: '100%',
             maxWidth: 600,
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               bgcolor: 'white',
             },
           }}
@@ -177,15 +179,15 @@ const Users = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Toplam Kullanıcı
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
               {statisticsLoading ? <CircularProgress size={24} /> : statistics?.totalUsers || 0}
             </Typography>
           </Card>
@@ -194,15 +196,15 @@ const Users = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Aktif
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#10b981' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.success.light }}>
               {statisticsLoading ? <CircularProgress size={24} /> : statistics?.activeUsers || 0}
             </Typography>
           </Card>
@@ -211,15 +213,15 @@ const Users = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Pasif
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
               {statisticsLoading ? <CircularProgress size={24} /> : statistics?.passiveUsers || 0}
             </Typography>
           </Card>
@@ -228,15 +230,15 @@ const Users = () => {
           <Card
             sx={{
               p: 3,
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              borderRadius: theme.custom.borderRadius.card,
+              boxShadow: theme.custom.shadows.card,
               bgcolor: 'white',
             }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Bu Ay Yeni
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
               {statisticsLoading ? <CircularProgress size={24} /> : statistics?.newThisMonth || 0}
             </Typography>
           </Card>
@@ -245,7 +247,7 @@ const Users = () => {
 
       {/* User List */}
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: '#0A1C59', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, mb: 2 }}>
           Kullanıcı Listesi
         </Typography>
       </Box>
@@ -258,8 +260,8 @@ const Users = () => {
         <Card
           sx={{
             p: 4,
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.card,
             bgcolor: 'white',
             textAlign: 'center',
           }}
@@ -272,20 +274,20 @@ const Users = () => {
         <TableContainer
           component={Paper}
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.card,
             bgcolor: 'white',
           }}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: '#F6F7FB' }}>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Kullanıcı</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>E-posta</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Departman</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Toplam Rezervasyon</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Durum</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>İşlemler</TableCell>
+              <TableRow sx={{ bgcolor: theme.palette.custom.background.page }}>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Kullanıcı</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>E-posta</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Departman</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Toplam Rezervasyon</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Durum</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>İşlemler</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -294,14 +296,14 @@ const Users = () => {
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <UserAvatar name={user.name} />
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                         {user.name}
                       </Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <EmailIcon sx={{ fontSize: 18, color: '#999' }} />
+                      <EmailIcon sx={{ fontSize: 18, color: theme.palette.custom.text.quaternary }} />
                       <Typography variant="body2">{user.email}</Typography>
                     </Box>
                   </TableCell>
@@ -312,9 +314,9 @@ const Users = () => {
                           display: 'inline-block',
                           px: 1.5,
                           py: 0.5,
-                          borderRadius: '12px',
-                          bgcolor: '#F0F0F0',
-                          color: '#666',
+                          borderRadius: theme.custom.borderRadius.button,
+                          bgcolor: theme.palette.custom.background.lighter,
+                          color: theme.palette.custom.text.secondary,
                         }}
                       >
                         {user.department}
@@ -335,7 +337,7 @@ const Users = () => {
                         component="button"
                         variant="body2"
                         onClick={() => handleOpenEditModal(user)}
-                        sx={{ color: '#0A1C59', textDecoration: 'none', cursor: 'pointer' }}
+                        sx={{ color: theme.palette.primary.main, textDecoration: 'none', cursor: 'pointer' }}
                       >
                         Düzenle
                       </Link>
@@ -343,7 +345,7 @@ const Users = () => {
                         component="button"
                         variant="body2"
                         onClick={() => handleOpenDetailModal(user)}
-                        sx={{ color: '#0A1C59', textDecoration: 'none', cursor: 'pointer' }}
+                        sx={{ color: theme.palette.primary.main, textDecoration: 'none', cursor: 'pointer' }}
                       >
                         Detay
                       </Link>

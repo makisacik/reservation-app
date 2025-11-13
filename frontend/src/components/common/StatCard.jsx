@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, useTheme } from '@mui/material';
 
 /**
  * StatCard - Reusable component for displaying statistics/metrics
@@ -6,10 +6,14 @@ import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
  * @param {string} title - The title/label of the stat
  * @param {string|number} value - The value to display
  * @param {ReactNode} icon - Icon component to display
- * @param {string} color - Color for the value and icon (hex color)
+ * @param {string} color - Color for the value and icon (hex color or theme color)
  * @param {number} changePercent - Percentage change to display as badge (optional)
  */
-const StatCard = ({ title, value, icon, color = "#1665d8", changePercent }) => {
+const StatCard = ({ title, value, icon, color, changePercent }) => {
+  const theme = useTheme();
+  const defaultColor = theme.palette.primary.light;
+  const iconColor = color || defaultColor;
+
   const formatValue = (val) => {
     if (typeof val === 'number') {
       return val.toLocaleString('tr-TR');
@@ -31,8 +35,8 @@ const StatCard = ({ title, value, icon, color = "#1665d8", changePercent }) => {
   return (
     <Card
       sx={{
-        borderRadius: "20px",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+        borderRadius: theme.custom.borderRadius.card,
+        boxShadow: theme.custom.shadows.card,
         bgcolor: 'white',
       }}
     >
@@ -50,20 +54,20 @@ const StatCard = ({ title, value, icon, color = "#1665d8", changePercent }) => {
               label={`${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(0)}%`}
               size="small"
               sx={{
-                bgcolor: '#1665d8',
+                bgcolor: theme.palette.primary.light,
                 color: 'white',
                 fontSize: '0.75rem',
                 height: '20px',
-                fontWeight: 500,
+                fontWeight: theme.custom.typography.fontWeight.medium,
               }}
             />
           )}
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-          <Typography sx={{ fontSize: "1.8rem", fontWeight: "bold", color: '#333' }}>
+          <Typography sx={{ fontSize: "1.8rem", fontWeight: theme.custom.typography.fontWeight.bold, color: theme.palette.custom.text.primary }}>
             {displayValue}
           </Typography>
-          <Box sx={{ color, ml: 'auto' }}>{icon}</Box>
+          <Box sx={{ color: iconColor, ml: 'auto' }}>{icon}</Box>
         </Box>
       </CardContent>
     </Card>

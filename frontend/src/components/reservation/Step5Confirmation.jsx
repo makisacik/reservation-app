@@ -1,4 +1,4 @@
-import { Box, Card, Typography, Button, Chip } from '@mui/material';
+import { Box, Card, Typography, Button, Chip, useTheme } from '@mui/material';
 import { mealTimeSlotsApi } from '../../api/mealTimeSlotsApi';
 import { useQuery } from '@tanstack/react-query';
 
@@ -27,6 +27,7 @@ const Step5Confirmation = ({
   onSubmit,
   isSubmitting,
 }) => {
+  const theme = useTheme();
   const { data: mealTimeSlots = [] } = useQuery({
     queryKey: ['mealTimeSlots'],
     queryFn: () => mealTimeSlotsApi.getMealTimeSlots(),
@@ -45,16 +46,16 @@ const Step5Confirmation = ({
     <Box>
       <Card
         sx={{
-          borderRadius: '20px',
+          borderRadius: theme.custom.borderRadius.card,
           p: 4,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+          boxShadow: theme.custom.shadows.card,
         }}
       >
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 600,
-            color: '#0A1C59',
+            fontWeight: theme.custom.typography.fontWeight.semibold,
+            color: theme.palette.primary.main,
             mb: 1,
           }}
         >
@@ -63,7 +64,7 @@ const Step5Confirmation = ({
         <Typography
           variant="body2"
           sx={{
-            color: '#666',
+            color: theme.palette.custom.text.secondary,
             mb: 4,
           }}
         >
@@ -76,7 +77,7 @@ const Step5Confirmation = ({
             variant="subtitle2"
             sx={{
               fontWeight: 600,
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
           >
@@ -86,8 +87,8 @@ const Step5Confirmation = ({
             <Box
               key={dateObj.date}
               sx={{
-                bgcolor: '#FFF8E1',
-                borderRadius: '12px',
+                bgcolor: theme.palette.warning.light,
+                borderRadius: theme.custom.borderRadius.button,
                 p: 2,
                 mb: 1.5,
                 display: 'flex',
@@ -102,9 +103,9 @@ const Step5Confirmation = ({
                 <Chip
                   label={getMealTimeSlotName(dateObj.mealTimeSlotId)}
                   sx={{
-                    bgcolor: '#0A1C59',
+                    bgcolor: theme.palette.primary.main,
                     color: 'white',
-                    fontWeight: 500,
+                    fontWeight: theme.custom.typography.fontWeight.medium,
                     fontSize: '12px',
                   }}
                 />
@@ -119,7 +120,7 @@ const Step5Confirmation = ({
             variant="subtitle2"
             sx={{
               fontWeight: 600,
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
           >
@@ -144,7 +145,7 @@ const Step5Confirmation = ({
             variant="subtitle2"
             sx={{
               fontWeight: 600,
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
           >
@@ -169,7 +170,7 @@ const Step5Confirmation = ({
             variant="subtitle2"
             sx={{
               fontWeight: 600,
-              color: '#666',
+              color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
           >
@@ -195,7 +196,7 @@ const Step5Confirmation = ({
               variant="subtitle2"
               sx={{
                 fontWeight: 600,
-                color: '#666',
+                color: theme.palette.custom.text.secondary,
                 mb: 1.5,
               }}
             >
@@ -203,10 +204,10 @@ const Step5Confirmation = ({
             </Typography>
             <Box
               sx={{
-                bgcolor: '#E3F2FD',
-                borderRadius: '12px',
+                bgcolor: theme.palette.info.light,
+                borderRadius: theme.custom.borderRadius.button,
                 p: 2,
-                border: '2px solid #4A90E2',
+                border: `2px solid ${theme.palette.info.main}`,
               }}
             >
               <Typography sx={{ color: '#333', fontSize: '14px' }}>
@@ -223,19 +224,19 @@ const Step5Confirmation = ({
             disabled={isSubmitting}
             variant="contained"
             sx={{
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               px: 4,
               py: 1.5,
-              bgcolor: '#0A1C59',
+              bgcolor: theme.palette.primary.main,
               color: 'white',
               textTransform: 'none',
-              fontWeight: 500,
+              fontWeight: theme.custom.typography.fontWeight.medium,
               '&:hover': {
-                bgcolor: '#0d2569',
+                bgcolor: theme.palette.primary.dark,
               },
               '&:disabled': {
-                bgcolor: '#E0E0E0',
-                color: '#999',
+                bgcolor: theme.palette.custom.border.default,
+                color: theme.palette.custom.text.quaternary,
               },
             }}
           >

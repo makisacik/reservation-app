@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 import StatCard from '../common/StatCard';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PeopleIcon from '@mui/icons-material/People';
@@ -12,6 +12,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
  * @param {boolean} isLoading - Loading state
  */
 const StatsSection = ({ stats, isLoading = false }) => {
+  const theme = useTheme();
   const { totalMeals = 0, mostPopular = "", preferenceRate = 0, aperatifCount = 0 } = stats || {};
   
   // Display "N/A" if mostPopular is empty (no reservations yet)
@@ -22,25 +23,25 @@ const StatsSection = ({ stats, isLoading = false }) => {
       title: "Toplam Yemek", 
       value: totalMeals.toString(), 
       icon: <TrendingUpIcon />, 
-      color: "#4caf50" 
+      color: theme.palette.success.main
     },
     { 
       title: "En Popüler", 
       value: displayMostPopular, 
       icon: <PeopleIcon />, 
-      color: "#1665d8" 
+      color: theme.palette.primary.light
     },
     { 
       title: "Tercih Oranı", 
       value: `${preferenceRate}%`, 
       icon: <FavoriteIcon />, 
-      color: "#e53935" 
+      color: theme.palette.error.main
     },
     { 
       title: "Aperatif", 
       value: aperatifCount.toString(), 
       icon: <CalendarTodayIcon />, 
-      color: "#fb8c00" 
+      color: theme.palette.warning.main
     },
   ];
 

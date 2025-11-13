@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
@@ -7,6 +7,7 @@ import StoreIcon from '@mui/icons-material/Store';
 import { ROUTES } from '../utils/constants';
 
 const Onboarding = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
@@ -18,7 +19,7 @@ const Onboarding = () => {
       sx={{
         minHeight: '100vh',
         width: '100%',
-        background: 'linear-gradient(180deg, #E8F4F8 0%, #F5F9FC 50%, #FFFFFF 100%)',
+        background: theme.palette.custom.gradients.onboarding,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -32,8 +33,8 @@ const Onboarding = () => {
         sx={{
           width: { xs: 70, sm: 80 },
           height: { xs: 70, sm: 80 },
-          borderRadius: '12px',
-          backgroundColor: '#0A1445',
+          borderRadius: theme.custom.borderRadius.button,
+          backgroundColor: theme.palette.custom.onboarding.primary,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -43,9 +44,9 @@ const Onboarding = () => {
       >
         <Typography
           sx={{
-            color: '#FFFFFF',
+            color: theme.palette.custom.text.white,
             fontSize: { xs: '28px', sm: '32px' },
-            fontWeight: 700,
+            fontWeight: theme.custom.typography.fontWeight.bold,
             letterSpacing: '1px',
           }}
         >
@@ -58,7 +59,7 @@ const Onboarding = () => {
         sx={{
           fontSize: { xs: '28px', sm: '38px', md: '44px', lg: '48px' },
           fontWeight: 700,
-          color: '#0A1445',
+          color: theme.palette.custom.onboarding.primary,
           textAlign: 'center',
           mb: 2,
           lineHeight: 1.2,
@@ -72,7 +73,7 @@ const Onboarding = () => {
       <Typography
         sx={{
           fontSize: { xs: '14px', sm: '15px', md: '16px' },
-          color: '#666666',
+          color: theme.palette.custom.text.secondary,
           textAlign: 'center',
           mb: 0.5,
           maxWidth: '700px',
@@ -84,7 +85,7 @@ const Onboarding = () => {
       <Typography
         sx={{
           fontSize: { xs: '14px', sm: '15px', md: '16px' },
-          color: '#666666',
+          color: theme.palette.custom.text.secondary,
           textAlign: 'center',
           mb: { xs: 3, md: 4 },
           maxWidth: '700px',
@@ -100,19 +101,19 @@ const Onboarding = () => {
         variant="contained"
         endIcon={<ArrowForwardIcon sx={{ fontSize: '20px' }} />}
         sx={{
-          backgroundColor: '#0A1445',
-          color: '#FFFFFF',
-          borderRadius: '12px',
+          backgroundColor: theme.palette.custom.onboarding.primary,
+          color: theme.palette.custom.text.white,
+          borderRadius: theme.custom.borderRadius.button,
           px: { xs: 3, sm: 4 },
           py: 1.5,
           fontSize: { xs: '15px', sm: '16px' },
-          fontWeight: 600,
+          fontWeight: theme.custom.typography.fontWeight.semibold,
           textTransform: 'none',
           mb: { xs: 4, md: 6 },
-          boxShadow: '0 4px 12px rgba(10, 20, 69, 0.25)',
+          boxShadow: theme.custom.shadows.buttonHover,
           '&:hover': {
-            backgroundColor: '#091234',
-            boxShadow: '0 6px 16px rgba(10, 20, 69, 0.35)',
+            backgroundColor: theme.palette.custom.onboarding.primaryDark,
+            boxShadow: theme.custom.shadows.buttonActive,
           },
         }}
       >
@@ -135,13 +136,13 @@ const Onboarding = () => {
         <Card
           sx={{
             flex: 1,
-            borderRadius: '16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            backgroundColor: '#FFFFFF',
+            borderRadius: theme.custom.borderRadius.xlarge,
+            boxShadow: theme.custom.shadows.onboardingCard,
+            backgroundColor: theme.palette.background.paper,
             transition: 'transform 0.2s, box-shadow 0.2s',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+              boxShadow: theme.custom.shadows.onboardingCardHover,
             },
           }}
         >
@@ -150,21 +151,21 @@ const Onboarding = () => {
               sx={{
                 width: { xs: 50, md: 56 },
                 height: { xs: 50, md: 56 },
-                borderRadius: '12px',
-                backgroundColor: '#9C27B0',
+                borderRadius: theme.custom.borderRadius.button,
+                background: theme.palette.custom.gradients.purple,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mb: 2,
               }}
             >
-              <CalendarTodayIcon sx={{ fontSize: { xs: 26, md: 28 }, color: '#FFFFFF' }} />
+              <CalendarTodayIcon sx={{ fontSize: { xs: 26, md: 28 }, color: theme.palette.custom.text.white }} />
             </Box>
             <Typography
               sx={{
                 fontSize: { xs: '18px', md: '20px' },
-                fontWeight: 700,
-                color: '#0A1445',
+                fontWeight: theme.custom.typography.fontWeight.bold,
+                color: theme.palette.custom.onboarding.primary,
                 mb: 1,
               }}
             >
@@ -173,7 +174,7 @@ const Onboarding = () => {
             <Typography
               sx={{
                 fontSize: { xs: '13px', md: '14px' },
-                color: '#666666',
+                color: theme.palette.custom.text.secondary,
                 lineHeight: 1.6,
               }}
             >
@@ -186,13 +187,13 @@ const Onboarding = () => {
         <Card
           sx={{
             flex: 1,
-            borderRadius: '16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            backgroundColor: '#FFFFFF',
+            borderRadius: theme.custom.borderRadius.xlarge,
+            boxShadow: theme.custom.shadows.onboardingCard,
+            backgroundColor: theme.palette.background.paper,
             transition: 'transform 0.2s, box-shadow 0.2s',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+              boxShadow: theme.custom.shadows.onboardingCardHover,
             },
           }}
         >
@@ -201,21 +202,21 @@ const Onboarding = () => {
               sx={{
                 width: { xs: 50, md: 56 },
                 height: { xs: 50, md: 56 },
-                borderRadius: '12px',
-                backgroundColor: '#03A9F4',
+                borderRadius: theme.custom.borderRadius.button,
+                background: theme.palette.custom.gradients.blue,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mb: 2,
               }}
             >
-              <RestaurantMenuIcon sx={{ fontSize: { xs: 26, md: 28 }, color: '#FFFFFF' }} />
+              <RestaurantMenuIcon sx={{ fontSize: { xs: 26, md: 28 }, color: theme.palette.custom.text.white }} />
             </Box>
             <Typography
               sx={{
                 fontSize: { xs: '18px', md: '20px' },
-                fontWeight: 700,
-                color: '#0A1445',
+                fontWeight: theme.custom.typography.fontWeight.bold,
+                color: theme.palette.custom.onboarding.primary,
                 mb: 1,
               }}
             >
@@ -224,7 +225,7 @@ const Onboarding = () => {
             <Typography
               sx={{
                 fontSize: { xs: '13px', md: '14px' },
-                color: '#666666',
+                color: theme.palette.custom.text.secondary,
                 lineHeight: 1.6,
               }}
             >
@@ -237,13 +238,13 @@ const Onboarding = () => {
         <Card
           sx={{
             flex: 1,
-            borderRadius: '16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            backgroundColor: '#FFFFFF',
+            borderRadius: theme.custom.borderRadius.xlarge,
+            boxShadow: theme.custom.shadows.onboardingCard,
+            backgroundColor: theme.palette.background.paper,
             transition: 'transform 0.2s, box-shadow 0.2s',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+              boxShadow: theme.custom.shadows.onboardingCardHover,
             },
           }}
         >
@@ -252,21 +253,21 @@ const Onboarding = () => {
               sx={{
                 width: { xs: 50, md: 56 },
                 height: { xs: 50, md: 56 },
-                borderRadius: '12px',
-                backgroundColor: '#00BCD4',
+                borderRadius: theme.custom.borderRadius.button,
+                background: theme.palette.custom.gradients.cyan,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mb: 2,
               }}
             >
-              <StoreIcon sx={{ fontSize: { xs: 26, md: 28 }, color: '#FFFFFF' }} />
+              <StoreIcon sx={{ fontSize: { xs: 26, md: 28 }, color: theme.palette.custom.text.white }} />
             </Box>
             <Typography
               sx={{
                 fontSize: { xs: '18px', md: '20px' },
-                fontWeight: 700,
-                color: '#0A1445',
+                fontWeight: theme.custom.typography.fontWeight.bold,
+                color: theme.palette.custom.onboarding.primary,
                 mb: 1,
               }}
             >
@@ -275,7 +276,7 @@ const Onboarding = () => {
             <Typography
               sx={{
                 fontSize: { xs: '13px', md: '14px' },
-                color: '#666666',
+                color: theme.palette.custom.text.secondary,
                 lineHeight: 1.6,
               }}
             >

@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, CircularProgress } from '@mui/material';
+import { Card, CardContent, Typography, Box, CircularProgress, useTheme } from '@mui/material';
 
 /**
  * TodayReservations - Component for displaying today's reservations grouped by time slot
@@ -7,6 +7,7 @@ import { Card, CardContent, Typography, Box, CircularProgress } from '@mui/mater
  * @param {boolean} isLoading - Loading state
  */
 const TodayReservations = ({ reservations = [], isLoading = false }) => {
+  const theme = useTheme();
   // Turkish name mapping for meal time slots
   const TURKISH_NAMES = {
     Breakfast: 'Kahvaltı',
@@ -45,7 +46,7 @@ const TodayReservations = ({ reservations = [], isLoading = false }) => {
 
   if (isLoading) {
     return (
-      <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white' }}>
+      <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white' }}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
             <CircularProgress />
@@ -56,9 +57,9 @@ const TodayReservations = ({ reservations = [], isLoading = false }) => {
   }
 
   return (
-    <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white' }}>
+    <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white' }}>
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#333' }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, mb: 2, color: theme.palette.custom.text.primary }}>
           Bugünkü Rezervasyonlar
         </Typography>
         {reservations.length === 0 ? (
@@ -75,18 +76,18 @@ const TodayReservations = ({ reservations = [], isLoading = false }) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   py: 1.5,
-                  borderBottom: index < reservations.length - 1 ? '1px solid #f0f0f0' : 'none',
+                  borderBottom: index < reservations.length - 1 ? `1px solid ${theme.palette.custom.background.lighter}` : 'none',
                 }}
               >
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500, color: '#333', mb: 0.5 }}>
+                  <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium, color: theme.palette.custom.text.primary, mb: 0.5 }}>
                     {getTurkishName(reservation.mealTimeSlotName)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {formatTimeRange(reservation.startTime, reservation.endTime)} • {reservation.restaurantName}
                   </Typography>
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1665d8' }}>
+                <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.light }}>
                   {reservation.reservationCount}
                 </Typography>
               </Box>

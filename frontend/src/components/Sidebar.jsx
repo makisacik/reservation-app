@@ -8,6 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
   Card,
+  useTheme,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -40,6 +41,7 @@ const adminMenuItems = [
 ];
 
 const Sidebar = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin } = useAuth();
@@ -58,7 +60,7 @@ const Sidebar = () => {
           width: drawerWidth,
           boxSizing: 'border-box',
           border: 'none',
-          bgcolor: '#F6F7FB',
+          bgcolor: theme.palette.custom.background.page,
           position: 'relative',
           height: '100%',
           top: 0,
@@ -69,8 +71,8 @@ const Sidebar = () => {
       <Box sx={{ p: 2, pt: 1.5 }}>
         <Card
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            borderRadius: theme.custom.borderRadius.card,
+            boxShadow: theme.custom.shadows.card,
             bgcolor: 'white',
             p: 1,
           }}
@@ -95,20 +97,20 @@ const Sidebar = () => {
                   <ListItemButton
                     onClick={() => navigate(item.path)}
                     sx={{
-                      borderRadius: '12px',
+                      borderRadius: theme.custom.borderRadius.button,
                       py: 1.5,
                       px: 2,
-                      bgcolor: isActive ? '#0A1C59' : 'transparent',
-                      color: isActive ? 'white' : '#333',
+                      bgcolor: isActive ? theme.palette.primary.main : 'transparent',
+                      color: isActive ? 'white' : theme.palette.custom.text.primary,
                       '&:hover': {
-                        bgcolor: isActive ? '#0A1C59' : 'rgba(0,0,0,0.04)',
+                        bgcolor: isActive ? theme.palette.primary.main : 'rgba(0,0,0,0.04)',
                       },
                       transition: 'all 0.2s ease',
                     }}
                   >
                     <ListItemIcon
                       sx={{
-                        color: isActive ? 'white' : '#666',
+                        color: isActive ? 'white' : theme.palette.custom.text.secondary,
                         minWidth: 40,
                       }}
                     >
@@ -117,7 +119,7 @@ const Sidebar = () => {
                     <ListItemText
                       primary={item.text}
                       primaryTypographyProps={{
-                        fontWeight: isActive ? 600 : 400,
+                        fontWeight: isActive ? theme.custom.typography.fontWeight.semibold : theme.custom.typography.fontWeight.regular,
                         fontSize: '0.95rem',
                       }}
                     />

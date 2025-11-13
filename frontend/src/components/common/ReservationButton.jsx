@@ -1,4 +1,4 @@
-import { Button, Box } from '@mui/material';
+import { Button, Box, useTheme } from '@mui/material';
 
 /**
  * ReservationButton - Reusable action button component
@@ -14,6 +14,7 @@ const ReservationButton = ({
   fullWidth = false,
   variant = "contained"
 }) => {
+  const theme = useTheme();
   return (
     <Box sx={{ textAlign: "center", mt: 3 }}>
       <Button
@@ -21,18 +22,18 @@ const ReservationButton = ({
         onClick={onClick}
         fullWidth={fullWidth}
         sx={{
-          bgcolor: variant === "contained" ? "#0A1C59" : "transparent",
+          bgcolor: variant === "contained" ? theme.palette.primary.main : "transparent",
           color: "white",
-          fontWeight: 600,
+          fontWeight: theme.custom.typography.fontWeight.semibold,
           px: 4,
           py: 1.5,
-          borderRadius: "12px",
+          borderRadius: theme.custom.borderRadius.button,
           boxShadow: "none",
           textTransform: "none",
           fontSize: "0.95rem",
-          border: variant === "outlined" ? "1px solid #0A1C59" : "none",
+          border: variant === "outlined" ? `1px solid ${theme.palette.primary.main}` : "none",
           "&:hover": {
-            bgcolor: variant === "contained" ? "#0d255f" : "rgba(10, 28, 89, 0.05)",
+            bgcolor: variant === "contained" ? theme.palette.primary.dark : "rgba(10, 28, 89, 0.05)",
             boxShadow: "none",
           },
         }}

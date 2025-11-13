@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, CircularProgress, useTheme } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../api/dashboardApi';
 import StatCard from '../components/common/StatCard';
@@ -11,6 +11,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 const Dashboard = () => {
+  const theme = useTheme();
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: () => dashboardApi.getSummary(),
@@ -32,9 +33,9 @@ const Dashboard = () => {
   });
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#F6F7FB', minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ flexGrow: 1, p: 3, bgcolor: theme.palette.custom.background.page, minHeight: 'calc(100vh - 64px)' }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, color: '#333', mb: 0.5 }}>
+        <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary, mb: 0.5 }}>
           Dashboard
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -49,7 +50,7 @@ const Dashboard = () => {
             title="Toplam Rezervasyon"
             value={summary?.totalReservations || 0}
             icon={<CalendarTodayIcon />}
-            color="#1665d8"
+            color={theme.palette.primary.light}
             changePercent={summary?.totalReservationsChangePercent}
           />
         </Grid>
@@ -58,7 +59,7 @@ const Dashboard = () => {
             title="Aktif Kullanıcı"
             value={summary?.activeUsers || 0}
             icon={<PeopleIcon />}
-            color="#1665d8"
+            color={theme.palette.primary.light}
             changePercent={summary?.activeUsersChangePercent}
           />
         </Grid>
@@ -67,7 +68,7 @@ const Dashboard = () => {
             title="Bugünkü Yemek"
             value={summary?.todayMeals || 0}
             icon={<RestaurantIcon />}
-            color="#1665d8"
+            color={theme.palette.primary.light}
             changePercent={summary?.todayMealsChangePercent}
           />
         </Grid>
@@ -76,7 +77,7 @@ const Dashboard = () => {
             title="Aylık Maliyet"
             value={summary?.monthlyCost || 0}
             icon={<AttachMoneyIcon />}
-            color="#1665d8"
+            color={theme.palette.primary.light}
             changePercent={summary?.monthlyCostChangePercent}
           />
         </Grid>

@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, useTheme } from '@mui/material';
 
 /**
  * MealCard - Reusable component for displaying a meal card
@@ -7,16 +7,17 @@ import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
  * @param {function} onClick - Optional click handler
  */
 const MealCard = ({ meal, onClick }) => {
+  const theme = useTheme();
   return (
     <Card
       onClick={onClick}
       sx={{
-        borderRadius: "20px",
+        borderRadius: theme.custom.borderRadius.card,
         overflow: "hidden",
         cursor: onClick ? "pointer" : "default",
         transition: "0.25s",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
-        "&:hover": onClick ? { boxShadow: "0 8px 20px rgba(0,0,0,0.10)" } : {},
+        boxShadow: theme.custom.shadows.card,
+        "&:hover": onClick ? { boxShadow: theme.custom.shadows.cardHover } : {},
       }}
     >
       <Box
@@ -35,16 +36,16 @@ const MealCard = ({ meal, onClick }) => {
             position: "absolute",
             top: 8,
             right: 8,
-            bgcolor: "#1665d8",
+            bgcolor: theme.palette.primary.light,
             color: "white",
-            fontWeight: 600,
-            borderRadius: "8px",
+            fontWeight: theme.custom.typography.fontWeight.semibold,
+            borderRadius: theme.custom.borderRadius.medium,
           }}
         />
       </Box>
 
       <CardContent>
-        <Typography sx={{ fontWeight: "bold" }}>{meal.name}</Typography>
+        <Typography sx={{ fontWeight: theme.custom.typography.fontWeight.bold }}>{meal.name}</Typography>
         <Typography color="text.secondary">
           {meal.kcal} kcal
         </Typography>

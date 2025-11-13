@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Typography, CircularProgress } from '@mui/material';
+import { Box, Card, CardContent, Typography, CircularProgress, useTheme } from '@mui/material';
 
 /**
  * WeeklySummary - Component for displaying weekly reservation summary (7 days)
@@ -7,9 +7,10 @@ import { Box, Card, CardContent, Typography, CircularProgress } from '@mui/mater
  * @param {boolean} isLoading - Loading state
  */
 const WeeklySummary = ({ dailyData = [], isLoading = false }) => {
+  const theme = useTheme();
   if (isLoading) {
     return (
-      <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white', p: 3 }}>
+      <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white', p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '150px' }}>
           <CircularProgress />
         </Box>
@@ -18,9 +19,9 @@ const WeeklySummary = ({ dailyData = [], isLoading = false }) => {
   }
 
   return (
-    <Card sx={{ borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', bgcolor: 'white' }}>
+    <Card sx={{ borderRadius: theme.custom.borderRadius.card, boxShadow: theme.custom.shadows.card, bgcolor: 'white' }}>
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#333' }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, mb: 3, color: theme.palette.custom.text.primary }}>
           Haftalık Rezervasyon Özeti
         </Typography>
         <Box
@@ -40,22 +41,22 @@ const WeeklySummary = ({ dailyData = [], isLoading = false }) => {
             >
               <Card
                 sx={{
-                  borderRadius: '12px',
-                  bgcolor: '#f8f9fa',
+                  borderRadius: theme.custom.borderRadius.button,
+                  bgcolor: theme.palette.custom.background.inactiveTab,
                   textAlign: 'center',
                   p: 2,
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  border: '1px solid #e0e0e0',
+                  border: `1px solid ${theme.palette.custom.border.default}`,
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
-                    fontWeight: 600,
-                    color: '#666',
+                    fontWeight: theme.custom.typography.fontWeight.semibold,
+                    color: theme.palette.custom.text.secondary,
                     mb: 1,
                     fontSize: '0.875rem',
                   }}
@@ -66,7 +67,7 @@ const WeeklySummary = ({ dailyData = [], isLoading = false }) => {
                   variant="h5"
                   sx={{
                     fontWeight: 700,
-                    color: '#333',
+                    color: theme.palette.custom.text.primary,
                     mb: 0.5,
                   }}
                 >
@@ -75,7 +76,7 @@ const WeeklySummary = ({ dailyData = [], isLoading = false }) => {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: '#999',
+                    color: theme.palette.custom.text.quaternary,
                     fontSize: '0.75rem',
                   }}
                 >
