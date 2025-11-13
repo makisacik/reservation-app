@@ -12,12 +12,12 @@ struct AdminTabView: View {
         TabView {
             AdminDashboardView()
                 .tabItem {
-                    Label("Dashboard", systemImage: "chart.bar.fill")
+                    Label("Panel", systemImage: "chart.bar.fill")
                 }
             
             AdminReservationsView()
                 .tabItem {
-                    Label("Rezervasyonlar", systemImage: "calendar")
+                    Label("Rezervasyon", systemImage: "calendar")
                 }
             
             MenuManagementView()
@@ -38,17 +38,3 @@ struct AdminTabView: View {
         .accentColor(AppColors.primaryMain)
     }
 }
-
-// Placeholder views for other tabs (to be implemented in later phases)
-
-struct SettingsView: View {
-    var body: some View {
-        VStack {
-            Text("Settings")
-                .font(AppTypography.h4())
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.backgroundPage)
-    }
-}
-

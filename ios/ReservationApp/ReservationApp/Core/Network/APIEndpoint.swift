@@ -50,6 +50,14 @@ enum APIEndpoint {
     case adminUpdateUser(id: String)
     case adminDeleteUser(id: String)
     
+    // Admin Settings
+    case adminGeneralSettings
+    case adminUpdateGeneralSettings
+    case adminReservationSettings
+    case adminUpdateReservationSettings
+    case adminNotificationSettings
+    case adminUpdateNotificationSettings
+    
     var path: String {
         switch self {
         case .login:
@@ -118,6 +126,12 @@ enum APIEndpoint {
             return "/admin/users/\(id)"
         case .adminDeleteUser(let id):
             return "/admin/users/\(id)"
+        case .adminGeneralSettings, .adminUpdateGeneralSettings:
+            return "/admin/settings/general"
+        case .adminReservationSettings, .adminUpdateReservationSettings:
+            return "/admin/settings/reservation"
+        case .adminNotificationSettings, .adminUpdateNotificationSettings:
+            return "/admin/settings/notifications"
         }
     }
     
@@ -125,11 +139,11 @@ enum APIEndpoint {
         switch self {
         case .login, .register, .createReservation, .adminCreateMeal, .adminCreateUser:
             return "POST"
-        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation, .adminUpdateMeal, .adminUpdateUser:
+        case .updateUserProfile, .adminApproveReservation, .adminCancelReservation, .adminUpdateMeal, .adminUpdateUser, .adminUpdateGeneralSettings, .adminUpdateReservationSettings, .adminUpdateNotificationSettings:
             return "PUT"
         case .adminDeleteMeal, .adminDeleteUser:
             return "DELETE"
-        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById, .adminMeals, .adminMeal, .adminUserStatistics:
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus, .myReservations, .restaurants, .mealTimeSlots, .adminDashboardSummary, .adminPopularMeals, .adminTodayReservations, .adminWeeklyTrends, .adminDailySummary, .adminReservations, .reservationSummary, .getReservationById, .adminMeals, .adminMeal, .adminUserStatistics, .adminGeneralSettings, .adminReservationSettings, .adminNotificationSettings:
             return "GET"
         }
     }

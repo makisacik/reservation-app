@@ -39,6 +39,7 @@ struct ProfileCardView: View {
             // Location
             LocationView()
         }
+        .frame(maxWidth: .infinity)
         .padding(ThemeManager.shared.spacing.lg)
         .background(AppColors.backgroundPaper)
         .cornerRadius(ThemeManager.shared.borderRadius.card.value)

@@ -17,11 +17,11 @@ struct UsersManagementView: View {
                     // Header
                     HStack {
                         VStack(alignment: .leading, spacing: ThemeManager.shared.spacing.xs) {
-                            Text("Kullanıcı Yönetimi")
+                            Text("Kullanıcılar")
                                 .font(AppTypography.h4())
                                 .foregroundColor(AppColors.textPrimary)
                             
-                            Text("Sistem kullanıcılarını yönetin")
+                            Text("Kullanıcıları yönetin")
                                 .font(AppTypography.body2())
                                 .foregroundColor(AppColors.textSecondary)
                         }
