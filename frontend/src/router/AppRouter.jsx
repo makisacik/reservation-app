@@ -8,7 +8,7 @@ import Dashboard from '../pages/Dashboard';
 import MakeReservation from '../pages/MakeReservation';
 import MyReservations from '../pages/MyReservations';
 import Users from '../pages/Users';
-import Settings from '../pages/Settings';
+import Profile from '../pages/Profile';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 
@@ -142,7 +142,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <Settings />
+              <Profile />
             </AppLayout>
           </ProtectedRoute>
         }
