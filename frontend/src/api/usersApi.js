@@ -7,6 +7,12 @@ export const usersApi = {
     return response.data;
   },
 
+  // Update current user profile
+  updateCurrentUserProfile: async (profileData) => {
+    const response = await axiosClient.put('/users/me', profileData);
+    return response.data;
+  },
+
   // Get all users (Admin only)
   getAllUsers: async () => {
     const response = await axiosClient.get('/users');

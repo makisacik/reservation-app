@@ -11,6 +11,7 @@ export const ROUTES = {
   USERS: '/users',
   ADMIN_USERS: '/admin/users',
   SETTINGS: '/settings',
+  ADMIN_SETTINGS: '/admin/settings',
 };
 
 // API endpoints

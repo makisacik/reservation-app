@@ -36,7 +36,7 @@ const adminMenuItems = [
   { text: 'Menü Yönetimi', icon: <RestaurantMenuIcon />, path: ROUTES.ADMIN_MENU_MANAGEMENT },
   { text: 'Rezervasyonlar', icon: <CalendarTodayIcon />, path: ROUTES.ADMIN_RESERVATIONS },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: ROUTES.ADMIN_USERS },
-  { text: 'Ayarlar', icon: <SettingsIcon />, path: ROUTES.SETTINGS },
+  { text: 'Ayarlar', icon: <SettingsIcon />, path: ROUTES.ADMIN_SETTINGS },
 ];
 
 const Sidebar = () => {
@@ -86,6 +86,7 @@ const Sidebar = () => {
                 item.path === ROUTES.ADMIN_DASHBOARD ||
                 item.path === ROUTES.ADMIN_MENU_MANAGEMENT ||
                 item.path === ROUTES.ADMIN_RESERVATIONS ||
+                item.path === ROUTES.ADMIN_SETTINGS ||
                 item.path === ROUTES.SETTINGS
                   ? location.pathname.startsWith(item.path) || location.pathname === item.path
                   : location.pathname === item.path;

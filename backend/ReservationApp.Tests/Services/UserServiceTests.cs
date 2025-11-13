@@ -20,11 +20,12 @@ public class UserServiceTests
     public UserServiceTests()
     {
         _repositoryMock = new Mock<IUserRepository>();
+        var reportRepositoryMock = new Mock<IReportRepository>();
         _configurationMock = new Mock<IConfiguration>();
         _configurationMock.Setup(c => c["Jwt:Key"]).Returns("test-key-that-is-long-enough-for-hmac-sha256");
         _configurationMock.Setup(c => c["Jwt:Issuer"]).Returns("test-issuer");
         _configurationMock.Setup(c => c["Jwt:Audience"]).Returns("test-audience");
-        _service = new UserService(_repositoryMock.Object, _configurationMock.Object);
+        _service = new UserService(_repositoryMock.Object, reportRepositoryMock.Object, _configurationMock.Object);
     }
 
     [Fact]

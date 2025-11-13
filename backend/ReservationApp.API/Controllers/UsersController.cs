@@ -48,6 +48,26 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateCurrentUserProfile(
+        [FromBody] UpdateProfileDto dto,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) 
+            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            _logger.LogWarning("Invalid user ID claim in token");
+            return Unauthorized(new { message = "Invalid token" });
+        }
+
+        _logger.LogInformation("User updating their profile for ID: {UserId}", userId);
+        
+        var user = await _userService.UpdateCurrentUserProfileAsync(userId, dto, cancellationToken);
+        return Ok(user);
+    }
+
     [HttpPut("{id}/role")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> UpdateUserRole(

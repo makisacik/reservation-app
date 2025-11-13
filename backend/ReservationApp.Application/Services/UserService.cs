@@ -176,6 +176,22 @@ public class UserService : IUserService
         };
     }
 
+    public async Task<UserDto> UpdateCurrentUserProfileAsync(Guid userId, UpdateProfileDto dto, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {userId} not found.");
+        }
+
+        // Only update name and department (users cannot update their own role or status)
+        user.UpdateProfile(dto.Name, dto.Department);
+
+        await _userRepository.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(user);
+    }
+
     public async Task<UserDto> CreateUserAsync(AdminCreateUserDto request, CancellationToken cancellationToken = default)
     {
         if (await _userRepository.ExistsByEmailAsync(request.Email, cancellationToken))

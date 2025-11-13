@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -10,30 +10,66 @@ import {
   Button,
   Chip,
   IconButton,
+  CircularProgress,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
 import BusinessIcon from '@mui/icons-material/Business';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { usersApi } from '../api/usersApi';
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
-  // Example data matching the image
+  const { user: authUser, setAuthState } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // User data
   const [formData, setFormData] = useState({
-    name: 'Ahmet',
-    surname: 'Yılmaz',
-    email: 'ahmet.yilmaz@sirket.com',
-    phone: '+90 555 123 4567',
-    department: 'IT Departmanı',
+    name: '',
+    email: '',
+    department: '',
   });
 
-  const [foodPreferences, setFoodPreferences] = useState({
-    vegetarian: false,
-    vegan: false,
-    glutenFree: false,
-    lactoseIntolerant: false,
+  const [originalData, setOriginalData] = useState({
+    name: '',
+    email: '',
+    department: '',
   });
+
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const userData = await usersApi.getCurrentUser();
+      
+      setFormData({
+        name: userData.name || '',
+        email: userData.email || '',
+        department: userData.department || '',
+      });
+      
+      setOriginalData({
+        name: userData.name || '',
+        email: userData.email || '',
+        department: userData.department || '',
+      });
+    } catch (err) {
+      setError('Profil bilgileri yüklenirken bir hata oluştu.');
+      console.error('Error loading user profile:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (field) => (event) => {
     setFormData({
@@ -42,38 +78,112 @@ const Profile = () => {
     });
   };
 
-  const handleFoodPreferenceToggle = (preference) => {
-    setFoodPreferences({
-      ...foodPreferences,
-      [preference]: !foodPreferences[preference],
-    });
-  };
-
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving profile data:', formData, foodPreferences);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      
+      // Validate name
+      if (!formData.name.trim()) {
+        setError('Ad alanı zorunludur.');
+        return;
+      }
+      
+      const updatedUser = await usersApi.updateCurrentUserProfile({
+        name: formData.name.trim(),
+        department: formData.department.trim() || null,
+      });
+      
+      // Update auth context with new user data
+      const token = localStorage.getItem('token');
+      if (token) {
+        setAuthState(token, updatedUser);
+      }
+      
+      // Update original data and form data
+      setOriginalData({
+        name: updatedUser.name || '',
+        email: updatedUser.email || '',
+        department: updatedUser.department || '',
+      });
+      
+      setFormData({
+        name: updatedUser.name || '',
+        email: updatedUser.email || '',
+        department: updatedUser.department || '',
+      });
+      
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Profil kaydedilirken bir hata oluştu.');
+      console.error('Error saving profile:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
     // Reset to original values
     setFormData({
-      name: 'Ahmet',
-      surname: 'Yılmaz',
-      email: 'ahmet.yilmaz@sirket.com',
-      phone: '+90 555 123 4567',
-      department: 'IT Departmanı',
-    });
-    setFoodPreferences({
-      vegetarian: false,
-      vegan: false,
-      glutenFree: false,
-      lactoseIntolerant: false,
+      ...originalData,
     });
   };
 
   // Get initials for avatar
-  const getInitials = (name, surname) => {
-    return `${name.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  // Format created date
+  const formatCreatedDate = (dateString) => {
+    if (!dateString) return 'Bilinmiyor';
+    try {
+      const date = new Date(dateString);
+      const months = [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      ];
+      return `Üyelik: ${months[date.getMonth()]} ${date.getFullYear()}`;
+    } catch {
+      return 'Bilinmiyor';
+    }
+  };
+
+  // Get role display name
+  const getRoleDisplayName = (role) => {
+    if (role === 'Admin' || role === 1) return 'Admin';
+    return 'Personel';
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 64px)',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Use formData for editable fields (it's loaded from API and updated after save)
+  // Fallback to authUser if formData is not yet loaded
+  // Use authUser for non-editable fields (role, createdAt)
+  const displayUser = {
+    name: formData.name || authUser?.name || '',
+    email: formData.email || authUser?.email || '',
+    department: formData.department || authUser?.department || '',
+    role: authUser?.role || 'User',
+    createdAt: authUser?.createdAt || null,
   };
 
   return (
@@ -131,7 +241,7 @@ const Profile = () => {
                     color: 'white',
                   }}
                 >
-                  {getInitials(formData.name, formData.surname)}
+                  {getInitials(displayUser.name)}
                 </Avatar>
               </Box>
 
@@ -145,7 +255,7 @@ const Profile = () => {
                   mb: 0.5,
                 }}
               >
-                {formData.name} {formData.surname}
+                {displayUser.name || 'Kullanıcı'}
               </Typography>
 
               {/* Title */}
@@ -157,13 +267,13 @@ const Profile = () => {
                   mb: 2,
                 }}
               >
-                Yazılım Geliştirici
+                {displayUser.department || 'Departman Belirtilmemiş'}
               </Typography>
 
               {/* Tags */}
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
                 <Chip
-                  label="Personel"
+                  label={getRoleDisplayName(displayUser.role)}
                   sx={{
                     bgcolor: '#1665d8',
                     color: 'white',
@@ -172,39 +282,43 @@ const Profile = () => {
                     height: '24px',
                   }}
                 />
-                <Chip
-                  label="IT Departmanı"
-                  sx={{
-                    bgcolor: '#E0E0E0',
-                    color: '#666',
-                    fontWeight: 500,
-                    fontSize: '0.75rem',
-                    height: '24px',
-                  }}
-                />
+                {displayUser.department && (
+                  <Chip
+                    label={displayUser.department}
+                    sx={{
+                      bgcolor: '#E0E0E0',
+                      color: '#666',
+                      fontWeight: 500,
+                      fontSize: '0.75rem',
+                      height: '24px',
+                    }}
+                  />
+                )}
               </Box>
 
               {/* Membership Date */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1,
-                  mb: 1.5,
-                }}
-              >
-                <CalendarTodayIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
-                <Typography
-                  variant="body2"
+              {displayUser.createdAt && (
+                <Box
                   sx={{
-                    color: '#666',
-                    fontSize: '0.875rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    mb: 1.5,
                   }}
                 >
-                  Üyelik: Ocak 2023
-                </Typography>
-              </Box>
+                  <CalendarTodayIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: '#666',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {formatCreatedDate(displayUser.createdAt)}
+                  </Typography>
+                </Box>
+              )}
 
               {/* Company Location */}
               <Box
@@ -256,7 +370,7 @@ const Profile = () => {
               <Box sx={{ mb: 2.5 }}>
                 <TextField
                   fullWidth
-                  label="Ad"
+                  label="Ad Soyad"
                   value={formData.name}
                   onChange={handleInputChange('name')}
                   InputProps={{
@@ -293,40 +407,13 @@ const Profile = () => {
                 />
               </Box>
 
-              {/* Surname Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="Soyad"
-                  value={formData.surname}
-                  onChange={handleInputChange('surname')}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
-
               {/* Email Field */}
               <Box sx={{ mb: 2.5 }}>
                 <TextField
                   fullWidth
                   label="E-posta"
                   value={formData.email}
-                  onChange={handleInputChange('email')}
+                  disabled
                   InputProps={{
                     startAdornment: (
                       <IconButton
@@ -344,59 +431,10 @@ const Profile = () => {
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '12px',
+                      bgcolor: '#F5F5F5',
                       '& fieldset': {
                         borderColor: '#E0E0E0',
                       },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
-
-              {/* Phone Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="Telefon"
-                  value={formData.phone}
-                  onChange={handleInputChange('phone')}
-                  InputProps={{
-                    startAdornment: (
-                      <IconButton
-                        edge="start"
-                        sx={{
-                          mr: 1,
-                          color: '#9E9E9E',
-                        }}
-                        disabled
-                      >
-                        <PhoneIcon />
-                      </IconButton>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
                     },
                   }}
                 />
@@ -448,6 +486,7 @@ const Profile = () => {
                 <Button
                   variant="outlined"
                   onClick={handleCancel}
+                  disabled={saving}
                   sx={{
                     borderRadius: '12px',
                     textTransform: 'none',
@@ -466,6 +505,7 @@ const Profile = () => {
                 <Button
                   variant="contained"
                   onClick={handleSave}
+                  disabled={saving}
                   sx={{
                     borderRadius: '12px',
                     textTransform: 'none',
@@ -478,123 +518,37 @@ const Profile = () => {
                     },
                   }}
                 >
-                  Kaydet
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Food Preferences - Bottom */}
-        <Grid item xs={12}>
-          <Card
-            sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              bgcolor: 'white',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
-                  mb: 3,
-                }}
-              >
-                Yemek Tercihleri
-              </Typography>
-
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant={foodPreferences.vegetarian ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('vegetarian')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.vegetarian ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.vegetarian ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.vegetarian ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.vegetarian ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Vejetaryen
-                </Button>
-
-                <Button
-                  variant={foodPreferences.vegan ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('vegan')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.vegan ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.vegan ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.vegan ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.vegan ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Vegan
-                </Button>
-
-                <Button
-                  variant={foodPreferences.glutenFree ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('glutenFree')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.glutenFree ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.glutenFree ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.glutenFree ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.glutenFree ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Gluten Free
-                </Button>
-
-                <Button
-                  variant={foodPreferences.lactoseIntolerant ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('lactoseIntolerant')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.lactoseIntolerant ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.lactoseIntolerant ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.lactoseIntolerant ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.lactoseIntolerant ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Laktoz İntoleransı
+                  {saving ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
               </Box>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={() => setSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="success" onClose={() => setSuccess(false)}>
+          Profil başarıyla güncellendi
+        </Alert>
+      </Snackbar>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
