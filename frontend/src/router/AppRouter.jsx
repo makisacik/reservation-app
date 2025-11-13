@@ -3,8 +3,10 @@ import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES } from '../utils/constants';
 import Login from '../pages/Login';
+import HomePage from '../pages/HomePage';
 import Dashboard from '../pages/Dashboard';
 import Reservations from '../pages/Reservations';
+import MyReservations from '../pages/MyReservations';
 import Users from '../pages/Users';
 import Settings from '../pages/Settings';
 import Navbar from '../components/Navbar';
@@ -57,20 +59,28 @@ const PublicRoute = ({ children }) => {
 // Layout component that wraps protected routes with Navbar and Sidebar
 const AppLayout = ({ children }) => {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      <Sidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          bgcolor: 'background.default',
-          minHeight: '100vh',
-          mt: '64px', // Navbar height
-          ml: '240px', // Sidebar width
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flex: 1, 
+          mt: '64px',
+          alignItems: 'flex-start', // Align items at the top
         }}
       >
-        {children}
+        <Sidebar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: 'background.default',
+            minHeight: 'calc(100vh - 64px)',
+            width: 'calc(100% - 240px)',
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );
@@ -92,7 +102,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <HomePage />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -103,6 +113,16 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <AppLayout>
               <Reservations />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.MY_RESERVATIONS}
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MyReservations />
             </AppLayout>
           </ProtectedRoute>
         }

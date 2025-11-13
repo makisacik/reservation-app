@@ -24,6 +24,9 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
         return await _dbContext.Menus
             .Include(m => m.Restaurant)
             .Include(m => m.Meals)
+                .ThenInclude(meal => meal.Category)
+            .Include(m => m.Meals)
+                .ThenInclude(meal => meal.Restaurant)
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
     }
 
@@ -32,6 +35,9 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
         var q = _dbContext.Menus
             .Include(m => m.Restaurant)
             .Include(m => m.Meals)
+                .ThenInclude(meal => meal.Category)
+            .Include(m => m.Meals)
+                .ThenInclude(meal => meal.Restaurant)
             .AsQueryable();
 
         if (query.RestaurantId.HasValue)

@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   RESERVATIONS: '/reservations',
+  MY_RESERVATIONS: '/reservations/my',
   USERS: '/users',
   SETTINGS: '/settings',
 };
