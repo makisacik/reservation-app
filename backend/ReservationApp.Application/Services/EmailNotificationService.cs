@@ -29,6 +29,14 @@ public class EmailNotificationService : IEmailNotificationService
     {
         try
         {
+            // Only send emails for Active (confirmed) reservations
+            if (reservation.Status != ReservationStatus.Active)
+            {
+                _logger.LogInformation("Reservation {ReservationId} is not Active (Status: {Status}). Skipping confirmation email for user {UserId}", 
+                    reservation.Id, reservation.Status, user.Id);
+                return;
+            }
+
             // Check if email is enabled
             var emailEnabled = await _settingService.GetValueAsync<bool>("Notifications", "EmailEnabled", true, cancellationToken);
             if (!emailEnabled)
@@ -170,23 +178,47 @@ public class EmailNotificationService : IEmailNotificationService
             return;
         }
 
+        // Check if credentials are provided (required for Gmail and most SMTP servers)
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            _logger.LogWarning(
+                "SMTP credentials are not configured. Email will not be sent. " +
+                "Please configure Smtp:Username and Smtp:Password in appsettings.json. " +
+                "For Gmail, use an App Password: https://support.google.com/accounts/answer/185833");
+            return;
+        }
+
         using var client = new SmtpClient();
         try
         {
             await client.ConnectAsync(host, port, SecureSocketOptions.StartTls, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
-            {
-                await client.AuthenticateAsync(username, password, cancellationToken);
-            }
+            // Authenticate with provided credentials
+            await client.AuthenticateAsync(username, password, cancellationToken);
 
             await client.SendAsync(message, cancellationToken);
             await client.DisconnectAsync(true, cancellationToken);
         }
+        catch (MailKit.Security.AuthenticationException authEx)
+        {
+            _logger.LogError(authEx, 
+                "SMTP authentication failed. Please verify your credentials. " +
+                "For Gmail, ensure you're using an App Password, not your regular password. " +
+                "Create an App Password at: https://myaccount.google.com/apppasswords");
+            // Don't throw - email failures shouldn't break the application
+        }
+        catch (MailKit.ServiceNotAuthenticatedException serviceAuthEx)
+        {
+            _logger.LogError(serviceAuthEx, 
+                "SMTP service requires authentication. Please configure Smtp:Username and Smtp:Password. " +
+                "For Gmail, use an App Password: https://myaccount.google.com/apppasswords");
+            // Don't throw - email failures shouldn't break the application
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending email via SMTP");
-            throw;
+            _logger.LogError(ex, "Error sending email via SMTP. Host: {Host}, Port: {Port}, Error: {Error}", 
+                host, port, ex.Message);
+            // Don't throw - email failures shouldn't break the application
         }
     }
 }

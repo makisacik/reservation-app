@@ -1,80 +1,150 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
   Card,
   CardContent,
-  Avatar,
-  Grid,
   TextField,
   Button,
-  Chip,
-  IconButton,
+  Switch,
+  Tabs,
+  Tab,
+  CircularProgress,
+  Alert,
+  Snackbar,
 } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import BusinessIcon from '@mui/icons-material/Business';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SaveIcon from '@mui/icons-material/Save';
+import { settingsApi } from '../api/settingsApi';
 
-const Profile = () => {
-  // Example data matching the image
-  const [formData, setFormData] = useState({
-    name: 'Ahmet',
-    surname: 'Yılmaz',
-    email: 'ahmet.yilmaz@sirket.com',
-    phone: '+90 555 123 4567',
-    department: 'IT Departmanı',
+const Settings = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+
+  // General settings
+  const [generalSettings, setGeneralSettings] = useState({
+    CompanyName: '',
+    Timezone: 'Europe/Istanbul',
   });
 
-  const [foodPreferences, setFoodPreferences] = useState({
-    vegetarian: false,
-    vegan: false,
-    glutenFree: false,
-    lactoseIntolerant: false,
+  // Reservation settings
+  const [reservationSettings, setReservationSettings] = useState({
+    MaxAdvanceReservationDays: '30',
+    MinCancellationHours: '24',
+    AutoApproval: false,
   });
 
-  const handleInputChange = (field) => (event) => {
-    setFormData({
-      ...formData,
-      [field]: event.target.value,
-    });
+  // Notification settings
+  const [notificationSettings, setNotificationSettings] = useState({
+    EmailEnabled: false,
+  });
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      const [general, reservation, notification] = await Promise.all([
+        settingsApi.getGeneralSettings(),
+        settingsApi.getReservationSettings(),
+        settingsApi.getNotificationSettings(),
+      ]);
+
+      setGeneralSettings({
+        CompanyName: general.CompanyName || '',
+        Timezone: general.Timezone || 'Europe/Istanbul',
+      });
+
+      setReservationSettings({
+        MaxAdvanceReservationDays: reservation.MaxAdvanceReservationDays || '30',
+        MinCancellationHours: reservation.CancellationNoticeHours || '24',
+        AutoApproval: reservation.AutoApproval === 'true' || reservation.AutoApproval === true,
+      });
+
+      setNotificationSettings({
+        EmailEnabled: notification.EmailEnabled === 'true' || notification.EmailEnabled === true,
+      });
+    } catch (err) {
+      setError('Ayarlar yüklenirken bir hata oluştu.');
+      console.error('Error loading settings:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFoodPreferenceToggle = (preference) => {
-    setFoodPreferences({
-      ...foodPreferences,
-      [preference]: !foodPreferences[preference],
-    });
+  const handleSaveGeneral = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      await settingsApi.updateGeneralSettings({
+        CompanyName: generalSettings.CompanyName,
+        Timezone: generalSettings.Timezone,
+      });
+      setSuccess(true);
+    } catch (err) {
+      setError('Ayarlar kaydedilirken bir hata oluştu.');
+      console.error('Error saving general settings:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving profile data:', formData, foodPreferences);
+  const handleSaveReservation = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      await settingsApi.updateReservationSettings({
+        MaxAdvanceReservationDays: reservationSettings.MaxAdvanceReservationDays,
+        CancellationNoticeHours: reservationSettings.MinCancellationHours,
+        AutoApproval: reservationSettings.AutoApproval.toString(),
+      });
+      setSuccess(true);
+    } catch (err) {
+      setError('Ayarlar kaydedilirken bir hata oluştu.');
+      console.error('Error saving reservation settings:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleCancel = () => {
-    // Reset to original values
-    setFormData({
-      name: 'Ahmet',
-      surname: 'Yılmaz',
-      email: 'ahmet.yilmaz@sirket.com',
-      phone: '+90 555 123 4567',
-      department: 'IT Departmanı',
-    });
-    setFoodPreferences({
-      vegetarian: false,
-      vegan: false,
-      glutenFree: false,
-      lactoseIntolerant: false,
-    });
+  const handleSaveNotification = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      await settingsApi.updateNotificationSettings({
+        EmailEnabled: notificationSettings.EmailEnabled.toString(),
+      });
+      setSuccess(true);
+    } catch (err) {
+      setError('Ayarlar kaydedilirken bir hata oluştu.');
+      console.error('Error saving notification settings:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  // Get initials for avatar
-  const getInitials = (name, surname) => {
-    return `${name.charAt(0)}${surname.charAt(0)}`.toUpperCase();
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 64px)',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -85,518 +155,502 @@ const Profile = () => {
         minHeight: 'calc(100vh - 64px)',
       }}
     >
-      <Grid container spacing={3}>
-        {/* Profile Card - Top Left */}
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              bgcolor: 'white',
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
-                  mb: 0.5,
-                }}
-              >
-                Profilim
-              </Typography>
+      {/* Header */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 600,
+          color: '#0A1C59',
+          mb: 0.5,
+        }}
+      >
+        Ayarlar
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          color: '#9E9E9E',
+          mb: 3,
+          fontSize: '0.875rem',
+        }}
+      >
+        Sistem ayarlarını yapılandırın
+      </Typography>
+
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: '#E0E0E0', mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          sx={{
+            '& .MuiTabs-flexContainer': {
+              gap: 1,
+            },
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              color: '#666',
+              minHeight: 48,
+              px: 3,
+              borderRadius: '8px 8px 0 0',
+              '&.Mui-selected': {
+                color: '#0A1C59',
+                fontWeight: 600,
+                bgcolor: '#F5E6D3',
+              },
+              '&:hover:not(.Mui-selected)': {
+                bgcolor: 'rgba(10, 28, 89, 0.04)',
+              },
+            },
+            '& .MuiTabs-indicator': {
+              display: 'none',
+            },
+          }}
+        >
+          <Tab label="Genel" />
+          <Tab label="Rezervasyonlar" />
+          <Tab label="Bildirimler" />
+        </Tabs>
+      </Box>
+
+      {/* General Tab */}
+      {activeTab === 0 && (
+        <Card
+          sx={{
+            borderRadius: '20px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            bgcolor: 'white',
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: '#0A1C59',
+                mb: 0.5,
+              }}
+            >
+              Genel Ayarlar
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#9E9E9E',
+                mb: 3,
+                fontSize: '0.875rem',
+              }}
+            >
+              Sistemin genel ayarlarını düzenleyin
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
               <Typography
                 variant="body2"
                 sx={{
-                  color: '#9E9E9E',
-                  mb: 3,
-                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#333',
+                  mb: 1,
                 }}
               >
-                Hesap bilgilerinizi görüntüleyin ve düzenleyin
+                Şirket Adı
               </Typography>
-
-              {/* Avatar */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <Avatar
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    bgcolor: 'transparent',
-                    background: 'linear-gradient(135deg, #FF6B35 0%, #C94B4B 100%)',
-                    fontSize: '2.5rem',
-                    fontWeight: 600,
-                    color: 'white',
-                  }}
-                >
-                  {getInitials(formData.name, formData.surname)}
-                </Avatar>
-              </Box>
-
-              {/* Name */}
-              <Typography
-                variant="h6"
+              <TextField
+                fullWidth
+                placeholder="Şirket Adı"
+                value={generalSettings.CompanyName}
+                onChange={(e) =>
+                  setGeneralSettings({
+                    ...generalSettings,
+                    CompanyName: e.target.value,
+                  })
+                }
                 sx={{
-                  textAlign: 'center',
-                  fontWeight: 600,
-                  color: '#0A1C59',
-                  mb: 0.5,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    '& fieldset': {
+                      borderColor: '#E0E0E0',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#0A1C59',
+                  },
                 }}
-              >
-                {formData.name} {formData.surname}
-              </Typography>
+              />
+            </Box>
 
-              {/* Title */}
+            <Box sx={{ mb: 3 }}>
               <Typography
                 variant="body2"
                 sx={{
-                  textAlign: 'center',
-                  color: '#666',
-                  mb: 2,
+                  fontWeight: 500,
+                  color: '#333',
+                  mb: 1,
                 }}
               >
-                Yazılım Geliştirici
+                Saat Dilimi
               </Typography>
+              <TextField
+                fullWidth
+                value={generalSettings.Timezone}
+                InputProps={{
+                  readOnly: true,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    bgcolor: '#F5F5F5',
+                    '& fieldset': {
+                      borderColor: '#E0E0E0',
+                    },
+                  },
+                }}
+              />
+            </Box>
 
-              {/* Tags */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
-                <Chip
-                  label="Personel"
-                  sx={{
-                    bgcolor: '#1665d8',
-                    color: 'white',
-                    fontWeight: 500,
-                    fontSize: '0.75rem',
-                    height: '24px',
-                  }}
-                />
-                <Chip
-                  label="IT Departmanı"
-                  sx={{
-                    bgcolor: '#E0E0E0',
-                    color: '#666',
-                    fontWeight: 500,
-                    fontSize: '0.75rem',
-                    height: '24px',
-                  }}
-                />
-              </Box>
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleSaveGeneral}
+              disabled={saving}
+              sx={{
+                borderRadius: '12px',
+                textTransform: 'none',
+                bgcolor: '#0A1C59',
+                px: 3,
+                py: 1.5,
+                fontWeight: 500,
+                '&:hover': {
+                  bgcolor: '#0d2569',
+                },
+              }}
+            >
+              {saving ? 'Kaydediliyor...' : 'Kaydet'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-              {/* Membership Date */}
+      {/* Reservations Tab */}
+      {activeTab === 1 && (
+        <Card
+          sx={{
+            borderRadius: '20px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            bgcolor: 'white',
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: '#0A1C59',
+                mb: 0.5,
+              }}
+            >
+              Rezervasyon Ayarları
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#9E9E9E',
+                mb: 3,
+                fontSize: '0.875rem',
+              }}
+            >
+              Rezervasyon kurallarını yapılandırın
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 500,
+                  color: '#333',
+                  mb: 1,
+                }}
+              >
+                Maksimum İleri Tarihli Rezervasyon (Gün)
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                value={reservationSettings.MaxAdvanceReservationDays}
+                onChange={(e) =>
+                  setReservationSettings({
+                    ...reservationSettings,
+                    MaxAdvanceReservationDays: e.target.value,
+                  })
+                }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    '& fieldset': {
+                      borderColor: '#E0E0E0',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#0A1C59',
+                  },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 500,
+                  color: '#333',
+                  mb: 1,
+                }}
+              >
+                İptal İçin Minimum Süre (Saat)
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                value={reservationSettings.MinCancellationHours}
+                onChange={(e) =>
+                  setReservationSettings({
+                    ...reservationSettings,
+                    MinCancellationHours: e.target.value,
+                  })
+                }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    '& fieldset': {
+                      borderColor: '#E0E0E0',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#0A1C59',
+                    },
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#0A1C59',
+                  },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1,
-                  mb: 1.5,
                 }}
               >
-                <CalendarTodayIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
-                <Typography
-                  variant="body2"
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 500,
+                      color: '#333',
+                      mb: 0.5,
+                    }}
+                  >
+                    Otomatik Onay
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: '#9E9E9E',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    Rezervasyonları otomatik olarak onayla
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={reservationSettings.AutoApproval}
+                  onChange={(e) =>
+                    setReservationSettings({
+                      ...reservationSettings,
+                      AutoApproval: e.target.checked,
+                    })
+                  }
                   sx={{
-                    color: '#666',
-                    fontSize: '0.875rem',
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#0A1C59',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#0A1C59',
+                    },
                   }}
-                >
-                  Üyelik: Ocak 2023
-                </Typography>
+                />
               </Box>
+            </Box>
 
-              {/* Company Location */}
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleSaveReservation}
+              disabled={saving}
+              sx={{
+                borderRadius: '12px',
+                textTransform: 'none',
+                bgcolor: '#0A1C59',
+                px: 3,
+                py: 1.5,
+                fontWeight: 500,
+                '&:hover': {
+                  bgcolor: '#0d2569',
+                },
+              }}
+            >
+              {saving ? 'Kaydediliyor...' : 'Kaydet'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Notifications Tab */}
+      {activeTab === 2 && (
+        <Card
+          sx={{
+            borderRadius: '20px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            bgcolor: 'white',
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: '#0A1C59',
+                mb: 0.5,
+              }}
+            >
+              Bildirim Ayarları
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#9E9E9E',
+                mb: 3,
+                fontSize: '0.875rem',
+              }}
+            >
+              Bildirim tercihlerini yönetin
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1,
                 }}
               >
-                <LocationOnIcon sx={{ fontSize: 18, color: '#9E9E9E' }} />
-                <Typography
-                  variant="body2"
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 500,
+                      color: '#333',
+                      mb: 0.5,
+                    }}
+                  >
+                    E-posta Bildirimleri
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: '#9E9E9E',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    Rezervasyon onayları için e-posta gönder
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={notificationSettings.EmailEnabled}
+                  onChange={(e) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      EmailEnabled: e.target.checked,
+                    })
+                  }
                   sx={{
-                    color: '#666',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  Şirket Merkez
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Personal Information Form - Top Right */}
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              bgcolor: 'white',
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
-                  mb: 3,
-                }}
-              >
-                Kişisel Bilgiler
-              </Typography>
-
-              {/* Name Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="Ad"
-                  value={formData.name}
-                  onChange={handleInputChange('name')}
-                  InputProps={{
-                    startAdornment: (
-                      <IconButton
-                        edge="start"
-                        sx={{
-                          mr: 1,
-                          color: '#9E9E9E',
-                        }}
-                        disabled
-                      >
-                        <PersonIcon />
-                      </IconButton>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
+                    '& .MuiSwitch-switchBase.Mui-checked': {
                       color: '#0A1C59',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#0A1C59',
                     },
                   }}
                 />
               </Box>
+            </Box>
 
-              {/* Surname Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="Soyad"
-                  value={formData.surname}
-                  onChange={handleInputChange('surname')}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleSaveNotification}
+              disabled={saving}
+              sx={{
+                borderRadius: '12px',
+                textTransform: 'none',
+                bgcolor: '#0A1C59',
+                px: 3,
+                py: 1.5,
+                fontWeight: 500,
+                '&:hover': {
+                  bgcolor: '#0d2569',
+                },
+              }}
+            >
+              {saving ? 'Kaydediliyor...' : 'Kaydet'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-              {/* Email Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="E-posta"
-                  value={formData.email}
-                  onChange={handleInputChange('email')}
-                  InputProps={{
-                    startAdornment: (
-                      <IconButton
-                        edge="start"
-                        sx={{
-                          mr: 1,
-                          color: '#9E9E9E',
-                        }}
-                        disabled
-                      >
-                        <EmailIcon />
-                      </IconButton>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
+      {/* Success Snackbar */}
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={() => setSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="success" onClose={() => setSuccess(false)}>
+          Ayarlar başarıyla kaydedildi
+        </Alert>
+      </Snackbar>
 
-              {/* Phone Field */}
-              <Box sx={{ mb: 2.5 }}>
-                <TextField
-                  fullWidth
-                  label="Telefon"
-                  value={formData.phone}
-                  onChange={handleInputChange('phone')}
-                  InputProps={{
-                    startAdornment: (
-                      <IconButton
-                        edge="start"
-                        sx={{
-                          mr: 1,
-                          color: '#9E9E9E',
-                        }}
-                        disabled
-                      >
-                        <PhoneIcon />
-                      </IconButton>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
-
-              {/* Department Field */}
-              <Box sx={{ mb: 3 }}>
-                <TextField
-                  fullWidth
-                  label="Departman"
-                  value={formData.department}
-                  onChange={handleInputChange('department')}
-                  InputProps={{
-                    startAdornment: (
-                      <IconButton
-                        edge="start"
-                        sx={{
-                          mr: 1,
-                          color: '#9E9E9E',
-                        }}
-                        disabled
-                      >
-                        <BusinessIcon />
-                      </IconButton>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      '& fieldset': {
-                        borderColor: '#E0E0E0',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#0A1C59',
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#0A1C59',
-                    },
-                  }}
-                />
-              </Box>
-
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={handleCancel}
-                  sx={{
-                    borderRadius: '12px',
-                    textTransform: 'none',
-                    color: '#666',
-                    borderColor: '#E0E0E0',
-                    px: 3,
-                    py: 1,
-                    '&:hover': {
-                      borderColor: '#9E9E9E',
-                      bgcolor: '#F5F5F5',
-                    },
-                  }}
-                >
-                  İptal
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleSave}
-                  sx={{
-                    borderRadius: '12px',
-                    textTransform: 'none',
-                    bgcolor: '#0A1C59',
-                    px: 3,
-                    py: 1,
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: '#0d2569',
-                    },
-                  }}
-                >
-                  Kaydet
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Food Preferences - Bottom */}
-        <Grid item xs={12}>
-          <Card
-            sx={{
-              borderRadius: '20px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              bgcolor: 'white',
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 600,
-                  color: '#0A1C59',
-                  mb: 3,
-                }}
-              >
-                Yemek Tercihleri
-              </Typography>
-
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant={foodPreferences.vegetarian ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('vegetarian')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.vegetarian ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.vegetarian ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.vegetarian ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.vegetarian ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Vejetaryen
-                </Button>
-
-                <Button
-                  variant={foodPreferences.vegan ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('vegan')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.vegan ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.vegan ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.vegan ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.vegan ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Vegan
-                </Button>
-
-                <Button
-                  variant={foodPreferences.glutenFree ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('glutenFree')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.glutenFree ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.glutenFree ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.glutenFree ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.glutenFree ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Gluten Free
-                </Button>
-
-                <Button
-                  variant={foodPreferences.lactoseIntolerant ? 'contained' : 'outlined'}
-                  onClick={() => handleFoodPreferenceToggle('lactoseIntolerant')}
-                  sx={{
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    bgcolor: foodPreferences.lactoseIntolerant ? '#0A1C59' : 'transparent',
-                    color: foodPreferences.lactoseIntolerant ? 'white' : '#666',
-                    borderColor: '#E0E0E0',
-                    fontWeight: 500,
-                    '&:hover': {
-                      bgcolor: foodPreferences.lactoseIntolerant ? '#0d2569' : '#F5F5F5',
-                      borderColor: foodPreferences.lactoseIntolerant ? '#0d2569' : '#9E9E9E',
-                    },
-                  }}
-                >
-                  Laktoz İntoleransı
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
 
-export default Profile;
+export default Settings;

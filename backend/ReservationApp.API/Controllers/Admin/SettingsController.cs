@@ -18,6 +18,7 @@ public class SettingsController : ControllerBase
     private static readonly HashSet<string> ReservationKeys = new() 
     { 
         "MaxWeeklyReservations", 
+        "MaxAdvanceReservationDays",
         "AllowPastReservations", 
         "CancellationNoticeHours", 
         "AutoApproval",

@@ -8,7 +8,7 @@ import Dashboard from '../pages/Dashboard';
 import MakeReservation from '../pages/MakeReservation';
 import MyReservations from '../pages/MyReservations';
 import Users from '../pages/Users';
-import Profile from '../pages/Profile';
+import Settings from '../pages/Settings';
 import MenuManagement from '../pages/MenuManagement';
 import AdminReservations from '../pages/AdminReservations';
 import Navbar from '../components/Navbar';
@@ -250,11 +250,11 @@ const AppRoutes = () => {
       <Route
         path={ROUTES.SETTINGS}
         element={
-          <ProtectedRoute>
+          <AdminRoute>
             <AppLayout>
-              <Profile />
+              <Settings />
             </AppLayout>
-          </ProtectedRoute>
+          </AdminRoute>
         }
       />
       <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />

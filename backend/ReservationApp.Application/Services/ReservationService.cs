@@ -165,6 +165,19 @@ public class ReservationService : IReservationService
         await _reservationRepository.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Service - Changes saved successfully");
 
+        // Check if AutoApproval is enabled
+        var autoApprovalResult = await _settingService.GetValueAsync<bool?>("Reservation", "AutoApproval", null, cancellationToken);
+        var autoApproval = autoApprovalResult ?? false;
+
+        // If AutoApproval is enabled, approve the reservation immediately
+        if (autoApproval)
+        {
+            _logger.LogInformation("Service - AutoApproval is enabled, approving reservation {ReservationId}", reservation.Id);
+            reservation.Approve();
+            await _reservationRepository.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Service - Reservation {ReservationId} approved automatically", reservation.Id);
+        }
+
         // Reload with navigation properties
         var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
         if (createdReservation == null)
@@ -172,19 +185,23 @@ public class ReservationService : IReservationService
             throw new DomainException("Failed to retrieve created reservation.");
         }
 
-        // Send confirmation email (fire-and-forget)
-        _ = Task.Run(async () =>
+        // Send confirmation email only if reservation is Active (approved)
+        // EmailNotificationService will check if email is enabled and if reservation is Active
+        if (createdReservation.Status == ReservationStatus.Active)
         {
-            try
+            _ = Task.Run(async () =>
             {
-                await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
-            }
-            catch
-            {
-                // Log but don't throw - email failures shouldn't break reservation creation
-                // EmailNotificationService handles its own logging
-            }
-        }, cancellationToken);
+                try
+                {
+                    await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
+                }
+                catch
+                {
+                    // Log but don't throw - email failures shouldn't break reservation creation
+                    // EmailNotificationService handles its own logging
+                }
+            }, cancellationToken);
+        }
 
         return MapToDto(createdReservation);
     }
@@ -254,6 +271,29 @@ public class ReservationService : IReservationService
 
         reservation.Approve();
         await _reservationRepository.SaveChangesAsync(cancellationToken);
+
+        // Reload with navigation properties for email
+        var approvedReservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
+        if (approvedReservation != null && approvedReservation.Status == ReservationStatus.Active)
+        {
+            var user = approvedReservation.User;
+            if (user != null)
+            {
+                // Send confirmation email (fire-and-forget)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailNotificationService.SendReservationConfirmationAsync(user, approvedReservation, cancellationToken);
+                    }
+                    catch
+                    {
+                        // Log but don't throw - email failures shouldn't break approval
+                        // EmailNotificationService handles its own logging
+                    }
+                }, cancellationToken);
+            }
+        }
     }
 
     public async Task<ReservationSummaryDto> GetReservationSummaryAsync(CancellationToken cancellationToken = default)
@@ -325,6 +365,19 @@ public class ReservationService : IReservationService
         await _reservationRepository.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Service - Changes saved successfully");
 
+        // Check if AutoApproval is enabled
+        var autoApprovalResult = await _settingService.GetValueAsync<bool?>("Reservation", "AutoApproval", null, cancellationToken);
+        var autoApproval = autoApprovalResult ?? false;
+
+        // If AutoApproval is enabled, approve the reservation immediately
+        if (autoApproval)
+        {
+            _logger.LogInformation("Service - AutoApproval is enabled, approving reservation {ReservationId}", reservation.Id);
+            reservation.Approve();
+            await _reservationRepository.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Service - Reservation {ReservationId} approved automatically", reservation.Id);
+        }
+
         // Reload with navigation properties
         var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
         if (createdReservation == null)
@@ -332,19 +385,23 @@ public class ReservationService : IReservationService
             throw new DomainException("Failed to retrieve created reservation.");
         }
 
-        // Send confirmation email (fire-and-forget)
-        _ = Task.Run(async () =>
+        // Send confirmation email only if reservation is Active (approved)
+        // EmailNotificationService will check if email is enabled and if reservation is Active
+        if (createdReservation.Status == ReservationStatus.Active)
         {
-            try
+            _ = Task.Run(async () =>
             {
-                await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
-            }
-            catch
-            {
-                // Log but don't throw - email failures shouldn't break reservation creation
-                // EmailNotificationService handles its own logging
-            }
-        }, cancellationToken);
+                try
+                {
+                    await _emailNotificationService.SendReservationConfirmationAsync(user, createdReservation, cancellationToken);
+                }
+                catch
+                {
+                    // Log but don't throw - email failures shouldn't break reservation creation
+                    // EmailNotificationService handles its own logging
+                }
+            }, cancellationToken);
+        }
 
         return MapToDto(createdReservation);
     }

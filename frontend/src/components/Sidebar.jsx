@@ -16,6 +16,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { ROUTES } from '../utils/constants';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,7 +36,7 @@ const adminMenuItems = [
   { text: 'Menü Yönetimi', icon: <RestaurantMenuIcon />, path: ROUTES.ADMIN_MENU_MANAGEMENT },
   { text: 'Rezervasyonlar', icon: <CalendarTodayIcon />, path: ROUTES.ADMIN_RESERVATIONS },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: ROUTES.ADMIN_USERS },
-  { text: 'Profilim', icon: <PersonIcon />, path: ROUTES.SETTINGS },
+  { text: 'Ayarlar', icon: <SettingsIcon />, path: ROUTES.SETTINGS },
 ];
 
 const Sidebar = () => {
@@ -84,8 +85,9 @@ const Sidebar = () => {
                 item.path === ROUTES.ADMIN_USERS ||
                 item.path === ROUTES.ADMIN_DASHBOARD ||
                 item.path === ROUTES.ADMIN_MENU_MANAGEMENT ||
-                item.path === ROUTES.ADMIN_RESERVATIONS
-                  ? location.pathname.startsWith(item.path)
+                item.path === ROUTES.ADMIN_RESERVATIONS ||
+                item.path === ROUTES.SETTINGS
+                  ? location.pathname.startsWith(item.path) || location.pathname === item.path
                   : location.pathname === item.path;
               return (
                 <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>

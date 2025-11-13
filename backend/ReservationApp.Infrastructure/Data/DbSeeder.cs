@@ -72,7 +72,11 @@ public static class DbSeeder
         }
         if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "CancellationNoticeHours"))
         {
-            settingsToSeed.Add(new SystemSetting("Reservation", "CancellationNoticeHours", "2", SettingType.Int, "Hours before reservation that cancellation is allowed"));
+            settingsToSeed.Add(new SystemSetting("Reservation", "CancellationNoticeHours", "24", SettingType.Int, "Hours before reservation that cancellation is allowed"));
+        }
+        if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "MaxAdvanceReservationDays"))
+        {
+            settingsToSeed.Add(new SystemSetting("Reservation", "MaxAdvanceReservationDays", "30", SettingType.Int, "Maximum number of days in advance a reservation can be made"));
         }
         if (!await context.SystemSettings.AnyAsync(s => s.Category == "Reservation" && s.Key == "AutoApproval"))
         {
