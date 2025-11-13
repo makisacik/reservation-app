@@ -17,14 +17,26 @@ struct PersonalPanelView: View {
                 // Header Section
                 PersonalHeaderView(
                     user: viewModel.user,
-                    alertMessage: nil // Phase 3
+                    alertMessage: viewModel.alertMessage
                 )
                 
                 // Stats Section
                 StatsGridView(stats: viewModel.stats)
                 
-                // Menu Section (Placeholder - Phase 3)
-                MenuSectionPlaceholder()
+                // Menu Section
+                MenuSectionView(
+                    categories: viewModel.categories,
+                    selectedCategory: viewModel.selectedCategory,
+                    meals: viewModel.displayedMeals,
+                    isLoading: viewModel.isLoading,
+                    onCategorySelected: { category in
+                        viewModel.selectCategory(category)
+                    },
+                    onReservationTap: {
+                        // Navigate to reservation screen (Phase 4)
+                        print("Navigate to reservation")
+                    }
+                )
             }
             .padding(ThemeManager.shared.spacing.md)
         }
@@ -56,25 +68,6 @@ struct PersonalPanelView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
-        }
-    }
-}
-
-// Placeholder component for Phase 3
-struct MenuSectionPlaceholder: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: ThemeManager.shared.spacing.md) {
-            Text("Menü")
-                .font(AppTypography.h5())
-                .foregroundColor(AppColors.textPrimary)
-            
-            Text("Yakında eklenecek...")
-                .font(AppTypography.body1())
-                .foregroundColor(AppColors.textSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(ThemeManager.shared.spacing.md)
-                .background(AppColors.backgroundPaper)
-                .cornerRadius(ThemeManager.BorderRadius.card.value)
         }
     }
 }

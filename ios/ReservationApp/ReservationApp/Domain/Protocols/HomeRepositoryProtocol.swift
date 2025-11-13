@@ -9,5 +9,8 @@ import Foundation
 
 protocol HomeRepositoryProtocol {
     func getHomeStats() async throws -> HomePageStats
+    func getCategories() async throws -> [MenuCategory]
+    func getMeals(restaurantId: String?, categoryId: String?) async throws -> [Meal]
+    func getTodayMenu() async throws -> [Menu]
 }
 

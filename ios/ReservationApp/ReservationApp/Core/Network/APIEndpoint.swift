@@ -14,6 +14,9 @@ enum APIEndpoint {
     case allUsers
     case adminUsers
     case homeStats
+    case menuCategories
+    case meals
+    case menus
     
     var path: String {
         switch self {
@@ -29,6 +32,12 @@ enum APIEndpoint {
             return "/admin/users"
         case .homeStats:
             return "/home/stats"
+        case .menuCategories:
+            return "/menu-categories"
+        case .meals:
+            return "/meals"
+        case .menus:
+            return "/menus"
         }
     }
     
@@ -36,7 +45,7 @@ enum APIEndpoint {
         switch self {
         case .login, .register:
             return "POST"
-        case .currentUser, .allUsers, .adminUsers, .homeStats:
+        case .currentUser, .allUsers, .adminUsers, .homeStats, .menuCategories, .meals, .menus:
             return "GET"
         }
     }

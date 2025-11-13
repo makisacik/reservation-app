@@ -30,9 +30,19 @@ class APIClient {
         endpoint: APIEndpoint,
         method: String? = nil,
         body: Encodable? = nil,
+        queryParams: [String: String]? = nil,
         responseType: T.Type
     ) async throws -> T {
-        guard let url = URL(string: baseURL + endpoint.path) else {
+        // Build URL with query parameters
+        var urlComponents = URLComponents(string: baseURL + endpoint.path)
+        
+        if let queryParams = queryParams {
+            urlComponents?.queryItems = queryParams.map {
+                URLQueryItem(name: $0.key, value: $0.value)
+            }
+        }
+        
+        guard let url = urlComponents?.url else {
             throw NetworkError.invalidURL
         }
         
