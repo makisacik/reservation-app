@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.reservationapp.core.ui.theme.ReservationAppTheme
 import com.reservationapp.navigation.NavGraph
 import com.reservationapp.navigation.Screen
+import com.reservationapp.ui.MainTabView
 
 class MainActivity : ComponentActivity() {
 
@@ -34,20 +35,22 @@ class MainActivity : ComponentActivity() {
                     val authStateManager = remember { DependencyContainer.getAuthStateManager() }
                     val isAuthenticated by authStateManager.isAuthenticated.collectAsState()
 
-                    // Determine start destination based on auth state
-                    val startDestination = remember(isAuthenticated) {
-                        if (isAuthenticated) {
-                            // Will navigate to main app in later phases
-                            Screen.Home.route
-                        } else {
-                            Screen.Onboarding.route
-                        }
+                    if (isAuthenticated) {
+                        // Show main tab view with bottom navigation
+                        MainTabView(
+                            homeRepository = DependencyContainer.getHomeRepository(),
+                            reservationRepository = DependencyContainer.getReservationRepository(),
+                            authRepository = DependencyContainer.getAuthRepository(),
+                            authStateManager = authStateManager
+                        )
+                    } else {
+                        // Show login/onboarding flow
+                        val startDestination = Screen.Onboarding.route
+                        NavGraph(
+                            navController = navController,
+                            startDestination = startDestination
+                        )
                     }
-
-                    NavGraph(
-                        navController = navController,
-                        startDestination = startDestination
-                    )
                 }
             }
         }

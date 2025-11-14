@@ -6,11 +6,14 @@ import com.reservationapp.core.network.AuthInterceptor
 import com.reservationapp.core.network.RetrofitModule
 import com.reservationapp.core.network.api.AuthApi
 import com.reservationapp.core.network.api.HomeApi
+import com.reservationapp.core.network.api.ReservationApi
 import com.reservationapp.core.storage.SecureStorage
 import com.reservationapp.data.repository.AuthRepositoryImpl
 import com.reservationapp.data.repository.HomeRepositoryImpl
+import com.reservationapp.data.repository.ReservationRepositoryImpl
 import com.reservationapp.domain.repository.AuthRepository
 import com.reservationapp.domain.repository.HomeRepository
+import com.reservationapp.domain.repository.ReservationRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
@@ -31,6 +34,8 @@ object DependencyContainer {
     private var authStateManager: AuthStateManager? = null
     private var homeApi: HomeApi? = null
     private var homeRepository: HomeRepository? = null
+    private var reservationApi: ReservationApi? = null
+    private var reservationRepository: ReservationRepository? = null
 
     fun initialize(appContext: Context) {
         context = appContext.applicationContext
@@ -50,6 +55,10 @@ object DependencyContainer {
         // Initialize Home API and Repository
         homeApi = retrofit!!.create(HomeApi::class.java)
         homeRepository = HomeRepositoryImpl(homeApi!!)
+        
+        // Initialize Reservation API and Repository
+        reservationApi = retrofit!!.create(ReservationApi::class.java)
+        reservationRepository = ReservationRepositoryImpl(reservationApi!!)
     }
 
     fun getSecureStorage(): SecureStorage {
@@ -70,6 +79,14 @@ object DependencyContainer {
 
     fun getHomeRepository(): HomeRepository {
         return homeRepository ?: throw IllegalStateException("DependencyContainer not initialized")
+    }
+
+    fun getReservationApi(): ReservationApi {
+        return reservationApi ?: throw IllegalStateException("DependencyContainer not initialized")
+    }
+
+    fun getReservationRepository(): ReservationRepository {
+        return reservationRepository ?: throw IllegalStateException("DependencyContainer not initialized")
     }
 }
 

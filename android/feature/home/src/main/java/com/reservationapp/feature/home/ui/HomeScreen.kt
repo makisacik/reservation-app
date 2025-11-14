@@ -5,6 +5,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restaurant
@@ -14,10 +15,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.reservationapp.core.common.AuthStateManager
 import com.reservationapp.core.ui.theme.*
 import com.reservationapp.domain.model.*
@@ -447,17 +454,66 @@ fun MealCardView(meal: Meal) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                PrimaryLight.copy(alpha = 0.3f),
-                                PrimaryMain.copy(alpha = 0.3f)
-                            )
-                        )
-                    ),
+                    .height(150.dp),
                 contentAlignment = Alignment.TopEnd
             ) {
+                // Meal image or placeholder
+                val placeholderGradient = Brush.linearGradient(
+                    colors = listOf(
+                        PrimaryLight.copy(alpha = 0.3f),
+                        PrimaryMain.copy(alpha = 0.3f)
+                    )
+                )
+                
+                if (!meal.imageUrl.isNullOrEmpty()) {
+                    SubcomposeAsyncImage(
+                        model = meal.imageUrl,
+                        contentDescription = meal.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 12.dp,
+                                    topEnd = 12.dp
+                                )
+                            ),
+                        contentScale = ContentScale.Crop
+                    ) {
+                        when (painter.state) {
+                            is AsyncImagePainter.State.Loading -> {
+                                // Show placeholder gradient while loading
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(150.dp)
+                                        .background(placeholderGradient)
+                                )
+                            }
+                            is AsyncImagePainter.State.Error -> {
+                                // Show placeholder gradient on error
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(150.dp)
+                                        .background(placeholderGradient)
+                                )
+                            }
+                            else -> {
+                                SubcomposeAsyncImageContent()
+                            }
+                        }
+                    }
+                } else {
+                    // Placeholder gradient when no image URL
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(placeholderGradient)
+                    )
+                }
+                
                 // Category badge
                 meal.categoryName?.let { categoryName ->
                     Box(
