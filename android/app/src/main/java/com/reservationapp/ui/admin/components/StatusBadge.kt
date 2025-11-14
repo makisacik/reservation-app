@@ -17,8 +17,9 @@ fun StatusBadge(
 ) {
     val (text, color) = when (status.lowercase()) {
         "pending", "3" -> "Beklemede" to WarningMain
-        "active", "1" -> "Onaylandı" to SuccessMain
+        "active", "1" -> "Aktif" to SuccessMain
         "cancelled", "2" -> "İptal" to ErrorMain
+        "passive", "2" -> "Pasif" to TextSecondary
         else -> "Bilinmiyor" to TextSecondary
     }
 

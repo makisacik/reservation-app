@@ -1,6 +1,7 @@
 package com.reservationapp.core.network.api
 
 import com.reservationapp.domain.model.AdminCreateReservationRequest
+import com.reservationapp.domain.model.AdminCreateUserRequest
 import com.reservationapp.domain.model.AdminReservationQueryParams
 import com.reservationapp.domain.model.CreateMealRequest
 import com.reservationapp.domain.model.DailySummary
@@ -12,6 +13,9 @@ import com.reservationapp.domain.model.Reservation
 import com.reservationapp.domain.model.ReservationSummary
 import com.reservationapp.domain.model.TodayReservationGroup
 import com.reservationapp.domain.model.UpdateMealRequest
+import com.reservationapp.domain.model.User
+import com.reservationapp.domain.model.UserStatistics
+import com.reservationapp.domain.model.UserUpdateRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -74,5 +78,30 @@ interface AdminApi {
 
     @DELETE("admin/meals/{id}")
     suspend fun deleteMeal(@Path("id") id: String): Unit
+
+    @GET("admin/users/statistics")
+    suspend fun getUserStatistics(): UserStatistics
+
+    @GET("admin/users")
+    suspend fun getAdminUsers(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int,
+        @Query("search") search: String? = null,
+        @Query("status") status: String? = null,
+        @Query("role") role: String? = null,
+        @Query("department") department: String? = null
+    ): PaginatedResult<User>
+
+    @GET("admin/users/{id}")
+    suspend fun getUserById(@Path("id") id: String): User
+
+    @POST("admin/users")
+    suspend fun createUser(@Body request: AdminCreateUserRequest): User
+
+    @PUT("admin/users/{id}")
+    suspend fun updateUser(@Path("id") id: String, @Body request: UserUpdateRequest): User
+
+    @DELETE("admin/users/{id}")
+    suspend fun deleteUser(@Path("id") id: String): Unit
 }
 

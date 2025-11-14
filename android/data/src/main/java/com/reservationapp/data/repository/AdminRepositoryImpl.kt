@@ -4,6 +4,7 @@ import com.reservationapp.core.common.Result
 import com.reservationapp.core.network.api.AdminApi
 import com.reservationapp.core.network.safeApiCall
 import com.reservationapp.domain.model.AdminCreateReservationRequest
+import com.reservationapp.domain.model.AdminCreateUserRequest
 import com.reservationapp.domain.model.AdminReservationQueryParams
 import com.reservationapp.domain.model.CreateMealRequest
 import com.reservationapp.domain.model.DailySummary
@@ -15,6 +16,10 @@ import com.reservationapp.domain.model.Reservation
 import com.reservationapp.domain.model.ReservationSummary
 import com.reservationapp.domain.model.TodayReservationGroup
 import com.reservationapp.domain.model.UpdateMealRequest
+import com.reservationapp.domain.model.User
+import com.reservationapp.domain.model.UserFilterParams
+import com.reservationapp.domain.model.UserStatistics
+import com.reservationapp.domain.model.UserUpdateRequest
 import com.reservationapp.domain.repository.AdminRepository
 
 class AdminRepositoryImpl(
@@ -109,6 +114,49 @@ class AdminRepositoryImpl(
     override suspend fun deleteMeal(id: String): Result<Unit> {
         return safeApiCall {
             adminApi.deleteMeal(id)
+        }
+    }
+
+    override suspend fun getUserStatistics(): Result<UserStatistics> {
+        return safeApiCall {
+            adminApi.getUserStatistics()
+        }
+    }
+
+    override suspend fun getAdminUsers(filterParams: UserFilterParams): Result<PaginatedResult<User>> {
+        return safeApiCall {
+            adminApi.getAdminUsers(
+                page = filterParams.page,
+                pageSize = filterParams.pageSize,
+                search = filterParams.search,
+                status = filterParams.status,
+                role = filterParams.role,
+                department = filterParams.department
+            )
+        }
+    }
+
+    override suspend fun getUserById(id: String): Result<User> {
+        return safeApiCall {
+            adminApi.getUserById(id)
+        }
+    }
+
+    override suspend fun createUser(request: AdminCreateUserRequest): Result<User> {
+        return safeApiCall {
+            adminApi.createUser(request)
+        }
+    }
+
+    override suspend fun updateUser(id: String, request: UserUpdateRequest): Result<User> {
+        return safeApiCall {
+            adminApi.updateUser(id, request)
+        }
+    }
+
+    override suspend fun deleteUser(id: String): Result<Unit> {
+        return safeApiCall {
+            adminApi.deleteUser(id)
         }
     }
 }
