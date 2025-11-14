@@ -5,6 +5,7 @@ import com.reservationapp.core.network.api.HomeApi
 import com.reservationapp.core.network.safeApiCall
 import com.reservationapp.domain.model.HomePageStats
 import com.reservationapp.domain.model.Meal
+import com.reservationapp.domain.model.MealTimeSlot
 import com.reservationapp.domain.model.Menu
 import com.reservationapp.domain.model.MenuCategory
 import com.reservationapp.domain.model.Restaurant
@@ -46,6 +47,18 @@ class HomeRepositoryImpl(
     override suspend fun getRestaurants(): Result<List<Restaurant>> {
         return safeApiCall {
             homeApi.getRestaurants()
+        }
+    }
+
+    override suspend fun getMealTimeSlots(): Result<List<MealTimeSlot>> {
+        return safeApiCall {
+            homeApi.getMealTimeSlots()
+        }
+    }
+
+    override suspend fun getMenus(date: String, restaurantId: String): Result<List<Menu>> {
+        return safeApiCall {
+            homeApi.getMenus(date, restaurantId)
         }
     }
 }

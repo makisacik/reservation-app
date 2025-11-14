@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:reservations"))
+    implementation(project(":feature:make-reservation"))
 
     // Compose BOM
     implementation(platform(libs.compose.bom))

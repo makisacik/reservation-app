@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import com.reservationapp.domain.repository.AuthRepository
 import com.reservationapp.domain.repository.HomeRepository
 import com.reservationapp.domain.repository.ReservationRepository
 import com.reservationapp.feature.home.ui.HomeScreen
+import com.reservationapp.feature.makereservation.ui.MakeReservationScreen
 import com.reservationapp.feature.profile.ui.ProfileScreen
 import com.reservationapp.feature.reservations.ui.ReservationsScreen
 
@@ -36,6 +38,7 @@ fun MainTabView(
     authStateManager: AuthStateManager
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var showMakeReservation by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
@@ -89,7 +92,10 @@ fun MainTabView(
                 0 -> HomeScreen(
                     homeRepository = homeRepository,
                     authRepository = authRepository,
-                    authStateManager = authStateManager
+                    authStateManager = authStateManager,
+                    onNavigateToReservation = {
+                        showMakeReservation = true
+                    }
                 )
                 1 -> ReservationsScreen(
                     reservationRepository = reservationRepository
@@ -98,6 +104,25 @@ fun MainTabView(
                     authRepository = authRepository,
                     authStateManager = authStateManager
                 )
+            }
+            
+            // Show MakeReservation screen as fullscreen overlay
+            if (showMakeReservation) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MakeReservationScreen(
+                        reservationRepository = reservationRepository,
+                        homeRepository = homeRepository,
+                        onNavigateBack = {
+                            showMakeReservation = false
+                        },
+                        onReservationCreated = {
+                            showMakeReservation = false
+                        }
+                    )
+                }
             }
         }
     }

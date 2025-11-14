@@ -2,6 +2,7 @@ package com.reservationapp.core.network.api
 
 import com.reservationapp.domain.model.HomePageStats
 import com.reservationapp.domain.model.Meal
+import com.reservationapp.domain.model.MealTimeSlot
 import com.reservationapp.domain.model.Menu
 import com.reservationapp.domain.model.MenuCategory
 import com.reservationapp.domain.model.Restaurant
@@ -28,5 +29,14 @@ interface HomeApi {
 
     @GET("restaurants")
     suspend fun getRestaurants(): List<Restaurant>
+    
+    @GET("mealtimes")
+    suspend fun getMealTimeSlots(): List<MealTimeSlot>
+    
+    @GET("menus")
+    suspend fun getMenus(
+        @Query("date") date: String,
+        @Query("restaurantId") restaurantId: String
+    ): List<Menu>
 }
 
