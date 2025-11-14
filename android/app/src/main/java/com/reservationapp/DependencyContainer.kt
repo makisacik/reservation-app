@@ -5,9 +5,12 @@ import com.google.gson.Gson
 import com.reservationapp.core.network.AuthInterceptor
 import com.reservationapp.core.network.RetrofitModule
 import com.reservationapp.core.network.api.AuthApi
+import com.reservationapp.core.network.api.HomeApi
 import com.reservationapp.core.storage.SecureStorage
 import com.reservationapp.data.repository.AuthRepositoryImpl
+import com.reservationapp.data.repository.HomeRepositoryImpl
 import com.reservationapp.domain.repository.AuthRepository
+import com.reservationapp.domain.repository.HomeRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
@@ -26,6 +29,8 @@ object DependencyContainer {
     private var authApi: AuthApi? = null
     private var authRepository: AuthRepository? = null
     private var authStateManager: AuthStateManager? = null
+    private var homeApi: HomeApi? = null
+    private var homeRepository: HomeRepository? = null
 
     fun initialize(appContext: Context) {
         context = appContext.applicationContext
@@ -41,6 +46,10 @@ object DependencyContainer {
         authApi = retrofit!!.create(AuthApi::class.java)
         authRepository = AuthRepositoryImpl(authApi!!, secureStorage!!)
         authStateManager = AuthStateManager(secureStorage!!, authRepository!!)
+        
+        // Initialize Home API and Repository
+        homeApi = retrofit!!.create(HomeApi::class.java)
+        homeRepository = HomeRepositoryImpl(homeApi!!)
     }
 
     fun getSecureStorage(): SecureStorage {
@@ -57,6 +66,10 @@ object DependencyContainer {
 
     fun getAuthApi(): AuthApi {
         return authApi ?: throw IllegalStateException("DependencyContainer not initialized")
+    }
+
+    fun getHomeRepository(): HomeRepository {
+        return homeRepository ?: throw IllegalStateException("DependencyContainer not initialized")
     }
 }
 

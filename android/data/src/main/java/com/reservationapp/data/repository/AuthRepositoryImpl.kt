@@ -7,6 +7,7 @@ import com.reservationapp.core.storage.SecureStorage
 import com.reservationapp.domain.model.AuthResponse
 import com.reservationapp.domain.model.LoginRequest
 import com.reservationapp.domain.model.RegisterRequest
+import com.reservationapp.domain.model.UpdateUserProfileRequest
 import com.reservationapp.domain.model.User
 import com.reservationapp.domain.repository.AuthRepository
 
@@ -47,6 +48,12 @@ class AuthRepositoryImpl(
     override suspend fun getCurrentUser(): Result<User> {
         return safeApiCall {
             authApi.getCurrentUser()
+        }
+    }
+
+    override suspend fun updateProfile(request: UpdateUserProfileRequest): Result<User> {
+        return safeApiCall {
+            authApi.updateProfile(request)
         }
     }
 

@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.reservationapp.DependencyContainer
 import com.reservationapp.feature.auth.ui.LoginScreen
+import com.reservationapp.feature.home.ui.HomeScreen
+import com.reservationapp.feature.profile.ui.ProfileScreen
 
 @Composable
 fun NavGraph(
@@ -14,6 +16,7 @@ fun NavGraph(
 ) {
     val authRepository = DependencyContainer.getAuthRepository()
     val authStateManager = DependencyContainer.getAuthStateManager()
+    val homeRepository = DependencyContainer.getHomeRepository()
 
     NavHost(
         navController = navController,
@@ -46,9 +49,18 @@ fun NavGraph(
         }
 
         composable(Screen.Home.route) {
-            // Placeholder for home screen
-            // TODO: Implement home screen in later phase
-            androidx.compose.material3.Text("Home Screen - Coming Soon")
+            HomeScreen(
+                homeRepository = homeRepository,
+                authRepository = authRepository,
+                authStateManager = authStateManager
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                authRepository = authRepository,
+                authStateManager = authStateManager
+            )
         }
     }
 }

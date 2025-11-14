@@ -69,6 +69,8 @@ dependencies {
 
     // Feature modules
     implementation(project(":feature:auth"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:profile"))
 
     // Compose BOM
     implementation(platform(libs.compose.bom))
