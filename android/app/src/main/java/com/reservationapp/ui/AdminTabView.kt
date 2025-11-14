@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.reservationapp.core.common.AuthStateManager
 import com.reservationapp.core.ui.theme.PrimaryMain
+import com.reservationapp.domain.repository.AdminRepository
 import com.reservationapp.domain.repository.AuthRepository
 import com.reservationapp.ui.admin.*
 
@@ -30,7 +31,8 @@ enum class AdminTab {
 @Composable
 fun AdminTabView(
     authRepository: AuthRepository,
-    authStateManager: AuthStateManager
+    authStateManager: AuthStateManager,
+    adminRepository: AdminRepository
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -105,7 +107,7 @@ fun AdminTabView(
                 .padding(paddingValues)
         ) {
             when (selectedTab) {
-                0 -> AdminDashboardScreen()
+                0 -> AdminDashboardScreen(adminRepository = adminRepository)
                 1 -> AdminReservationsScreen()
                 2 -> AdminMenuScreen()
                 3 -> AdminUsersScreen()

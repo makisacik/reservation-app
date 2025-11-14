@@ -4,13 +4,16 @@ import android.content.Context
 import com.google.gson.Gson
 import com.reservationapp.core.network.AuthInterceptor
 import com.reservationapp.core.network.RetrofitModule
+import com.reservationapp.core.network.api.AdminApi
 import com.reservationapp.core.network.api.AuthApi
 import com.reservationapp.core.network.api.HomeApi
 import com.reservationapp.core.network.api.ReservationApi
 import com.reservationapp.core.storage.SecureStorage
+import com.reservationapp.data.repository.AdminRepositoryImpl
 import com.reservationapp.data.repository.AuthRepositoryImpl
 import com.reservationapp.data.repository.HomeRepositoryImpl
 import com.reservationapp.data.repository.ReservationRepositoryImpl
+import com.reservationapp.domain.repository.AdminRepository
 import com.reservationapp.domain.repository.AuthRepository
 import com.reservationapp.domain.repository.HomeRepository
 import com.reservationapp.domain.repository.ReservationRepository
@@ -36,6 +39,8 @@ object DependencyContainer {
     private var homeRepository: HomeRepository? = null
     private var reservationApi: ReservationApi? = null
     private var reservationRepository: ReservationRepository? = null
+    private var adminApi: AdminApi? = null
+    private var adminRepository: AdminRepository? = null
 
     fun initialize(appContext: Context) {
         context = appContext.applicationContext
@@ -59,6 +64,10 @@ object DependencyContainer {
         // Initialize Reservation API and Repository
         reservationApi = retrofit!!.create(ReservationApi::class.java)
         reservationRepository = ReservationRepositoryImpl(reservationApi!!)
+        
+        // Initialize Admin API and Repository
+        adminApi = retrofit!!.create(AdminApi::class.java)
+        adminRepository = AdminRepositoryImpl(adminApi!!)
     }
 
     fun getSecureStorage(): SecureStorage {
@@ -87,6 +96,14 @@ object DependencyContainer {
 
     fun getReservationRepository(): ReservationRepository {
         return reservationRepository ?: throw IllegalStateException("DependencyContainer not initialized")
+    }
+
+    fun getAdminApi(): AdminApi {
+        return adminApi ?: throw IllegalStateException("DependencyContainer not initialized")
+    }
+
+    fun getAdminRepository(): AdminRepository {
+        return adminRepository ?: throw IllegalStateException("DependencyContainer not initialized")
     }
 }
 
