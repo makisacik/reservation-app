@@ -14,9 +14,23 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Detect PostgreSQL user
+# Try postgres first, then fall back to current user (common on macOS/Homebrew)
+# Temporarily disable set -e for this check
+set +e
+psql -U postgres -c "SELECT 1" > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    PGUSER="postgres"
+else
+    PGUSER=$(whoami)
+    echo -e "${YELLOW}Note: Using PostgreSQL user '${PGUSER}' (postgres user not found, common on macOS/Homebrew)${NC}"
+    echo ""
+fi
+set -e
+
 # Check if PostgreSQL is running
 echo "Checking if PostgreSQL is running..."
-if ! pg_isready -U postgres > /dev/null 2>&1; then
+if ! pg_isready -U "$PGUSER" > /dev/null 2>&1; then
     echo -e "${RED}Error: PostgreSQL is not running or not accessible.${NC}"
     echo "Please start PostgreSQL and try again."
     exit 1
@@ -26,22 +40,22 @@ echo ""
 
 # Check if database exists
 echo "Checking if database 'reservationdb' exists..."
-if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw reservationdb; then
+if psql -U "$PGUSER" -lqt | cut -d \| -f 1 | grep -qw reservationdb; then
     echo -e "${YELLOW}⚠ Database 'reservationdb' already exists${NC}"
     read -p "Do you want to recreate it? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Dropping existing database..."
-        psql -U postgres -c "DROP DATABASE IF EXISTS reservationdb;"
+        psql -U "$PGUSER" -c "DROP DATABASE IF EXISTS reservationdb;"
         echo "Creating new database..."
-        psql -U postgres -c "CREATE DATABASE reservationdb;"
+        psql -U "$PGUSER" -c "CREATE DATABASE reservationdb;"
         echo -e "${GREEN}✓ Database created${NC}"
     else
         echo "Using existing database..."
     fi
 else
     echo "Creating database 'reservationdb'..."
-    psql -U postgres -c "CREATE DATABASE reservationdb;"
+    psql -U "$PGUSER" -c "CREATE DATABASE reservationdb;"
     echo -e "${GREEN}✓ Database created${NC}"
 fi
 echo ""

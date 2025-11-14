@@ -106,42 +106,187 @@ reservation-app/
 
 1. **Prerequisites**:
    - .NET 8 SDK
-   - PostgreSQL 12+
+   - PostgreSQL 12+ (must be installed and running)
    - EF Core tools: `dotnet tool install --global dotnet-ef`
 
-2. **Configure Database**:
-   Update `backend/ReservationApp.API/appsettings.Development.json`:
-   ```json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Host=localhost;Database=reservationdb;Username=postgres;Password=yourpassword"
-     }
-   }
+2. **Restore Dependencies**:
+   ```bash
+   cd backend
+   dotnet restore
    ```
 
-3. **Create Database**:
+3. **Configure Database Connection** (if needed):
+   The connection string is already configured in `backend/ReservationApp.API/appsettings.Development.json` with default values:
+   - Username: `postgres`
+   - Password: `postgres`
+   - Database: `reservationdb`
+   - Host: `localhost`
+
+   **Common scenarios:**
+   - **macOS/Homebrew PostgreSQL**: Often uses your system username instead of `postgres`. Update the connection string to use your username (usually no password needed):
+     ```json
+     "DefaultConnection": "Host=localhost;Database=reservationdb;Username=your_username"
+     ```
+   - **Linux/Standard PostgreSQL**: Usually works with default `postgres/postgres` credentials
+   - **Custom setup**: Edit `appsettings.Development.json` and update the `ConnectionStrings.DefaultConnection` value
+   - **No password**: Remove the `Password` parameter: `Host=localhost;Database=reservationdb;Username=your_username`
+
+   **Why credentials are needed**: PostgreSQL requires authentication for security. The default `postgres` user is created automatically when PostgreSQL is installed (on Linux/Windows). On macOS with Homebrew, it typically uses your system username.
+
+4. **Create Database** (if it doesn't exist):
+
+   **Option 1** - Use the setup script (recommended, auto-detects your PostgreSQL user):
    ```bash
+   cd backend
+   chmod +x setup-database.sh
+   ./setup-database.sh
+   ```
+
+   **Note**: The script automatically detects your PostgreSQL user. On macOS/Homebrew, it will use your system username (e.g., `mkisacik`) instead of `postgres` if the `postgres` user doesn't exist.
+
+   **Option 2** - Manual creation:
+   ```bash
+   # For standard PostgreSQL (Linux/Windows):
    psql -U postgres
+   CREATE DATABASE reservationdb;
+   \q
+
+   # For macOS/Homebrew (use your username):
+   psql -U $(whoami)
    CREATE DATABASE reservationdb;
    \q
    ```
 
-4. **Run Migrations**:
+5. **Run Migrations**:
    ```bash
    cd backend
-   dotnet ef migrations add InitialCreate -p ReservationApp.Infrastructure -s ReservationApp.API
-   dotnet ef database update -p ReservationApp.Infrastructure -s ReservationApp.API
    ```
 
-5. **Run Application**:
+   **Check if migrations already exist**:
+   ```bash
+   ls ReservationApp.Infrastructure/Migrations
+   ```
+
+   - **If migrations folder exists and contains `.cs` files**: Migrations are already in the repository, skip to applying them:
+     ```bash
+     dotnet ef database update -p ReservationApp.Infrastructure -s ReservationApp.API
+     ```
+
+   - **If migrations folder is empty or doesn't exist**: Create initial migration first:
+     ```bash
+     dotnet ef migrations add InitialCreate -p ReservationApp.Infrastructure -s ReservationApp.API
+     dotnet ef database update -p ReservationApp.Infrastructure -s ReservationApp.API
+     ```
+
+   **Troubleshooting**: If you get "Host can't be null" error, go back to step 3 and verify your connection string is correctly configured in `appsettings.Development.json`.
+
+6. **Run Application**:
+
+   **Option 1** (Recommended - from backend directory):
+   ```bash
+   cd backend
+   dotnet run --project ReservationApp.API/ReservationApp.API.csproj
+   ```
+
+   **Option 2** (from API project directory):
    ```bash
    cd backend/ReservationApp.API
    dotnet run
    ```
 
-6. **Access**:
+   **Option 3** (using the run script):
+   ```bash
+   cd backend
+   chmod +x run-app.sh
+   ./run-app.sh
+   ```
+
+7. **Access**:
    - Swagger UI: `https://localhost:7195/swagger`
    - API: `https://localhost:7195` or `http://localhost:5053`
+
+### Troubleshooting
+
+**"role 'postgres' does not exist" (macOS/Homebrew)**:
+- This is common on macOS when PostgreSQL is installed via Homebrew. It uses your system username instead of `postgres`.
+- **Solution**: Update `appsettings.Development.json` to use your username (usually no password needed):
+  ```json
+  "DefaultConnection": "Host=localhost;Database=reservationdb;Username=your_username"
+  ```
+- Replace `your_username` with your macOS username (run `whoami` to find it).
+- The setup script (`./setup-database.sh`) now auto-detects this, so you can use it instead of manual commands.
+
+**"Host can't be null" error**:
+- This means your connection string is not configured or invalid. Check `appsettings.Development.json` and ensure the connection string is correct.
+- The default connection string uses `postgres/postgres` - if your PostgreSQL setup is different, update it in step 3.
+- Verify PostgreSQL is running: `pg_isready` or `psql -U postgres -c "SELECT 1"`
+- Test your connection: `psql -U postgres -h localhost -c "SELECT 1"` (replace `postgres` with your username if different)
+
+**"The name 'InitialCreate' is used by an existing migration"**:
+- Migrations already exist in the repository. Skip the `migrations add` command and only run `database update`.
+
+**"Application failed to start" during migrations**:
+- Verify the connection string in `appsettings.Development.json` matches your PostgreSQL setup (default is `postgres/postgres`).
+- Verify the database exists: `psql -U postgres -l | grep reservationdb`
+- If the database doesn't exist, create it first (step 4).
+
+**Port already in use**:
+- The application is already running. Stop it first or change the port in `ReservationApp.API/Properties/launchSettings.json`.
+
+### Database Seeder
+
+The application includes an automatic database seeder that runs **only in Development mode** on every startup. The seeder populates the database with initial data if it doesn't already exist, making it safe to run multiple times.
+
+#### Example Users
+
+The seeder creates two default users for testing:
+
+| Email | Password | Role | Name | Description |
+|-------|----------|------|------|-------------|
+| `admin@example.com` | `admin123` | Admin | Admin User | Administrator account with full access to all features |
+| `user@example.com` | `user123` | User | Ahmet Yılmaz | Regular user account (Job Title: Yazılım Geliştirici) |
+
+#### Seeded Data
+
+The seeder automatically creates:
+
+- **Meal Time Slots**:
+  - Breakfast: 07:00 - 10:00
+  - Lunch: 12:00 - 14:00
+  - Dinner: 18:00 - 21:00
+
+- **Restaurants**:
+  - Yemekhane (Ana yemekhane restoranı)
+  - Japon Restoran (Özel Japon mutfağı restoranı)
+
+- **Menu Categories**:
+  - Ana Yemek
+  - Çorba
+  - Alakart
+  - Vejetaryen & Özel
+  - Mesai Aperatif
+
+- **Meals**: Various meals across different categories for both restaurants, including:
+  - Turkish dishes (Köfte, Şinitzel, Karnıyarık, etc.)
+  - Soups (Mantar, Mercimek, Domates)
+  - Special items (Bonfile, Levrek, Risotto, etc.)
+  - Japanese dishes (Sushi Seti, Ramen)
+
+- **Menus**: Daily menus for the next 30 days for both restaurants (Standard and Special menu types)
+
+- **System Settings**: Default configuration for:
+  - General settings (CompanyName: "Toyota ISS", Timezone: "Europe/Istanbul")
+  - Reservation settings (MaxWeeklyReservations: 5, CancellationNoticeHours: 24, etc.)
+  - Notification settings (EmailEnabled: true, DailyReminderEnabled: true, etc.)
+
+#### How It Works
+
+The seeder checks for existing data before inserting, so it's idempotent:
+- Users are only created if they don't exist (checked by email)
+- Other entities are only created if the table is empty or missing specific items
+- Existing data is never overwritten
+
+To disable seeding, run the application in **Production** mode (the seeder only runs when `Environment.IsDevelopment()` is `true`).
 
 ---
 
