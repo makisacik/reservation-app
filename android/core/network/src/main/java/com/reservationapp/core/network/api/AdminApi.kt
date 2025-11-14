@@ -2,14 +2,18 @@ package com.reservationapp.core.network.api
 
 import com.reservationapp.domain.model.AdminCreateReservationRequest
 import com.reservationapp.domain.model.AdminReservationQueryParams
+import com.reservationapp.domain.model.CreateMealRequest
 import com.reservationapp.domain.model.DailySummary
 import com.reservationapp.domain.model.DashboardSummary
+import com.reservationapp.domain.model.Meal
 import com.reservationapp.domain.model.PaginatedResult
 import com.reservationapp.domain.model.PopularMeal
 import com.reservationapp.domain.model.Reservation
 import com.reservationapp.domain.model.ReservationSummary
 import com.reservationapp.domain.model.TodayReservationGroup
+import com.reservationapp.domain.model.UpdateMealRequest
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -52,5 +56,23 @@ interface AdminApi {
 
     @POST("admin/reservations")
     suspend fun createReservation(@Body request: AdminCreateReservationRequest): Reservation
+
+    @GET("admin/meals")
+    suspend fun getAdminMeals(
+        @Query("restaurantId") restaurantId: String? = null,
+        @Query("categoryId") categoryId: String? = null
+    ): List<Meal>
+
+    @GET("admin/meals/{id}")
+    suspend fun getMealById(@Path("id") id: String): Meal
+
+    @POST("admin/meals")
+    suspend fun createMeal(@Body request: CreateMealRequest): Meal
+
+    @PUT("admin/meals/{id}")
+    suspend fun updateMeal(@Path("id") id: String, @Body request: UpdateMealRequest): Meal
+
+    @DELETE("admin/meals/{id}")
+    suspend fun deleteMeal(@Path("id") id: String): Unit
 }
 

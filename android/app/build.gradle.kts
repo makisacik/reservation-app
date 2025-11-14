@@ -95,6 +95,9 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
 
+    // Coil for image loading
+    implementation(libs.coil.compose)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.junit.ext)

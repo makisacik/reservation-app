@@ -59,7 +59,8 @@ class MainActivity : ComponentActivity() {
                                 AdminTabView(
                                     authRepository = DependencyContainer.getAuthRepository(),
                                     authStateManager = rememberedAuthStateManager,
-                                    adminRepository = DependencyContainer.getAdminRepository()
+                                    adminRepository = DependencyContainer.getAdminRepository(),
+                                    homeRepository = DependencyContainer.getHomeRepository()
                                 )
                             } else {
                                 // Show main tab view for regular users

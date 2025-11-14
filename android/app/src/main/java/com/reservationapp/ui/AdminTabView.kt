@@ -18,6 +18,7 @@ import com.reservationapp.core.common.AuthStateManager
 import com.reservationapp.core.ui.theme.PrimaryMain
 import com.reservationapp.domain.repository.AdminRepository
 import com.reservationapp.domain.repository.AuthRepository
+import com.reservationapp.domain.repository.HomeRepository
 import com.reservationapp.ui.admin.*
 
 enum class AdminTab {
@@ -32,7 +33,8 @@ enum class AdminTab {
 fun AdminTabView(
     authRepository: AuthRepository,
     authStateManager: AuthStateManager,
-    adminRepository: AdminRepository
+    adminRepository: AdminRepository,
+    homeRepository: HomeRepository
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -109,7 +111,10 @@ fun AdminTabView(
             when (selectedTab) {
                 0 -> AdminDashboardScreen(adminRepository = adminRepository)
                 1 -> AdminReservationsScreen(adminRepository = adminRepository)
-                2 -> AdminMenuScreen()
+                2 -> AdminMenuScreen(
+                    adminRepository = adminRepository,
+                    homeRepository = homeRepository
+                )
                 3 -> AdminUsersScreen()
                 4 -> AdminSettingsScreen(
                     authRepository = authRepository,
