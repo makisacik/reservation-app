@@ -16,6 +16,7 @@ import com.reservationapp.domain.model.Reservation
 import com.reservationapp.domain.model.ReservationSummary
 import com.reservationapp.domain.model.TodayReservationGroup
 import com.reservationapp.domain.model.UpdateMealRequest
+import com.reservationapp.domain.model.SettingsUpdateRequest
 import com.reservationapp.domain.model.User
 import com.reservationapp.domain.model.UserFilterParams
 import com.reservationapp.domain.model.UserStatistics
@@ -157,6 +158,42 @@ class AdminRepositoryImpl(
     override suspend fun deleteUser(id: String): Result<Unit> {
         return safeApiCall {
             adminApi.deleteUser(id)
+        }
+    }
+
+    override suspend fun getGeneralSettings(): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.getGeneralSettings()
+        }
+    }
+
+    override suspend fun updateGeneralSettings(request: SettingsUpdateRequest): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.updateGeneralSettings(request)
+        }
+    }
+
+    override suspend fun getReservationSettings(): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.getReservationSettings()
+        }
+    }
+
+    override suspend fun updateReservationSettings(request: SettingsUpdateRequest): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.updateReservationSettings(request)
+        }
+    }
+
+    override suspend fun getNotificationSettings(): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.getNotificationSettings()
+        }
+    }
+
+    override suspend fun updateNotificationSettings(request: SettingsUpdateRequest): Result<Map<String, String>> {
+        return safeApiCall {
+            adminApi.updateNotificationSettings(request)
         }
     }
 }

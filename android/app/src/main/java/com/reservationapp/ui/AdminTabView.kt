@@ -117,6 +117,7 @@ fun AdminTabView(
                 )
                 3 -> AdminUsersScreen(adminRepository = adminRepository)
                 4 -> AdminSettingsScreen(
+                    adminRepository = adminRepository,
                     authRepository = authRepository,
                     authStateManager = authStateManager
                 )

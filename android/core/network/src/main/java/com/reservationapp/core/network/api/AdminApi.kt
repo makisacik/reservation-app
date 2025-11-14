@@ -13,6 +13,7 @@ import com.reservationapp.domain.model.Reservation
 import com.reservationapp.domain.model.ReservationSummary
 import com.reservationapp.domain.model.TodayReservationGroup
 import com.reservationapp.domain.model.UpdateMealRequest
+import com.reservationapp.domain.model.SettingsUpdateRequest
 import com.reservationapp.domain.model.User
 import com.reservationapp.domain.model.UserStatistics
 import com.reservationapp.domain.model.UserUpdateRequest
@@ -103,5 +104,23 @@ interface AdminApi {
 
     @DELETE("admin/users/{id}")
     suspend fun deleteUser(@Path("id") id: String): Unit
+
+    @GET("admin/settings/general")
+    suspend fun getGeneralSettings(): Map<String, String>
+
+    @PUT("admin/settings/general")
+    suspend fun updateGeneralSettings(@Body request: SettingsUpdateRequest): Map<String, String>
+
+    @GET("admin/settings/reservation")
+    suspend fun getReservationSettings(): Map<String, String>
+
+    @PUT("admin/settings/reservation")
+    suspend fun updateReservationSettings(@Body request: SettingsUpdateRequest): Map<String, String>
+
+    @GET("admin/settings/notifications")
+    suspend fun getNotificationSettings(): Map<String, String>
+
+    @PUT("admin/settings/notifications")
+    suspend fun updateNotificationSettings(@Body request: SettingsUpdateRequest): Map<String, String>
 }
 
