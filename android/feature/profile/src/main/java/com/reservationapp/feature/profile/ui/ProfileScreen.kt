@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,6 +15,7 @@ import com.reservationapp.core.ui.theme.*
 import com.reservationapp.domain.repository.AuthRepository
 import com.reservationapp.feature.profile.viewmodel.ProfileViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     authRepository: AuthRepository,
@@ -32,6 +34,7 @@ fun ProfileScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val successMessage by viewModel.successMessage.collectAsState()
+    var showLogoutConfirmation by remember { mutableStateOf(false) }
 
     // Clear messages after a delay
     LaunchedEffect(errorMessage, successMessage) {
@@ -41,12 +44,30 @@ fun ProfileScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(Spacing.md)
-    ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Profil") },
+                actions = {
+                    TextButton(
+                        onClick = { showLogoutConfirmation = true }
+                    ) {
+                        Text(
+                            text = "Çıkış",
+                            color = ErrorMain
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
+                .padding(Spacing.md)
+        ) {
         // Header
         ProfileHeaderView(user = currentUser)
 
@@ -129,23 +150,42 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.md))
 
-                Button(
-                    onClick = { viewModel.updateProfile() },
+                // Action Buttons - Cancel and Update side by side
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !isLoading && name.isNotEmpty() && email.isNotEmpty(),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryMain)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = androidx.compose.ui.graphics.Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
+                    // Cancel Button (Secondary)
+                    OutlinedButton(
+                        onClick = { viewModel.resetForm() },
+                        modifier = Modifier.weight(1f),
+                        enabled = !isLoading
+                    ) {
                         Text(
-                            text = "Güncelle",
+                            text = "İptal",
                             style = Typography.labelLarge
                         )
+                    }
+
+                    // Update Button (Primary)
+                    Button(
+                        onClick = { viewModel.updateProfile() },
+                        modifier = Modifier.weight(1f),
+                        enabled = !isLoading && name.isNotEmpty() && email.isNotEmpty(),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryMain)
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = androidx.compose.ui.graphics.Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "Kaydet",
+                                style = Typography.labelLarge
+                            )
+                        }
                     }
                 }
             }
@@ -180,6 +220,49 @@ fun ProfileScreen(
                     }
                 }
             }
+        }
+    }
+
+        // Logout Confirmation Dialog
+        if (showLogoutConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showLogoutConfirmation = false },
+                title = {
+                    Text(
+                        text = "Çıkış Yap",
+                        style = Typography.titleLarge
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Çıkış yapmak istediğinizden emin misiniz?",
+                        style = Typography.bodyMedium
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showLogoutConfirmation = false
+                            viewModel.logout()
+                        }
+                    ) {
+                        Text(
+                            text = "Çıkış Yap",
+                            color = ErrorMain
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutConfirmation = false }
+                    ) {
+                        Text(
+                            text = "İptal",
+                            style = Typography.labelLarge
+                        )
+                    }
+                }
+            )
         }
     }
 }

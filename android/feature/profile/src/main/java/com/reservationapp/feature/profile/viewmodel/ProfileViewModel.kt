@@ -108,6 +108,25 @@ class ProfileViewModel(
         loadUserProfile()
     }
 
+    fun resetForm() {
+        loadUserProfile()
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            // Clear secure storage
+            authRepository.logout()
+            
+            // Clear user data from form
+            name.value = ""
+            email.value = ""
+            department.value = null
+            
+            // Clear auth state - this will trigger navigation to login
+            authStateManager.clearUser()
+        }
+    }
+
     fun clearMessages() {
         _errorMessage.value = null
         _successMessage.value = null
