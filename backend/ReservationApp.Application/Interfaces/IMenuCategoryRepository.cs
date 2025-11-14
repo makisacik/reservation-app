@@ -9,3 +9,5 @@ public interface IMenuCategoryRepository
     Task<MenuCategory?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 }
 
+
+

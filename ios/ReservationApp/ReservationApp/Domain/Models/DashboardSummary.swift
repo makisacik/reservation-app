@@ -22,3 +22,5 @@ struct DashboardSummary: Codable {
     let totalRestaurants: Int
 }
 
+
+

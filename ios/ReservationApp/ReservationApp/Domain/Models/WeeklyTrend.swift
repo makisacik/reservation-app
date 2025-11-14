@@ -15,3 +15,5 @@ struct WeeklyTrend: Codable, Identifiable {
     var id: String { weekStart }
 }
 
+
+

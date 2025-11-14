@@ -17,3 +17,5 @@ struct TodayReservationGroup: Codable, Identifiable {
     var id: String { "\(mealTimeSlotName)-\(restaurantName)" }
 }
 
+
+

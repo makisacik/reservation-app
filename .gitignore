@@ -277,8 +277,8 @@ $RECYCLE.BIN/
 ## Secrets and sensitive configuration
 appsettings.*.json
 !appsettings.json
-# Uncomment the line below if you want to track appsettings.Development.json (without secrets)
-# !appsettings.Development.json
+# Track appsettings.Development.json with safe defaults for new users
+!appsettings.Development.json
 secrets.json
 *.secrets.json
 

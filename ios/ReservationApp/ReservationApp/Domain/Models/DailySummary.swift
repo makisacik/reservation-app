@@ -15,3 +15,5 @@ struct DailySummary: Codable, Identifiable {
     var id: String { dayAbbreviation }
 }
 
+
+

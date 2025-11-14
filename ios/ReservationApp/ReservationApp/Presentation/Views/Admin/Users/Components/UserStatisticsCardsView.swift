@@ -77,3 +77,5 @@ struct StatisticsCard: View {
     }
 }
 
+
+

@@ -6,3 +6,5 @@ public class MenuCategoryDto
     public string Name { get; set; } = string.Empty;
 }
 
+
+

@@ -7,3 +7,5 @@ public interface IMenuCategoryService
     Task<IEnumerable<MenuCategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default);
 }
 
+
+

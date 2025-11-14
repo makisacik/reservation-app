@@ -8,3 +8,5 @@ public class DailyReservationDto
     public int ReservationCount { get; set; }
 }
 
+
+

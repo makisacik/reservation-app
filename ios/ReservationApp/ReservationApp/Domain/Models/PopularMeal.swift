@@ -15,3 +15,5 @@ struct PopularMeal: Codable, Identifiable {
     var id: String { mealId }
 }
 
+
+
