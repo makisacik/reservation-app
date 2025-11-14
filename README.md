@@ -16,44 +16,44 @@ reservation-app/
 
 ### Frontend (Web)
 <div align="center">
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.02.11.png" width="200" alt="Frontend Screenshot 1"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.02.26.png" width="200" alt="Frontend Screenshot 2"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.02.39.png" width="200" alt="Frontend Screenshot 3"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.02.46.png" width="200" alt="Frontend Screenshot 4"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.02.56.png" width="200" alt="Frontend Screenshot 5"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.03.png" width="200" alt="Frontend Screenshot 6"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.09.png" width="200" alt="Frontend Screenshot 7"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.21.png" width="200" alt="Frontend Screenshot 8"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.27.png" width="200" alt="Frontend Screenshot 9"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.34.png" width="200" alt="Frontend Screenshot 10"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.44.png" width="200" alt="Frontend Screenshot 11"/>
-  <img src="reservation ss/frontend/Screenshot 2025-11-14 at 17.03.57.png" width="200" alt="Frontend Screenshot 12"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.02.11.png" width="200" alt="Frontend Screenshot 1"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.02.26.png" width="200" alt="Frontend Screenshot 2"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.02.39.png" width="200" alt="Frontend Screenshot 3"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.02.46.png" width="200" alt="Frontend Screenshot 4"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.02.56.png" width="200" alt="Frontend Screenshot 5"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.03.png" width="200" alt="Frontend Screenshot 6"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.09.png" width="200" alt="Frontend Screenshot 7"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.21.png" width="200" alt="Frontend Screenshot 8"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.27.png" width="200" alt="Frontend Screenshot 9"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.34.png" width="200" alt="Frontend Screenshot 10"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.44.png" width="200" alt="Frontend Screenshot 11"/>
+  <img src="screenshots/frontend/Screenshot 2025-11-14 at 17.03.57.png" width="200" alt="Frontend Screenshot 12"/>
 </div>
 
 ### iOS
 <div align="center">
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.48.20.png" width="200" alt="iOS Screenshot 1"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.48.26.png" width="200" alt="iOS Screenshot 2"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.19.png" width="200" alt="iOS Screenshot 3"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.32.png" width="200" alt="iOS Screenshot 4"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.55.png" width="200" alt="iOS Screenshot 5"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.10.png" width="200" alt="iOS Screenshot 6"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.19.png" width="200" alt="iOS Screenshot 7"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.27.png" width="200" alt="iOS Screenshot 8"/>
-  <img src="reservation ss/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.35.png" width="200" alt="iOS Screenshot 9"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.48.20.png" width="200" alt="iOS Screenshot 1"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.48.26.png" width="200" alt="iOS Screenshot 2"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.19.png" width="200" alt="iOS Screenshot 3"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.32.png" width="200" alt="iOS Screenshot 4"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.49.55.png" width="200" alt="iOS Screenshot 5"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.10.png" width="200" alt="iOS Screenshot 6"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.19.png" width="200" alt="iOS Screenshot 7"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.27.png" width="200" alt="iOS Screenshot 8"/>
+  <img src="screenshots/ios/Simulator Screenshot - iPhone 17 - 2025-11-14 at 16.51.35.png" width="200" alt="iOS Screenshot 9"/>
 </div>
 
 ### Android
 <div align="center">
-  <img src="reservation ss/android/Screenshot_20251114_165305.png" width="200" alt="Android Screenshot 1"/>
-  <img src="reservation ss/android/Screenshot_20251114_165345.png" width="200" alt="Android Screenshot 2"/>
-  <img src="reservation ss/android/Screenshot_20251114_165354.png" width="200" alt="Android Screenshot 3"/>
-  <img src="reservation ss/android/Screenshot_20251114_165404.png" width="200" alt="Android Screenshot 4"/>
-  <img src="reservation ss/android/Screenshot_20251114_165419.png" width="200" alt="Android Screenshot 5"/>
-  <img src="reservation ss/android/Screenshot_20251114_165428.png" width="200" alt="Android Screenshot 6"/>
-  <img src="reservation ss/android/Screenshot_20251114_170009.png" width="200" alt="Android Screenshot 7"/>
-  <img src="reservation ss/android/Screenshot_20251114_170019.png" width="200" alt="Android Screenshot 8"/>
-  <img src="reservation ss/android/Screenshot_20251114_170026.png" width="200" alt="Android Screenshot 9"/>
+  <img src="screenshots/android/Screenshot_20251114_165305.png" width="200" alt="Android Screenshot 1"/>
+  <img src="screenshots/android/Screenshot_20251114_165345.png" width="200" alt="Android Screenshot 2"/>
+  <img src="screenshots/android/Screenshot_20251114_165354.png" width="200" alt="Android Screenshot 3"/>
+  <img src="screenshots/android/Screenshot_20251114_165404.png" width="200" alt="Android Screenshot 4"/>
+  <img src="screenshots/android/Screenshot_20251114_165419.png" width="200" alt="Android Screenshot 5"/>
+  <img src="screenshots/android/Screenshot_20251114_165428.png" width="200" alt="Android Screenshot 6"/>
+  <img src="screenshots/android/Screenshot_20251114_170009.png" width="200" alt="Android Screenshot 7"/>
+  <img src="screenshots/android/Screenshot_20251114_170019.png" width="200" alt="Android Screenshot 8"/>
+  <img src="screenshots/android/Screenshot_20251114_170026.png" width="200" alt="Android Screenshot 9"/>
 </div>
 
 ---
