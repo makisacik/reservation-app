@@ -116,20 +116,21 @@ reservation-app/
    ```
 
 3. **Configure Database Connection** (if needed):
-   The connection string is already configured in `backend/ReservationApp.API/appsettings.Development.json` with default values:
+   The connection string is pre-configured in `backend/ReservationApp.API/appsettings.Development.json` with default values:
    - Username: `postgres`
    - Password: `postgres`
    - Database: `reservationdb`
    - Host: `localhost`
 
-   **Common scenarios:**
-   - **macOS/Homebrew PostgreSQL**: Often uses your system username instead of `postgres`. Update the connection string to use your username (usually no password needed):
+   **Update the connection string if your PostgreSQL setup is different:**
+   - **macOS/Homebrew PostgreSQL**: Uses your system username instead of `postgres`. Edit `appsettings.Development.json` and change the username (usually no password needed):
      ```json
      "DefaultConnection": "Host=localhost;Database=reservationdb;Username=your_username"
      ```
-   - **Linux/Standard PostgreSQL**: Usually works with default `postgres/postgres` credentials
-   - **Custom setup**: Edit `appsettings.Development.json` and update the `ConnectionStrings.DefaultConnection` value
-   - **No password**: Remove the `Password` parameter: `Host=localhost;Database=reservationdb;Username=your_username`
+     Replace `your_username` with your macOS username (run `whoami` to find it).
+   - **Linux/Standard PostgreSQL**: Usually works with the default `postgres/postgres` credentials - no changes needed
+   - **Custom password**: Update the `Password` value in the connection string
+   - **No password**: Remove the `Password` parameter entirely
 
    **Why credentials are needed**: PostgreSQL requires authentication for security. The default `postgres` user is created automatically when PostgreSQL is installed (on Linux/Windows). On macOS with Homebrew, it typically uses your system username.
 
