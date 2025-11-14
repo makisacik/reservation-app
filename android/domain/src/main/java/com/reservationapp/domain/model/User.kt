@@ -9,5 +9,12 @@ data class User(
     val status: String?,
     val totalReservations: Int?,
     val createdAt: String?
-)
+) {
+    /**
+     * Check if user is admin (matches iOS isAdmin property)
+     * Uses case-sensitive comparison to match iOS behavior
+     */
+    val isAdmin: Boolean
+        get() = role == "Admin"
+}
 

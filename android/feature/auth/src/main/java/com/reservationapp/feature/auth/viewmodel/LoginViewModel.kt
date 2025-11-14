@@ -73,8 +73,8 @@ class LoginViewModel(
                         is Result.Success -> {
                             val user = userResult.data
 
-                            // Validate role matches selected role
-                            val isUserAdmin = user.role.lowercase() == "admin"
+                            // Validate role matches selected role (case-sensitive to match iOS)
+                            val isUserAdmin = user.role == "Admin"
                             val selectedIsAdmin = selectedRole.value == LoginRole.ADMIN
 
                             if (isUserAdmin && !selectedIsAdmin) {
