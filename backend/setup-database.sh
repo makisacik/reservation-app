@@ -38,24 +38,35 @@ fi
 echo -e "${GREEN}✓ PostgreSQL is running${NC}"
 echo ""
 
+# Determine which database to connect to for admin operations
+# Try postgres database first, then template1 (both are system databases that always exist)
+set +e
+psql -U "$PGUSER" -d postgres -c "SELECT 1" > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    ADMIN_DB="postgres"
+else
+    ADMIN_DB="template1"
+fi
+set -e
+
 # Check if database exists
 echo "Checking if database 'reservationdb' exists..."
-if psql -U "$PGUSER" -lqt | cut -d \| -f 1 | grep -qw reservationdb; then
+if psql -U "$PGUSER" -d "$ADMIN_DB" -lqt | cut -d \| -f 1 | grep -qw reservationdb; then
     echo -e "${YELLOW}⚠ Database 'reservationdb' already exists${NC}"
     read -p "Do you want to recreate it? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Dropping existing database..."
-        psql -U "$PGUSER" -c "DROP DATABASE IF EXISTS reservationdb;"
+        psql -U "$PGUSER" -d "$ADMIN_DB" -c "DROP DATABASE IF EXISTS reservationdb;"
         echo "Creating new database..."
-        psql -U "$PGUSER" -c "CREATE DATABASE reservationdb;"
+        psql -U "$PGUSER" -d "$ADMIN_DB" -c "CREATE DATABASE reservationdb;"
         echo -e "${GREEN}✓ Database created${NC}"
     else
         echo "Using existing database..."
     fi
 else
     echo "Creating database 'reservationdb'..."
-    psql -U "$PGUSER" -c "CREATE DATABASE reservationdb;"
+    psql -U "$PGUSER" -d "$ADMIN_DB" -c "CREATE DATABASE reservationdb;"
     echo -e "${GREEN}✓ Database created${NC}"
 fi
 echo ""
