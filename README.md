@@ -1,191 +1,325 @@
 # Reservation App
 
-A full-stack reservation system with a .NET 8 backend and frontend application.
+A full-stack reservation management system with cross-platform mobile support, featuring a .NET 8 backend, React web frontend, iOS, and Android applications.
 
 ## Project Structure
 
 ```
 reservation-app/
-├── backend/                    # .NET 8 Backend API
-│   ├── ReservationApp.API/     # Web API entry point
-│   ├── ReservationApp.Application/  # Business logic, DTOs, Services
-│   ├── ReservationApp.Domain/  # Entities, Domain logic
-│   ├── ReservationApp.Infrastructure/  # Data access, EF Core, Repositories
-│   ├── ReservationApp.Tests/   # Unit tests
-│   ├── ReservationApp.sln      # Solution file
-│   └── [scripts and docs]      # Setup and testing scripts
-│
-└── frontend/                   # Frontend application
-    ├── src/                    # Source code
-    ├── public/                 # Public assets
-    └── package.json            # Frontend dependencies
+├── backend/          # .NET 8 Backend API
+├── frontend/         # React Web Application
+├── ios/              # iOS SwiftUI Application
+└── android/          # Android Kotlin Application
 ```
 
-## Backend Setup
+---
 
-### Prerequisites
+## Backend
 
-- .NET 8 SDK
-- PostgreSQL (version 12 or higher)
-- Entity Framework Core tools (if not already installed): `dotnet tool install --global dotnet-ef`
+### Tech Stack
+- **Framework**: .NET 8, ASP.NET Core Web API
+- **Database**: PostgreSQL with Entity Framework Core 8.0
+- **Authentication**: JWT Bearer Tokens
+- **Validation**: FluentValidation
+- **Logging**: Serilog (Console, File, Seq)
+- **Documentation**: Swagger/OpenAPI
+- **Mapping**: AutoMapper
+- **Password Hashing**: BCrypt.Net
 
-### Setup Instructions
+### Architecture & Patterns
+- **Clean Architecture** with clear separation of concerns:
+  - **API Layer**: Controllers, middleware, dependency injection, Swagger configuration
+  - **Application Layer**: Business logic, DTOs, services, validation, interfaces
+  - **Domain Layer**: Entities, enums, domain exceptions (no external dependencies)
+  - **Infrastructure Layer**: Data access, EF Core, repositories, database configuration
+- **Repository Pattern** for data access abstraction
+- **Dependency Injection** via interfaces only
+- **Middleware-based** exception handling with centralized error responses
+- **RESTful API** design with proper HTTP status codes
 
-#### 1. Configure Database Connection
+### Security
+- **JWT Authentication** with token validation (issuer, audience, lifetime, signing key)
+- **BCrypt password hashing** for secure credential storage
+- **Role-based authorization** (Admin, User) with policy-based access control
+- **HTTPS enforcement** in production
+- **CORS policy** configured for specific origins
+- **Secrets management** via configuration files (never hardcoded)
+- **Input validation** using FluentValidation to prevent injection attacks
+- **Centralized exception handling** prevents information leakage
 
-Update the connection string in `backend/ReservationApp.API/appsettings.Development.json`:
+### Features
+- User authentication (register, login, JWT tokens)
+- Reservation management (create, view, update, cancel)
+- Restaurant and menu management
+- Meal time slot management
+- Admin dashboard with statistics and reports
+- User profile management
+- Weekly reservation limits enforcement
+- Email notifications (configurable)
+- Timezone-aware date/time handling
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=reservationdb;Username=postgres;Password=yourpassword"
-  }
-}
-```
+### How to Run
 
-Replace `yourpassword` with your actual PostgreSQL password.
+1. **Prerequisites**:
+   - .NET 8 SDK
+   - PostgreSQL 12+
+   - EF Core tools: `dotnet tool install --global dotnet-ef`
 
-#### 2. Create PostgreSQL Database
+2. **Configure Database**:
+   Update `backend/ReservationApp.API/appsettings.Development.json`:
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Host=localhost;Database=reservationdb;Username=postgres;Password=yourpassword"
+     }
+   }
+   ```
 
-Connect to PostgreSQL and create the database:
+3. **Create Database**:
+   ```bash
+   psql -U postgres
+   CREATE DATABASE reservationdb;
+   \q
+   ```
 
-```bash
-psql -U postgres
-CREATE DATABASE reservationdb;
-\q
-```
+4. **Run Migrations**:
+   ```bash
+   cd backend
+   dotnet ef migrations add InitialCreate -p ReservationApp.Infrastructure -s ReservationApp.API
+   dotnet ef database update -p ReservationApp.Infrastructure -s ReservationApp.API
+   ```
 
-#### 3. Create and Apply Database Migrations
+5. **Run Application**:
+   ```bash
+   cd backend/ReservationApp.API
+   dotnet run
+   ```
 
-From the backend directory:
+6. **Access**:
+   - Swagger UI: `https://localhost:7195/swagger`
+   - API: `https://localhost:7195` or `http://localhost:5053`
 
-```bash
-cd backend
+---
 
-# Create initial migration
-dotnet ef migrations add InitialCreate -p ReservationApp.Infrastructure -s ReservationApp.API
+## Frontend
 
-# Apply migration to database
-dotnet ef database update -p ReservationApp.Infrastructure -s ReservationApp.API
-```
+### Tech Stack
+- **Framework**: React 19 with Vite
+- **UI Library**: Material-UI (MUI) v5
+- **Routing**: React Router v6
+- **State Management**: React Context API, TanStack Query (React Query)
+- **HTTP Client**: Axios
+- **Charts**: Recharts
+- **Date Handling**: Day.js
+- **Styling**: Emotion (CSS-in-JS)
 
-#### 4. Run the Backend Application
+### Architecture & Patterns
+- **Component-based architecture** with reusable UI components
+- **Context API** for global state (authentication)
+- **React Query** for server state management, caching, and synchronization
+- **Custom hooks** for reusable logic
+- **API abstraction layer** with centralized axios client
+- **Route protection** with authentication guards
+- **Modular structure** separating pages, components, API, and utilities
 
-##### Option 1: Using dotnet CLI (Recommended)
+### Security
+- **JWT token storage** in localStorage (with automatic cleanup on 401)
+- **Axios interceptors** for automatic token injection and error handling
+- **Protected routes** requiring authentication
+- **Automatic logout** on token expiration or invalid credentials
+- **Secure API communication** via HTTPS in production
+- **Input validation** on forms
 
-```bash
-cd backend/ReservationApp.API
-dotnet run
-```
+### Features
+- User authentication (login, register, logout)
+- Reservation management (view, create, edit, cancel)
+- Restaurant and menu browsing
+- Personal dashboard with statistics
+- Profile management
+- Admin panel (dashboard, user management, menu management, reservations)
+- Responsive design for desktop and mobile
+- Real-time data updates with React Query
 
-##### Option 2: Using Visual Studio / Rider
+### How to Run
 
-- Open `backend/ReservationApp.sln`
-- Set `ReservationApp.API` as the startup project
-- Press F5 or click Run
+1. **Prerequisites**:
+   - Node.js 18+
+   - npm or yarn
 
-##### Option 3: Using VS Code
+2. **Install Dependencies**:
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-- Open the `backend` folder
-- Select `ReservationApp.API` as the startup project
-- Press F5
+3. **Configure API URL** (optional):
+   Create `.env` file:
+   ```
+   VITE_API_BASE_URL=http://localhost:5053/api
+   ```
 
-#### 5. Access the Backend API
+4. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
 
-Once the application is running, you can access:
+5. **Access**:
+   - Application: `http://localhost:5173`
 
-- **Swagger UI**: https://localhost:7195/swagger (or http://localhost:5053/swagger)
-- **HTTPS API**: https://localhost:7195
-- **HTTP API**: http://localhost:5053
+---
 
-The browser should automatically open to the Swagger UI page.
+## iOS
 
-## Frontend Setup
+### Tech Stack
+- **Language**: Swift
+- **Framework**: SwiftUI
+- **Architecture**: MVVM (Model-View-ViewModel)
+- **Networking**: URLSession with async/await
+- **Reactive Programming**: Combine framework
+- **Storage**: Keychain Services for secure token storage
+- **Image Caching**: Custom image cache service
 
-### Prerequisites
+### Architecture & Patterns
+- **MVVM architecture** with ViewModels managing business logic
+- **Repository pattern** for data access abstraction (AuthRepository, ReservationRepository, etc.)
+- **Protocol-oriented design** with repository protocols
+- **Dependency injection** via shared singletons (APIClient, KeychainManager)
+- **Separation of concerns**: Core (network, storage, services), Data (repositories), Domain (models, enums), Presentation (views, view models)
+- **Theme management** with centralized colors, typography, and spacing
 
-- Node.js (version 18 or higher)
-- npm or yarn
+### Security
+- **Keychain Services** for secure JWT token storage (encrypted, hardware-backed)
+- **HTTPS-only** API communication
+- **Token-based authentication** with automatic token injection
+- **Automatic logout** on 401 unauthorized responses
+- **Secure credential handling** (no plaintext storage)
 
-### Setup Instructions
+### Features
+- User authentication (login, logout)
+- Reservation management (create, view, cancel)
+- Restaurant and menu browsing
+- Personal dashboard with statistics
+- Profile management
+- Admin features (dashboard, user management, menu management, reservations)
+- Onboarding flow
+- Image caching for performance
+- Dark mode support (via theme system)
 
-> **Note**: Frontend setup is pending. Check back soon for setup instructions.
+### How to Run
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+1. **Prerequisites**:
+   - Xcode 14+ (with iOS 15+ SDK)
+   - macOS
+   - CocoaPods (if using pods)
 
-## API Endpoints
+2. **Open Project**:
+   ```bash
+   cd ios
+   open ReservationApp/ReservationApp.xcodeproj
+   ```
 
-- `GET /api/reservations` - Get all reservations
-- `GET /api/reservations/{id}` - Get reservation by ID
-- `POST /api/reservations` - Create a new reservation
+3. **Configure API URL** (if needed):
+   Update `AppConstants.API.baseURL` in `Core/Constants/AppConstants.swift`
 
-See `backend/ReservationApp.API` for complete API documentation via Swagger.
+4. **Run**:
+   - Select a simulator or connected device
+   - Press `Cmd + R` or click Run
+
+---
+
+## Android
+
+### Tech Stack
+- **Language**: Kotlin
+- **UI Framework**: Jetpack Compose
+- **Architecture**: MVVM (Model-View-ViewModel)
+- **Dependency Injection**: Hilt (Dagger)
+- **Networking**: Retrofit 2 + OkHttp + Gson
+- **Storage**: DataStore Preferences + Encrypted Preferences
+- **Image Loading**: Coil
+- **Logging**: Timber
+- **Coroutines**: Kotlin Coroutines for async operations
+
+### Architecture & Patterns
+- **Modular architecture** with feature modules:
+  - **Core modules**: common, network, storage, ui
+  - **Domain layer**: business logic, use cases, models
+  - **Data layer**: repositories, data sources
+  - **Feature modules**: auth, home, profile, reservations, make-reservation
+- **MVVM pattern** with ViewModels and Compose UI
+- **Repository pattern** for data access
+- **Dependency injection** with Hilt
+- **Clean Architecture** principles with clear layer separation
+
+### Security
+- **Encrypted Preferences** (AndroidX Security Crypto) for secure token storage
+- **HTTPS-only** API communication
+- **JWT token-based authentication** with automatic token injection
+- **Secure credential storage** using Android Keystore-backed encryption
+- **Automatic token refresh** and logout on authentication failures
+
+### Features
+- User authentication (login, logout)
+- Reservation management (create, view, cancel)
+- Restaurant and menu browsing
+- Personal dashboard with statistics
+- Profile management
+- Admin features (dashboard, user management, menu management, reservations)
+- Material Design 3 UI
+- Image loading and caching
+- Offline support capabilities
+
+### How to Run
+
+1. **Prerequisites**:
+   - Android Studio Hedgehog (2023.1.1) or later
+   - JDK 17+
+   - Android SDK (API 24+)
+
+2. **Open Project**:
+   ```bash
+   cd android
+   # Open in Android Studio
+   ```
+
+3. **Configure API URL** (if needed):
+   Update base URL in network module configuration
+
+4. **Sync & Build**:
+   - Android Studio will sync Gradle automatically
+   - Build: `Build > Make Project` or `Ctrl+F9` (Windows/Linux) / `Cmd+F9` (Mac)
+
+5. **Run**:
+   - Select an emulator or connected device
+   - Click Run or press `Shift+F10` (Windows/Linux) / `Ctrl+R` (Mac)
+
+---
 
 ## Testing
 
 ### Backend Tests
-
-Run the backend unit tests:
-
 ```bash
 cd backend
 dotnet test
 ```
 
 ### Frontend Tests
-
-> **Note**: Frontend testing setup is pending.
-
-## Troubleshooting
-
-### Database Connection Issues
-
-- Ensure PostgreSQL is running: `pg_isready`
-- Verify connection string credentials in `backend/ReservationApp.API/appsettings.Development.json`
-- Check if the database exists: `psql -U postgres -l`
-
-### Migration Issues
-
-- Ensure EF Core tools are installed: `dotnet ef --version`
-- Check that the connection string is correct
-- Verify PostgreSQL is accessible
-- Make sure you're running migrations from the `backend` directory
-
-### Port Already in Use
-
-If port 7195 or 5053 is already in use, update `backend/ReservationApp.API/Properties/launchSettings.json` or specify a different port:
-
 ```bash
-cd backend/ReservationApp.API
-dotnet run --urls "https://localhost:7000;http://localhost:5000"
+cd frontend
+npm test
 ```
 
-## Development
-
-### Backend
-
-The backend follows Clean Architecture principles with the following layers:
-
-- **API**: Controllers, middleware, dependency injection
-- **Application**: Business logic, DTOs, services, validation
-- **Domain**: Entities, enums, domain exceptions
-- **Infrastructure**: Data access, EF Core, repositories
-
-### Frontend
-
-> **Note**: Frontend architecture details will be added once the frontend is set up.
+---
 
 ## Contributing
 
 1. Create a feature branch: `git checkout -b feature/your-feature-name`
 2. Make your changes
-3. Commit your changes: `git commit -m "Add your feature"`
-4. Push to the branch: `git push origin feature/your-feature-name`
+3. Commit: `git commit -m "Add your feature"`
+4. Push: `git push origin feature/your-feature-name`
 5. Create a Pull Request
+
+---
 
 ## License
 
