@@ -108,7 +108,7 @@ fun AdminTabView(
         ) {
             when (selectedTab) {
                 0 -> AdminDashboardScreen(adminRepository = adminRepository)
-                1 -> AdminReservationsScreen()
+                1 -> AdminReservationsScreen(adminRepository = adminRepository)
                 2 -> AdminMenuScreen()
                 3 -> AdminUsersScreen()
                 4 -> AdminSettingsScreen(
