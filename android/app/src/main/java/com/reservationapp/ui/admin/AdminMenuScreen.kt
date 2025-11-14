@@ -165,7 +165,11 @@ fun AdminMenuScreen(
         // Delete Confirmation Dialog
         if (showDeleteConfirmation && mealToDelete != null) {
             AlertDialog(
-                onDismissRequest = { viewModel.hideDeleteConfirmation() },
+                onDismissRequest = { 
+                    if (!isLoading) {
+                        viewModel.hideDeleteConfirmation()
+                    }
+                },
                 title = {
                     Text("Menü Sil")
                 },
@@ -175,17 +179,30 @@ fun AdminMenuScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            viewModel.deleteMeal(mealToDelete!!)
+                            if (!isLoading) {
+                                viewModel.deleteMeal(mealToDelete!!)
+                            }
                         },
+                        enabled = !isLoading,
                         colors = ButtonDefaults.textButtonColors(
                             contentColor = ErrorMain
                         )
                     ) {
-                        Text("Sil")
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = ErrorMain
+                            )
+                        } else {
+                            Text("Sil")
+                        }
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { viewModel.hideDeleteConfirmation() }) {
+                    TextButton(
+                        onClick = { viewModel.hideDeleteConfirmation() },
+                        enabled = !isLoading
+                    ) {
                         Text("İptal")
                     }
                 }

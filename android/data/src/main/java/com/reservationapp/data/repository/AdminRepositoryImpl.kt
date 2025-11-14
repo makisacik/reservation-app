@@ -2,6 +2,7 @@ package com.reservationapp.data.repository
 
 import com.reservationapp.core.common.Result
 import com.reservationapp.core.network.api.AdminApi
+import com.reservationapp.core.network.deleteMealSafely
 import com.reservationapp.core.network.safeApiCall
 import com.reservationapp.domain.model.AdminCreateReservationRequest
 import com.reservationapp.domain.model.AdminCreateUserRequest
@@ -114,7 +115,7 @@ class AdminRepositoryImpl(
 
     override suspend fun deleteMeal(id: String): Result<Unit> {
         return safeApiCall {
-            adminApi.deleteMeal(id)
+            deleteMealSafely(adminApi, id)
         }
     }
 

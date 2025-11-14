@@ -3,6 +3,7 @@ package com.reservationapp.ui.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reservationapp.core.common.Result
+import com.reservationapp.core.network.NetworkError
 import com.reservationapp.domain.model.CreateMealRequest
 import com.reservationapp.domain.model.Meal
 import com.reservationapp.domain.model.MenuCategory
@@ -63,6 +64,8 @@ class AdminMenuViewModel(
 
     private val _mealToDelete = MutableStateFlow<Meal?>(null)
     val mealToDelete: StateFlow<Meal?> = _mealToDelete.asStateFlow()
+
+    private var isDeleting = false
 
     init {
         loadData()
@@ -180,23 +183,49 @@ class AdminMenuViewModel(
     }
 
     fun deleteMeal(meal: Meal) {
+        // Prevent duplicate calls
+        if (isDeleting) {
+            return
+        }
+
+        isDeleting = true
         _isLoading.value = true
         _errorMessage.value = null
+        
+        // Close dialog immediately to prevent multiple clicks
+        _showDeleteConfirmation.value = false
+        val mealIdToDelete = meal.id
+        _mealToDelete.value = null
 
         viewModelScope.launch {
-            when (adminRepository.deleteMeal(meal.id)) {
-                is Result.Success -> {
-                    _successMessage.value = "Menü başarıyla silindi"
-                    loadData()
-                    _showDeleteConfirmation.value = false
-                    _mealToDelete.value = null
+            try {
+                when (val result = adminRepository.deleteMeal(mealIdToDelete)) {
+                    is Result.Success -> {
+                        _successMessage.value = "Menü başarıyla silindi"
+                        loadData()
+                    }
+                    is Result.Error -> {
+                        // Handle 404 gracefully - meal might already be deleted
+                        val errorMessage = when (result.exception) {
+                            is NetworkError.NotFound -> {
+                                "Menü zaten silinmiş."
+                            }
+                            else -> {
+                                "Menü silinirken bir hata oluştu."
+                            }
+                        }
+                        _errorMessage.value = errorMessage
+                        // Refresh data even on 404 (idempotent - meal is already deleted)
+                        if (result.exception is NetworkError.NotFound) {
+                            loadData()
+                        }
+                    }
+                    is Result.Loading -> { /* Handle loading */ }
                 }
-                is Result.Error -> {
-                    _errorMessage.value = "Menü silinirken bir hata oluştu."
-                }
-                is Result.Loading -> { /* Handle loading */ }
+            } finally {
+                _isLoading.value = false
+                isDeleting = false
             }
-            _isLoading.value = false
         }
     }
 

@@ -17,6 +17,7 @@ import com.reservationapp.domain.model.SettingsUpdateRequest
 import com.reservationapp.domain.model.User
 import com.reservationapp.domain.model.UserStatistics
 import com.reservationapp.domain.model.UserUpdateRequest
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -78,7 +79,7 @@ interface AdminApi {
     suspend fun updateMeal(@Path("id") id: String, @Body request: UpdateMealRequest): Meal
 
     @DELETE("admin/meals/{id}")
-    suspend fun deleteMeal(@Path("id") id: String): Unit
+    suspend fun deleteMeal(@Path("id") id: String): Response<Unit>
 
     @GET("admin/users/statistics")
     suspend fun getUserStatistics(): UserStatistics

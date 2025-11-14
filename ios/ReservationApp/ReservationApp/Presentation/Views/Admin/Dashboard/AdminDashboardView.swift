@@ -15,7 +15,7 @@ struct AdminDashboardView: View {
             VStack(spacing: ThemeManager.shared.spacing.lg) {
                 // Header
                 VStack(alignment: .leading, spacing: ThemeManager.shared.spacing.xs) {
-                    Text("Dashboard")
+                    Text("Panel")
                         .font(AppTypography.h4())
                         .foregroundColor(AppColors.textPrimary)
                     

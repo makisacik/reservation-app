@@ -4,6 +4,7 @@ import com.reservationapp.core.common.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 
 /**
@@ -35,6 +36,20 @@ suspend fun <T> safeApiCall(
                 else -> Result.Error(NetworkError.UnknownError)
             }
         }
+    }
+}
+
+/**
+ * Helper function to handle Response<Unit> from Retrofit DELETE requests
+ * Converts Response<Unit> to Unit, throwing HttpException if not successful
+ * This wrapper hides the Response type from callers in other modules
+ */
+suspend fun deleteMealSafely(adminApi: com.reservationapp.core.network.api.AdminApi, id: String): Unit {
+    val response = adminApi.deleteMeal(id)
+    if (response.isSuccessful) {
+        return Unit
+    } else {
+        throw HttpException(response)
     }
 }
 

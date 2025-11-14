@@ -111,7 +111,8 @@ public class MealService : IMealService
         var meal = await _mealRepository.GetByIdAsync(id, cancellationToken);
         if (meal == null)
         {
-            throw new NotFoundException($"Meal with id {id} not found.");
+            // Idempotent delete: if meal doesn't exist, consider it already deleted
+            return;
         }
 
         await _mealRepository.DeleteAsync(meal, cancellationToken);
