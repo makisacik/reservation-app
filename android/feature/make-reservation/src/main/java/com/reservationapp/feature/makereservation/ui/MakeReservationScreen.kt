@@ -65,12 +65,10 @@ fun MakeReservationScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(Spacing.lg)
         ) {
-            // Stepper
             ReservationStepper(currentStep = currentStep)
 
             Spacer(modifier = Modifier.height(Spacing.xl))
 
-            // Error message
             errorMessage?.let { error ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -86,7 +84,6 @@ fun MakeReservationScreen(
                 Spacer(modifier = Modifier.height(Spacing.md))
             }
 
-            // Step Content
             when (currentStep) {
                 1 -> Step1DateSelectionView(
                     selectedDates = viewModel.selectedDates.collectAsState().value,
@@ -104,7 +101,6 @@ fun MakeReservationScreen(
                     selectedMenuType = viewModel.selectedMenuType.collectAsState().value,
                     onMenuTypeSelected = { menuType ->
                         viewModel.selectedMenuType.value = menuType
-                        // Reload menus if restaurant and date are already selected
                         if (viewModel.selectedRestaurant.value != null && viewModel.selectedDates.value.isNotEmpty()) {
                             viewModel.loadMenus()
                         }
@@ -132,7 +128,6 @@ fun MakeReservationScreen(
 
             Spacer(modifier = Modifier.height(Spacing.lg))
 
-            // Navigation Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.md)
@@ -188,7 +183,6 @@ fun StepIndicator(step: Int, isActive: Boolean, isCompleted: Boolean) {
         contentAlignment = Alignment.Center
     ) {
         if (isCompleted) {
-            // Completed step - show checkmark
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = androidx.compose.foundation.shape.CircleShape,
@@ -203,7 +197,6 @@ fun StepIndicator(step: Int, isActive: Boolean, isCompleted: Boolean) {
                 }
             }
         } else if (isActive) {
-            // Active step - show number with primary color
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = androidx.compose.foundation.shape.CircleShape,
@@ -219,7 +212,6 @@ fun StepIndicator(step: Int, isActive: Boolean, isCompleted: Boolean) {
                 }
             }
         } else {
-            // Inactive step - show number with gray
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = androidx.compose.foundation.shape.CircleShape,

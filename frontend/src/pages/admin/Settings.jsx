@@ -508,12 +508,12 @@ const Settings = () => {
               onClick={handleSaveReservation}
               disabled={saving}
               sx={{
-                borderRadius: '12px',
+                borderRadius: theme.custom.borderRadius.button,
                 textTransform: 'none',
                 bgcolor: theme.palette.primary.main,
                 px: 3,
                 py: 1.5,
-                fontWeight: 500,
+                fontWeight: theme.custom.typography.fontWeight.medium,
                 '&:hover': {
                   bgcolor: theme.palette.primary.dark,
                 },
@@ -611,12 +611,12 @@ const Settings = () => {
               onClick={handleSaveNotification}
               disabled={saving}
               sx={{
-                borderRadius: '12px',
+                borderRadius: theme.custom.borderRadius.button,
                 textTransform: 'none',
                 bgcolor: theme.palette.primary.main,
                 px: 3,
                 py: 1.5,
-                fontWeight: 500,
+                fontWeight: theme.custom.typography.fontWeight.medium,
                 '&:hover': {
                   bgcolor: theme.palette.primary.dark,
                 },

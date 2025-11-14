@@ -48,8 +48,6 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
 
         if (query.Date.HasValue)
         {
-            // Query for menus on the given date (at any time on that date)
-            // Ensure the date is explicitly UTC for PostgreSQL compatibility
             var utcDate = DateTimeConversionHelper.ConvertToUtc(query.Date.Value);
             var dateOnly = new DateTime(utcDate.Year, utcDate.Month, utcDate.Day, 0, 0, 0, DateTimeKind.Utc);
             var nextDay = dateOnly.AddDays(1);
@@ -60,13 +58,11 @@ public class MenuRepository : Repository<Menu>, IMenuRepository
 
         var result = await q.ToListAsync(cancellationToken);
         
-        // Debug logging
         _logger.LogInformation("MenuRepository.GetMenusAsync - Query params: RestaurantId={RestaurantId}, Date={Date}. Result count: {ResultCount}", 
             query.RestaurantId, query.Date, result.Count);
         
         if (result.Count == 0 && (query.RestaurantId.HasValue || query.Date.HasValue))
         {
-            // Log total menus in database for debugging
             var totalMenus = await _dbContext.Menus.CountAsync(cancellationToken);
             _logger.LogWarning("No menus found matching query. Total menus in database: {TotalMenus}", totalMenus);
         }

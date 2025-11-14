@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { menusApi } from '../../api/menusApi';
@@ -14,6 +14,7 @@ import StatsSection from '../../components/home/StatsSection';
 import MenuSection from '../../components/home/MenuSection';
 
 const HomePage = () => {
+  const theme = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -41,13 +42,11 @@ const HomePage = () => {
     queryKey: ["meals"],
     queryFn: () => mealsApi.getMeals(),
     staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for meal data
-    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
+    gcTime: 60 * 60 * 1000,
   });
 
-  // Get default category (first category or "Aylık Menü")
   const defaultCategory = useMemo(() => {
     if (categories && categories.length > 0) {
-      // Try to find "Aylık Menü" or use first category
       return categories.find(c => c.name === "Aylık Menü")?.name || categories[0].name;
     }
     return "";
@@ -55,7 +54,6 @@ const HomePage = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Update selected category when defaultCategory changes
   useEffect(() => {
     if (defaultCategory && !selectedCategory) {
       setSelectedCategory(defaultCategory);
@@ -65,10 +63,8 @@ const HomePage = () => {
   const todayMenu = menus?.[0];
   const menuMeals = todayMenu?.meals || todayMenu?.Meals || [];
 
-  // Generate alert message
   const alertMessage = generateAlertMessage(menuMeals);
 
-  // Filter meals based on selected category
   const displayedMeals = filterMealsByCategory(
     selectedCategory,
     allMeals || [],
@@ -76,7 +72,6 @@ const HomePage = () => {
     categories || []
   );
 
-  // Prepare category names for display
   const categoryNames = useMemo(() => {
     if (!categories) return [];
     return categories.map(c => c.name);
@@ -87,7 +82,7 @@ const HomePage = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: "#F6F7FB", minHeight: "100vh", p: 3 }}>
+    <Box sx={{ bgcolor: theme.palette.custom.background.page, minHeight: "100vh", p: 3 }}>
       <Box sx={{ maxWidth: "1300px", margin: "0 auto" }}>
         <UserHeaderCard user={user} alertMessage={alertMessage} />
         

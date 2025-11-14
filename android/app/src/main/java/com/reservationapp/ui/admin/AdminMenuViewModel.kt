@@ -42,7 +42,6 @@ class AdminMenuViewModel(
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
-    // Filters
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
@@ -52,7 +51,6 @@ class AdminMenuViewModel(
     private val _selectedCategoryTab = MutableStateFlow(CategoryTab.ALL)
     val selectedCategoryTab: StateFlow<CategoryTab> = _selectedCategoryTab.asStateFlow()
 
-    // Modal state
     private val _showMealForm = MutableStateFlow(false)
     val showMealForm: StateFlow<Boolean> = _showMealForm.asStateFlow()
 
@@ -90,23 +88,23 @@ class AdminMenuViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Veriler yüklenirken bir hata oluştu."
                 }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
 
             when (categoriesTask) {
                 is Result.Success -> {
                     _categories.value = categoriesTask.data
                 }
-                is Result.Error -> { /* Handle error silently */ }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Error -> {}
+                is Result.Loading -> {}
             }
 
             when (restaurantsTask) {
                 is Result.Success -> {
                     _restaurants.value = restaurantsTask.data
                 }
-                is Result.Error -> { /* Handle error silently */ }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Error -> {}
+                is Result.Loading -> {}
             }
 
             _isLoading.value = false
@@ -116,16 +114,14 @@ class AdminMenuViewModel(
     fun applyFilters() {
         var filtered = _meals.value
 
-        // Search filter
         val query = _searchQuery.value.trim()
         if (query.isNotEmpty()) {
             val queryLower = query.lowercase()
             filtered = filtered.filter { it.name.lowercase().contains(queryLower) }
         }
 
-        // Category tab filter
         when (_selectedCategoryTab.value) {
-            CategoryTab.ALL -> { /* No filter */ }
+            CategoryTab.ALL -> {}
             CategoryTab.YEMEKHANE -> {
                 filtered = filtered.filter { it.restaurantName == "Yemekhane" }
             }
@@ -155,7 +151,7 @@ class AdminMenuViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Menü oluşturulurken bir hata oluştu."
                 }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
             _isLoading.value = false
         }
@@ -176,14 +172,13 @@ class AdminMenuViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Menü güncellenirken bir hata oluştu."
                 }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
             _isLoading.value = false
         }
     }
 
     fun deleteMeal(meal: Meal) {
-        // Prevent duplicate calls
         if (isDeleting) {
             return
         }
@@ -192,7 +187,6 @@ class AdminMenuViewModel(
         _isLoading.value = true
         _errorMessage.value = null
         
-        // Close dialog immediately to prevent multiple clicks
         _showDeleteConfirmation.value = false
         val mealIdToDelete = meal.id
         _mealToDelete.value = null
@@ -205,7 +199,6 @@ class AdminMenuViewModel(
                         loadData()
                     }
                     is Result.Error -> {
-                        // Handle 404 gracefully - meal might already be deleted
                         val errorMessage = when (result.exception) {
                             is NetworkError.NotFound -> {
                                 "Menü zaten silinmiş."
@@ -215,12 +208,11 @@ class AdminMenuViewModel(
                             }
                         }
                         _errorMessage.value = errorMessage
-                        // Refresh data even on 404 (idempotent - meal is already deleted)
                         if (result.exception is NetworkError.NotFound) {
                             loadData()
                         }
                     }
-                    is Result.Loading -> { /* Handle loading */ }
+                    is Result.Loading -> {}
                 }
             } finally {
                 _isLoading.value = false

@@ -8,24 +8,20 @@ import { convertUtcToLocal, isPast } from '../../utils/timezone';
 
 const MyReservations = () => {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState('active'); // 'active' or 'past'
+  const [activeTab, setActiveTab] = useState('active');
 
-  // Fetch reservations
   const { data: reservations = [], isLoading, error } = useQuery({
     queryKey: ['myReservations'],
     queryFn: () => reservationsApi.getMyReservations(),
   });
 
-  // Convert all reservation dates to local timezone and enrich with meal data
   const enrichedReservations = useMemo(() => {
     if (!reservations || reservations.length === 0) return [];
 
     return reservations.map((reservation) => {
-      // Convert UTC date to local timezone
       const localDate = convertUtcToLocal(reservation.date);
       const menuDate = convertUtcToLocal(reservation.menuDate || reservation.date);
 
-      // Validate dates
       if (!localDate || !localDate.isValid()) {
         console.warn('Invalid localDate for reservation:', reservation.id, reservation.date);
       }
@@ -42,16 +38,12 @@ const MyReservations = () => {
     });
   }, [reservations]);
 
-  // Fetch menus for all reservations to get meal names
-  // Group by date and restaurant to minimize API calls
   const uniqueMenuKeys = useMemo(() => {
     const keys = new Set();
     enrichedReservations.forEach((reservation) => {
       if (reservation.menuDate && reservation.menuDate.isValid() && reservation.restaurantId) {
         const dateStr = reservation.menuDate.format('YYYY-MM-DD');
-        // Only add if date string is valid (not "Invalid Date")
         if (dateStr && dateStr !== 'Invalid Date' && dateStr.includes('-')) {
-          // Use '|' as separator to avoid conflicts with date dashes and GUID dashes
           keys.add(`${dateStr}|${reservation.restaurantId}`);
         }
       }
@@ -62,9 +54,7 @@ const MyReservations = () => {
   const menuQueries = useQuery({
     queryKey: ['reservationMenus', uniqueMenuKeys],
     queryFn: async () => {
-      // Fetch all unique menus in parallel
       const menuPromises = uniqueMenuKeys.map(async (key) => {
-        // Split by '|' separator (date|restaurantId)
         const [dateStr, restaurantId] = key.split('|');
         try {
           const menus = await menusApi.getMenus(dateStr, restaurantId);
@@ -81,7 +71,6 @@ const MyReservations = () => {
       results.forEach(({ key, menu }) => {
         if (menu) {
           menuMap.set(menu.id, menu);
-          // Also store by key for lookup
           menuMap.set(key, menu);
         }
       });
@@ -99,12 +88,9 @@ const MyReservations = () => {
     return menuQueries.data;
   }, [menuQueries.data]);
 
-  // Get meal name for a reservation
   const getMealName = (reservation) => {
-    // Try to get menu by menuId first
     let menu = menuMap.get(reservation.menuId);
     
-    // If not found, try to get by date and restaurant key
     if (!menu && reservation.menuDate && reservation.restaurantId) {
       const dateStr = reservation.menuDate.format('YYYY-MM-DD');
       const key = `${dateStr}|${reservation.restaurantId}`;
@@ -115,33 +101,24 @@ const MyReservations = () => {
       return 'Menü';
     }
     
-    // Combine meal names if multiple meals
     const mealNames = menu.meals.map(meal => meal.name).filter(Boolean);
     return mealNames.length > 0 ? mealNames.join(' & ') : 'Menü';
   };
 
-  // Filter and sort reservations based on active tab
-  // Note: Pending/Confirmed system only affects admin section.
-  // Users should see all their reservations (Pending, Active, and past ones) in their personal section.
   const filteredReservations = useMemo(() => {
     let filtered = enrichedReservations.filter((reservation) => {
       if (activeTab === 'active') {
-        // Active: Show all non-cancelled reservations (Pending=3 or Active=1) that are not in the past
-        // This ensures users see their pending reservations that are waiting for admin approval
         const isPending = reservation.status === 3 || reservation.status === 'Pending';
         const isActive = reservation.status === 1 || reservation.status === 'Active';
         const isCancelled = reservation.status === 2 || reservation.status === 'Cancelled';
         
-        // Show if (Pending OR Active) AND not cancelled AND not past
         return (isPending || isActive) && !isCancelled && !reservation.isPastReservation;
       } else {
-        // Past: Show cancelled reservations OR reservations that are in the past (regardless of status)
         const isCancelled = reservation.status === 2 || reservation.status === 'Cancelled';
         return isCancelled || reservation.isPastReservation;
       }
     });
 
-    // Sort: active by date ascending, past by date descending
     filtered.sort((a, b) => {
       const dateA = a.localDate;
       const dateB = b.localDate;
@@ -184,7 +161,6 @@ const MyReservations = () => {
         Geçmiş ve aktif rezervasyonlarınız
       </Typography>
 
-      {/* Tabs */}
       <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
         <Button
           onClick={() => setActiveTab('active')}
@@ -226,21 +202,18 @@ const MyReservations = () => {
         </Button>
       </Box>
 
-      {/* Loading State */}
       {isOverallLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress sx={{ color: theme.palette.primary.main }} />
         </Box>
       )}
 
-      {/* Error State */}
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           Rezervasyonlar yüklenirken bir hata oluştu. Lütfen tekrar deneyin.
         </Alert>
       )}
 
-      {/* Empty State */}
       {!isOverallLoading && !error && filteredReservations.length === 0 && (
         <Box
           sx={{
@@ -257,7 +230,6 @@ const MyReservations = () => {
         </Box>
       )}
 
-      {/* Reservations Grid */}
       {!isOverallLoading && !error && filteredReservations.length > 0 && (
         <Grid container spacing={3}>
           {filteredReservations.map((reservation) => (

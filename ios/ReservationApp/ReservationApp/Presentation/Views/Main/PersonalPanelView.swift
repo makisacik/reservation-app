@@ -15,18 +15,14 @@ struct PersonalPanelView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: ThemeManager.shared.spacing.lg) {
-                // Header Section
                 PersonalHeaderView(
                     user: viewModel.user
                 )
                 
-                // Notification Card
                 NotificationCardView(alertMessage: viewModel.alertMessage)
                 
-                // Stats Section
                 StatsGridView(stats: viewModel.stats)
                 
-                // Menu Section
                 MenuSectionView(
                     categories: viewModel.categories,
                     selectedCategory: viewModel.selectedCategory,
@@ -36,7 +32,6 @@ struct PersonalPanelView: View {
                         viewModel.selectCategory(category)
                     },
                     onReservationTap: {
-                        // Navigate to reservation screen
                         showMakeReservation = true
                     }
                 )

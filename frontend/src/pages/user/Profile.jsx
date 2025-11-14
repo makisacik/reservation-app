@@ -31,7 +31,6 @@ const Profile = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   
-  // User data
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -85,7 +84,6 @@ const Profile = () => {
       setSaving(true);
       setError(null);
       
-      // Validate name
       if (!formData.name.trim()) {
         setError('Ad alanı zorunludur.');
         return;
@@ -96,13 +94,11 @@ const Profile = () => {
         department: formData.department.trim() || null,
       });
       
-      // Update auth context with new user data
       const token = localStorage.getItem('token');
       if (token) {
         setAuthState(token, updatedUser);
       }
       
-      // Update original data and form data
       setOriginalData({
         name: updatedUser.name || '',
         email: updatedUser.email || '',
@@ -125,13 +121,11 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    // Reset to original values
     setFormData({
       ...originalData,
     });
   };
 
-  // Get initials for avatar
   const getInitials = (name) => {
     if (!name) return 'U';
     const parts = name.split(' ').filter(Boolean);
@@ -141,7 +135,6 @@ const Profile = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Format created date
   const formatCreatedDate = (dateString) => {
     if (!dateString) return 'Bilinmiyor';
     try {
@@ -156,7 +149,6 @@ const Profile = () => {
     }
   };
 
-  // Get role display name
   const getRoleDisplayName = (role) => {
     if (role === 'Admin' || role === 1) return 'Admin';
     return 'Personel';
@@ -177,9 +169,6 @@ const Profile = () => {
     );
   }
 
-  // Use formData for editable fields (it's loaded from API and updated after save)
-  // Fallback to authUser if formData is not yet loaded
-  // Use authUser for non-editable fields (role, createdAt)
   const displayUser = {
     name: formData.name || authUser?.name || '',
     email: formData.email || authUser?.email || '',
@@ -198,7 +187,6 @@ const Profile = () => {
       }}
     >
       <Grid container spacing={3}>
-        {/* Profile Card - Top Left */}
         <Grid item xs={12} md={6}>
           <Card
             sx={{
@@ -230,7 +218,6 @@ const Profile = () => {
                 Hesap bilgilerinizi görüntüleyin ve düzenleyin
               </Typography>
 
-              {/* Avatar */}
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                 <Avatar
                   sx={{
@@ -247,7 +234,6 @@ const Profile = () => {
                 </Avatar>
               </Box>
 
-              {/* Name */}
               <Typography
                 variant="h6"
                 sx={{
@@ -260,7 +246,6 @@ const Profile = () => {
                 {displayUser.name || 'Kullanıcı'}
               </Typography>
 
-              {/* Title */}
               <Typography
                 variant="body2"
                 sx={{
@@ -272,7 +257,6 @@ const Profile = () => {
                 {displayUser.department || 'Departman Belirtilmemiş'}
               </Typography>
 
-              {/* Tags */}
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
                 <Chip
                   label={getRoleDisplayName(displayUser.role)}
@@ -298,7 +282,6 @@ const Profile = () => {
                 )}
               </Box>
 
-              {/* Membership Date */}
               {displayUser.createdAt && (
                 <Box
                   sx={{
@@ -322,7 +305,6 @@ const Profile = () => {
                 </Box>
               )}
 
-              {/* Company Location */}
               <Box
                 sx={{
                   display: 'flex',
@@ -346,7 +328,6 @@ const Profile = () => {
           </Card>
         </Grid>
 
-        {/* Personal Information Form - Top Right */}
         <Grid item xs={12} md={6}>
           <Card
             sx={{
@@ -368,7 +349,6 @@ const Profile = () => {
                 Kişisel Bilgiler
               </Typography>
 
-              {/* Name Field */}
               <Box sx={{ mb: 2.5 }}>
                 <TextField
                   fullWidth
@@ -409,7 +389,6 @@ const Profile = () => {
                 />
               </Box>
 
-              {/* Email Field */}
               <Box sx={{ mb: 2.5 }}>
                 <TextField
                   fullWidth
@@ -442,7 +421,6 @@ const Profile = () => {
                 />
               </Box>
 
-              {/* Department Field */}
               <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth
@@ -483,7 +461,6 @@ const Profile = () => {
                 />
               </Box>
 
-              {/* Action Buttons */}
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                 <Button
                   variant="outlined"
@@ -528,7 +505,6 @@ const Profile = () => {
         </Grid>
       </Grid>
 
-      {/* Success Snackbar */}
       <Snackbar
         open={success}
         autoHideDuration={3000}
@@ -540,7 +516,6 @@ const Profile = () => {
         </Alert>
       </Snackbar>
 
-      {/* Error Snackbar */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}

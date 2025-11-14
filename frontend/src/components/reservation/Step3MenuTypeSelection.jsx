@@ -93,7 +93,7 @@ const Step3MenuTypeSelection = ({ selectedMenuType, onMenuTypeSelect }) => {
                 <Typography
                   variant="h6"
                   sx={{
-                    fontWeight: 600,
+                    fontWeight: theme.custom.typography.fontWeight.semibold,
                     color: 'white',
                     bgcolor: menuType.color,
                     borderRadius: theme.custom.borderRadius.button,

@@ -32,22 +32,18 @@ class LoginViewModel: ObservableObject {
         authRepository: AuthRepositoryProtocol? = nil,
         keychainManager: KeychainManager? = nil
     ) {
-        // Create dependencies on main actor to avoid concurrency issues
         self.authRepository = authRepository ?? AuthRepository()
         self.keychainManager = keychainManager ?? KeychainManager.shared
     }
     
     func login() async {
-        // Clear previous error
         errorMessage = nil
         
-        // Basic validation
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Lütfen email ve şifre girin"
             return
         }
         
-        // Email format validation
         guard isValidEmail(email) else {
             errorMessage = "Geçerli bir email adresi girin"
             return
@@ -56,20 +52,16 @@ class LoginViewModel: ObservableObject {
         isLoading = true
         
         do {
-            // Login request - token is saved by repository
             _ = try await authRepository.login(email: email, password: password)
             
-            // Token should be saved by repository, but verify
             guard keychainManager.hasToken() else {
                 errorMessage = "Giriş başarısız. Token alınamadı."
                 isLoading = false
                 return
             }
             
-            // Fetch current user
             let user = try await authRepository.getCurrentUser()
             
-            // Validate role matches selected role
             let userRole = user.role
             let isUserAdmin = userRole == .admin
             let selectedIsAdmin = selectedRole == .admin
@@ -86,11 +78,9 @@ class LoginViewModel: ObservableObject {
                 return
             }
             
-            // Success - set user and notify
             currentUser = user
             isAuthenticated = true
             
-            // Set user in AuthStateManager immediately so RootView can route correctly
             let authState = AuthStateManager.shared
             authState.setCurrentUser(user)
             

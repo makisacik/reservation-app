@@ -8,12 +8,14 @@ import {
   Typography,
   Divider,
   Grid,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import UserAvatar from './UserAvatar';
 import StatusBadge from './StatusBadge';
 
 const UserDetailModal = ({ open, onClose, user }) => {
+  const theme = useTheme();
   if (!user) return null;
 
   const formatDate = (dateStr) => {
@@ -34,8 +36,8 @@ const UserDetailModal = ({ open, onClose, user }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           pb: 2,
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
         }}
       >
         Kullanıcı Detayları
@@ -53,7 +55,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <UserAvatar name={user.name} size={64} />
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+              <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
                 {user.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -70,7 +72,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 E-posta
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {user.email}
               </Typography>
             </Grid>
@@ -78,7 +80,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Departman
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {user.department || '-'}
               </Typography>
             </Grid>
@@ -86,7 +88,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Rol
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {user.role === 'Admin' ? 'Admin' : 'Kullanıcı'}
               </Typography>
             </Grid>
@@ -100,7 +102,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Toplam Rezervasyon
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {user.totalReservations || 0}
               </Typography>
             </Grid>
@@ -108,7 +110,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Kayıt Tarihi
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {formatDate(user.createdAt)}
               </Typography>
             </Grid>
@@ -120,8 +122,8 @@ const UserDetailModal = ({ open, onClose, user }) => {
           onClick={onClose}
           variant="contained"
           sx={{
-            bgcolor: '#0A1C59',
-            '&:hover': { bgcolor: '#0d2a7a' },
+            bgcolor: theme.palette.primary.main,
+            '&:hover': { bgcolor: theme.palette.primary.darker },
           }}
         >
           Kapat

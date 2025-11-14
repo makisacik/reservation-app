@@ -15,9 +15,6 @@ const Step4MenuSelection = ({
   onAppetizerChange,
 }) => {
   const theme = useTheme();
-  // Get the first selected date for menu fetching
-  // Note: We use the first date's menu for all reservations
-  // The backend will validate that menus exist for all dates
   const firstDate = selectedDates[0]?.date;
 
   const { data: menus = [], isLoading, error } = useQuery({
@@ -29,16 +26,13 @@ const Step4MenuSelection = ({
         selectedMenuType
       ),
     enabled: !!firstDate && !!selectedRestaurant && selectedMenuType !== null,
-    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
-    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   });
 
-  // Get meals from the first menu (assuming one menu per date/restaurant/type)
-  // Backend uses camelCase, so property is 'meals' not 'Meals'
   const menu = menus[0];
   const meals = menu?.meals || menu?.Meals || [];
 
-  // Preload all meal images when meals data is available
   const imageUrls = meals
     .map((meal) => meal.imageUrl)
     .filter((url) => url && url.trim() !== '');
@@ -52,7 +46,6 @@ const Step4MenuSelection = ({
     selectedMenuType 
   });
 
-  // Check if we have multiple dates and show a warning if needed
   const hasMultipleDates = selectedDates.length > 1;
 
   const getMenuTypeName = () => {
@@ -153,7 +146,7 @@ const Step4MenuSelection = ({
                   cursor: 'pointer',
                   '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    boxShadow: theme.custom.shadows.cardHover,
                   },
                 }}
                 onClick={() => {
@@ -190,7 +183,7 @@ const Step4MenuSelection = ({
                   <Typography
                     variant="h6"
                     sx={{
-                      fontWeight: 600,
+                      fontWeight: theme.custom.typography.fontWeight.semibold,
                       color: theme.palette.primary.main,
                       mb: 1,
                     }}
@@ -252,15 +245,15 @@ const Step4MenuSelection = ({
               checked={appetizer}
               onChange={(e) => onAppetizerChange(e.target.checked)}
               sx={{
-                color: '#0A1C59',
+                color: theme.palette.primary.main,
                 '&.Mui-checked': {
-                  color: '#0A1C59',
+                  color: theme.palette.primary.main,
                 },
               }}
             />
           }
           label={
-            <Typography sx={{ color: '#333', fontSize: '14px' }}>
+            <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
               Aparetif talebi ekle (Mevsim meze tabağı)
             </Typography>
           }

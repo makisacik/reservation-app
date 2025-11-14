@@ -16,7 +16,6 @@ class PersonalPanelViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    // Menu properties
     @Published var categories: [MenuCategory] = []
     @Published var allMeals: [Meal] = []
     @Published var todayMenus: [Menu] = []
@@ -31,7 +30,6 @@ class PersonalPanelViewModel: ObservableObject {
         homeRepository: HomeRepositoryProtocol? = nil,
         authRepository: AuthRepositoryProtocol? = nil
     ) {
-        // Create dependencies on main actor to avoid concurrency issues
         self.homeRepository = homeRepository ?? HomeRepository()
         self.authRepository = authRepository ?? AuthRepository()
     }
@@ -56,18 +54,13 @@ class PersonalPanelViewModel: ObservableObject {
             self.allMeals = mealsResult
             self.todayMenus = menusResult
             
-            // Set default category
             if !categoriesResult.isEmpty && selectedCategory.isEmpty {
-                // Try to find "Aylık Menü" or use first category
                 let aylikMenu = categoriesResult.first { $0.name == "Aylık Menü" }
                 let defaultCategory = aylikMenu?.name ?? categoriesResult.first?.name ?? ""
                 selectedCategory = defaultCategory
             }
             
-            // Filter meals based on selected category
             filterMeals()
-            
-            // Generate alert message
             generateAlertMessage()
             
         } catch let error as NetworkError {
@@ -89,30 +82,22 @@ class PersonalPanelViewModel: ObservableObject {
     }
     
     private func filterMeals() {
-        // Implement filtering logic similar to frontend
-        // See homePageUtils.js for reference
         if selectedCategory.isEmpty {
-            // Show today's menu meals or first 4 meals
             let todayMenuMeals = todayMenus.first?.meals ?? []
             displayedMeals = todayMenuMeals.isEmpty ? Array(allMeals.prefix(4)) : todayMenuMeals
         } else {
-            // Find category by name
             guard let category = categories.first(where: { $0.name == selectedCategory }) else {
-                // Category not found, show today's menu
                 let todayMenuMeals = todayMenus.first?.meals ?? []
                 displayedMeals = todayMenuMeals.isEmpty ? Array(allMeals.prefix(4)) : todayMenuMeals
                 return
             }
             
-            // Special handling for "Aylık Menü"
             if selectedCategory == "Aylık Menü" {
                 let todayMenuMeals = todayMenus.first?.meals ?? []
                 displayedMeals = todayMenuMeals.isEmpty ? Array(allMeals.prefix(4)) : todayMenuMeals
             } else if selectedCategory == "Japon Restoran" {
-                // Filter by restaurant name
                 displayedMeals = allMeals.filter { $0.restaurantName == "Japon Restoran" }
             } else {
-                // Filter by category ID
                 displayedMeals = allMeals.filter { $0.categoryId == category.id }
             }
         }
@@ -129,7 +114,6 @@ class PersonalPanelViewModel: ObservableObject {
             return
         }
         
-        // Check for "Karnıyarık"
         let hasKarniyarik = menuMeals.contains(where: { 
             $0.name.lowercased().contains("karnıyarık") || 
             $0.name.lowercased().contains("karniyarik")
@@ -143,7 +127,6 @@ class PersonalPanelViewModel: ObservableObject {
             return
         }
         
-        // Show first meal
         if let firstMeal = menuMeals.first {
             alertMessage = AlertMessage(
                 title: "Bugünün Özel Menüsü!",

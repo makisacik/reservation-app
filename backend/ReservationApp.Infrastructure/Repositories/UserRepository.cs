@@ -74,39 +74,31 @@ public class UserRepository : Repository<User>, IUserRepository
         {
             var query = _dbContext.Users.AsQueryable();
 
-            // Search filter (case-insensitive name or email)
             if (!string.IsNullOrEmpty(filter.Search))
             {
                 var searchLower = filter.Search.ToLower();
                 query = query.Where(u => u.Name.ToLower().Contains(searchLower) || u.Email.ToLower().Contains(searchLower));
             }
 
-            // Status filter
             if (filter.Status.HasValue)
             {
                 query = query.Where(u => u.Status == filter.Status.Value);
             }
 
-            // Role filter
             if (filter.Role.HasValue)
             {
                 query = query.Where(u => u.Role == filter.Role.Value);
             }
 
-            // Department filter (exact or partial match)
             if (!string.IsNullOrEmpty(filter.Department))
             {
                 var departmentLower = filter.Department.ToLower();
                 query = query.Where(u => u.Department != null && u.Department.ToLower().Contains(departmentLower));
             }
 
-            // Order by name
             query = query.OrderBy(u => u.Name);
 
-            // Get total count before pagination
             var totalCount = await query.CountAsync(cancellationToken);
-
-            // Apply pagination
             var skip = (filter.Page - 1) * filter.PageSize;
             var users = await query
                 .Skip(skip)
@@ -149,7 +141,6 @@ public class UserRepository : Repository<User>, IUserRepository
             .Select(g => new { UserId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.UserId, x => x.Count, cancellationToken);
 
-        // Ensure all user IDs are in the dictionary (with 0 count if no reservations)
         var result = userIds.ToDictionary(id => id, id => counts.GetValueOrDefault(id, 0));
         return result;
     }

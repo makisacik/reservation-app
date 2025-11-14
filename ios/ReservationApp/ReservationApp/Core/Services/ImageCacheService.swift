@@ -11,24 +11,17 @@ import UIKit
 actor ImageCacheService {
     nonisolated static let shared = ImageCacheService()
     
-    // Memory cache for fast access
     private let memoryCache: NSCache<NSString, UIImage>
-    
-    // Disk cache directory
     private let cacheDirectory: URL
-    
-    // Configuration
-    private let maxMemoryCacheCount = 100 // Maximum number of images in memory
-    private let maxDiskCacheSize: Int64 = 200 * 1024 * 1024 // 200MB
+    private let maxMemoryCacheCount = 100
+    private let maxDiskCacheSize: Int64 = 200 * 1024 * 1024
     
     nonisolated private init() {
-        // Initialize memory cache
         let cache = NSCache<NSString, UIImage>()
         cache.countLimit = 100
-        cache.totalCostLimit = 50 * 1024 * 1024 // 50MB memory limit
+        cache.totalCostLimit = 50 * 1024 * 1024
         self.memoryCache = cache
         
-        // Setup disk cache directory
         let fileManager = FileManager.default
         let urls = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)
         guard let cacheURL = urls.first else {
@@ -38,7 +31,6 @@ actor ImageCacheService {
         let imageCacheURL = cacheURL.appendingPathComponent("ImageCache", isDirectory: true)
         self.cacheDirectory = imageCacheURL
         
-        // Create directory if it doesn't exist
         if !fileManager.fileExists(atPath: imageCacheURL.path) {
             try? fileManager.createDirectory(at: imageCacheURL, withIntermediateDirectories: true)
         }
@@ -50,12 +42,10 @@ actor ImageCacheService {
     func getImage(for url: URL) async -> UIImage? {
         let key = cacheKey(for: url)
         
-        // Check memory cache first
         if let cachedImage = memoryCache.object(forKey: key as NSString) {
             return cachedImage
         }
         
-        // Check disk cache
         return await loadFromDisk(key: key)
     }
     
@@ -63,23 +53,17 @@ actor ImageCacheService {
     func storeImage(_ image: UIImage, for url: URL) async {
         let key = cacheKey(for: url)
         
-        // Store in memory cache
-        let cost = Int(image.size.width * image.size.height * 4) // Rough estimate: width * height * 4 bytes (RGBA)
+        let cost = Int(image.size.width * image.size.height * 4)
         memoryCache.setObject(image, forKey: key as NSString, cost: cost)
         
-        // Store in disk cache
         await saveToDisk(image: image, key: key)
-        
-        // Enforce disk cache size limit
         await enforceDiskCacheLimit()
     }
     
     /// Clear all caches
     func clearCache() async {
-        // Clear memory cache
         memoryCache.removeAllObjects()
         
-        // Clear disk cache
         let fileManager = FileManager.default
         if let files = try? fileManager.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil) {
             for file in files {
@@ -92,10 +76,8 @@ actor ImageCacheService {
     func removeImage(for url: URL) async {
         let key = cacheKey(for: url)
         
-        // Remove from memory cache
         memoryCache.removeObject(forKey: key as NSString)
         
-        // Remove from disk cache
         let fileURL = cacheDirectory.appendingPathComponent(key)
         try? FileManager.default.removeItem(at: fileURL)
     }
@@ -103,9 +85,7 @@ actor ImageCacheService {
     // MARK: - Private Methods
     
     private func cacheKey(for url: URL) -> String {
-        // Use URL's absolute string as cache key, but sanitize for filesystem
         let urlString = url.absoluteString
-        // Remove invalid filename characters
         let sanitized = urlString
             .replacingOccurrences(of: "://", with: "_")
             .replacingOccurrences(of: "/", with: "_")
@@ -114,7 +94,6 @@ actor ImageCacheService {
             .replacingOccurrences(of: "=", with: "_")
             .replacingOccurrences(of: " ", with: "_")
         
-        // Use hash to ensure reasonable length
         let hash = urlString.hash
         return "\(hash)_\(sanitized)".replacingOccurrences(of: "[^a-zA-Z0-9_-]", with: "", options: .regularExpression)
     }
@@ -131,7 +110,6 @@ actor ImageCacheService {
             return nil
         }
         
-        // Load back into memory cache for faster subsequent access
         let cost = Int(image.size.width * image.size.height * 4)
         memoryCache.setObject(image, forKey: key as NSString, cost: cost)
         
@@ -154,7 +132,6 @@ actor ImageCacheService {
             return
         }
         
-        // Calculate total size
         var totalSize: Int64 = 0
         var fileInfos: [(url: URL, size: Int64, date: Date)] = []
         
@@ -169,9 +146,8 @@ actor ImageCacheService {
             fileInfos.append((url: file, size: size, date: date))
         }
         
-        // If over limit, remove oldest files first
         if totalSize > maxDiskCacheSize {
-            fileInfos.sort { $0.date < $1.date } // Oldest first
+            fileInfos.sort { $0.date < $1.date }
             
             for fileInfo in fileInfos {
                 try? fileManager.removeItem(at: fileInfo.url)

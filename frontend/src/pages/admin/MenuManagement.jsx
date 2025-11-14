@@ -36,7 +36,6 @@ const MenuManagement = () => {
   const [editingMeal, setEditingMeal] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Fetch meals, restaurants, and categories
   const { data: meals = [], isLoading: mealsLoading } = useQuery({
     queryKey: ['admin-meals', selectedRestaurantId],
     queryFn: () => mealsApi.getAdminMeals(selectedRestaurantId || null, null),
@@ -54,7 +53,6 @@ const MenuManagement = () => {
     queryFn: () => categoriesApi.getCategories(),
   });
 
-  // Create meal mutation
   const createMealMutation = useMutation({
     mutationFn: (mealData) => mealsApi.createMeal(mealData),
     onSuccess: () => {
@@ -72,7 +70,6 @@ const MenuManagement = () => {
     },
   });
 
-  // Update meal mutation
   const updateMealMutation = useMutation({
     mutationFn: ({ id, mealData }) => mealsApi.updateMeal(id, mealData),
     onSuccess: () => {
@@ -90,7 +87,6 @@ const MenuManagement = () => {
     },
   });
 
-  // Delete meal mutation
   const deleteMealMutation = useMutation({
     mutationFn: (id) => mealsApi.deleteMeal(id),
     onSuccess: () => {
@@ -106,26 +102,20 @@ const MenuManagement = () => {
     },
   });
 
-  // Filter meals based on search, restaurant, and category tab
   const filteredMeals = useMemo(() => {
     let filtered = [...meals];
 
-    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((meal) => meal.name.toLowerCase().includes(query));
     }
 
-    // Category tab filter
     if (selectedCategoryTab !== 'all') {
       if (selectedCategoryTab === 'yemekhane') {
-        // Filter by restaurant name
         filtered = filtered.filter((meal) => meal.restaurantName === 'Yemekhane');
       } else if (selectedCategoryTab === 'japon') {
-        // Filter by restaurant name (Japon Restoran)
         filtered = filtered.filter((meal) => meal.restaurantName === 'Japon Restoran');
       } else if (selectedCategoryTab === 'alakart') {
-        // Filter by category name (Alakart is a category, not a restaurant)
         filtered = filtered.filter((meal) => meal.categoryName === 'Alakart');
       }
     }
@@ -166,10 +156,9 @@ const MenuManagement = () => {
   const isSaving = createMealMutation.isPending || updateMealMutation.isPending;
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#F6F7FB', minHeight: 'calc(100vh - 64px)' }}>
-      {/* Header */}
+    <Box sx={{ flexGrow: 1, p: 3, bgcolor: theme.palette.custom.background.page, minHeight: 'calc(100vh - 64px)' }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, color: '#333', mb: 0.5 }}>
+        <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary, mb: 0.5 }}>
           Menü Yönetimi
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -177,9 +166,7 @@ const MenuManagement = () => {
         </Typography>
       </Box>
 
-      {/* Search and Filters Bar */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-        {/* Search */}
         <TextField
           placeholder="Q Menü ara..."
           value={searchQuery}
@@ -187,7 +174,7 @@ const MenuManagement = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: '#999' }} />
+                <SearchIcon sx={{ color: theme.palette.custom.text.quaternary }} />
               </InputAdornment>
             ),
           }}
@@ -201,7 +188,6 @@ const MenuManagement = () => {
           }}
         />
 
-        {/* Restaurant Filter */}
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Restoran</InputLabel>
           <Select
@@ -222,7 +208,6 @@ const MenuManagement = () => {
           </Select>
         </FormControl>
 
-        {/* Add New Button */}
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -242,7 +227,6 @@ const MenuManagement = () => {
         </Button>
       </Box>
 
-      {/* Category Tabs */}
       <Box sx={{ mb: 3 }}>
         <Tabs
           value={selectedCategoryTab}
@@ -252,7 +236,7 @@ const MenuManagement = () => {
               textTransform: 'none',
               fontWeight: theme.custom.typography.fontWeight.medium,
               minHeight: 48,
-              borderRadius: '12px 12px 0 0',
+              borderRadius: `${theme.custom.borderRadius.button} ${theme.custom.borderRadius.button} 0 0`,
               mr: 1,
             },
             '& .Mui-selected': {
@@ -268,7 +252,6 @@ const MenuManagement = () => {
         </Tabs>
       </Box>
 
-      {/* Meals Grid */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
@@ -295,7 +278,6 @@ const MenuManagement = () => {
         </Grid>
       )}
 
-      {/* Meal Modal */}
       <MealModal
         open={modalOpen}
         onClose={handleCloseModal}
@@ -306,7 +288,6 @@ const MenuManagement = () => {
         isLoading={isSaving}
       />
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

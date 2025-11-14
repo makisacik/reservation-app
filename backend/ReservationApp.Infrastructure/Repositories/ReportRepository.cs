@@ -37,14 +37,12 @@ public class ReportRepository : IReportRepository
 
     public async Task<IEnumerable<PopularMealDto>> GetPopularMealsAsync(int count, ReservationStatus status, CancellationToken cancellationToken = default)
     {
-        // Get all reservations with their menus and meals
         var reservations = await _dbContext.Reservations
             .Include(r => r.Menu)
             .ThenInclude(m => m.Meals)
             .Where(r => r.Status == status)
             .ToListAsync(cancellationToken);
 
-        // Count meals across all reservations
         var mealCounts = reservations
             .SelectMany(r => r.Menu.Meals)
             .GroupBy(m => new { m.Id, m.Name })
@@ -67,14 +65,13 @@ public class ReportRepository : IReportRepository
             .Where(r => r.CreatedAt >= startDate && r.CreatedAt <= endDate && r.Status == status)
             .ToListAsync(cancellationToken);
 
-        // Group by week (Monday to Sunday)
         var trends = reservations
             .GroupBy(r =>
             {
                 var date = r.CreatedAt.Date;
                 var dayOfWeek = (int)date.DayOfWeek;
-                var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1; // Sunday = 0, convert to Monday = 0
-                return date.AddDays(-daysFromMonday); // Get Monday of the week
+                var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
+                return date.AddDays(-daysFromMonday);
             })
             .Select(g => new WeeklyTrendDto
             {
@@ -98,19 +95,32 @@ public class ReportRepository : IReportRepository
 
     public async Task<string> GetMostPopularMealNameAsync(CancellationToken cancellationToken = default)
     {
-        // Get the most popular meal from ACTUAL RESERVATIONS only
-        // This ensures the stat is calculated from real reservation data, not hardcoded or seeded
-        var popularMeals = await GetPopularMealsAsync(1, ReservationStatus.Active, cancellationToken);
-        var mostPopular = popularMeals.FirstOrDefault();
+        var reservations = await _dbContext.Reservations
+            .Include(r => r.Menu)
+            .ThenInclude(m => m.Meals)
+            .Where(r => r.Status == ReservationStatus.Active || r.Status == ReservationStatus.Pending)
+            .ToListAsync(cancellationToken);
+
+        var mealCounts = reservations
+            .SelectMany(r => r.Menu.Meals)
+            .GroupBy(m => new { m.Id, m.Name })
+            .Select(g => new PopularMealDto
+            {
+                MealId = g.Key.Id,
+                MealName = g.Key.Name,
+                ReservationCount = g.Count()
+            })
+            .OrderByDescending(m => m.ReservationCount)
+            .Take(1)
+            .ToList();
+
+        var mostPopular = mealCounts.FirstOrDefault();
         
         if (mostPopular != null)
         {
-            // Return first word of meal name (e.g., "Izgara" from "Izgara Köfte")
             return mostPopular.MealName.Split(' ')[0];
         }
 
-        // If no reservations exist, return empty string
-        // The stat should only show data from actual reservations, not fallback to menus or meals
         return string.Empty;
     }
 
@@ -122,7 +132,6 @@ public class ReportRepository : IReportRepository
             .Where(m => m.Date == today)
             .ToListAsync(cancellationToken);
 
-        // Count unique meals across all today's menus
         var uniqueMealIds = todayMenus
             .SelectMany(m => m.Meals)
             .Select(m => m.Id)
@@ -165,7 +174,6 @@ public class ReportRepository : IReportRepository
             .Where(r => r.Date >= startOfMonth && r.Date <= endOfMonth && r.Status == ReservationStatus.Active)
             .CountAsync(cancellationToken);
 
-        // Fixed price per reservation: 50 TL
         const decimal pricePerReservation = 50m;
         return reservationCount * pricePerReservation;
     }
@@ -210,7 +218,6 @@ public class ReportRepository : IReportRepository
     {
         var now = DateTime.UtcNow;
         var dayOfWeek = (int)now.DayOfWeek;
-        // Convert Sunday (0) to 7 for easier calculation
         var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
         var monday = now.Date.AddDays(-daysFromMonday);
         var sunday = monday.AddDays(6).AddHours(23).AddMinutes(59).AddSeconds(59);
@@ -299,7 +306,6 @@ public class ReportRepository : IReportRepository
             .Where(r => r.Date >= startOfPreviousMonth && r.Date <= endOfPreviousMonth && r.Status == ReservationStatus.Active)
             .CountAsync(cancellationToken);
 
-        // Fixed price per reservation: 50 TL
         const decimal pricePerReservation = 50m;
         return reservationCount * pricePerReservation;
     }

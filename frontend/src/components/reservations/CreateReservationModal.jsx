@@ -15,6 +15,7 @@ import {
   Box,
   Typography,
   Autocomplete,
+  useTheme,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '../../api/usersApi';
@@ -24,6 +25,7 @@ import { mealTimeSlotsApi } from '../../api/mealTimeSlotsApi';
 import { reservationsApi } from '../../api/reservationsApi';
 
 const CreateReservationModal = ({ open, onClose, onSuccess }) => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     userId: '',
@@ -34,28 +36,24 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
     appetizer: false,
   });
 
-  // Fetch users
   const { data: usersData, isLoading: usersLoading } = useQuery({
     queryKey: ['admin-users-list'],
     queryFn: () => usersApi.getFilteredUsers({ page: 1, pageSize: 1000 }),
     enabled: open,
   });
 
-  // Fetch restaurants
   const { data: restaurants = [], isLoading: restaurantsLoading } = useQuery({
     queryKey: ['restaurants'],
     queryFn: () => restaurantsApi.getRestaurants(),
     enabled: open,
   });
 
-  // Fetch meal time slots
   const { data: mealTimeSlots = [], isLoading: mealTimeSlotsLoading } = useQuery({
     queryKey: ['meal-time-slots'],
     queryFn: () => mealTimeSlotsApi.getMealTimeSlots(),
     enabled: open,
   });
 
-  // Fetch menus when restaurant and date are selected
   const { data: menus = [], isLoading: menusLoading } = useQuery({
     queryKey: ['menus', formData.restaurantId, formData.date],
     queryFn: () => {
@@ -63,11 +61,10 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
       return menusApi.getMenus(formData.date, formData.restaurantId);
     },
     enabled: open && !!formData.restaurantId && !!formData.date,
-    staleTime: 30 * 60 * 1000, // 30 minutes - extend cache for menu data
-    gcTime: 60 * 60 * 1000, // 1 hour - keep in cache for 1 hour
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   });
 
-  // Create reservation mutation
   const createMutation = useMutation({
     mutationFn: (data) => reservationsApi.adminCreateReservation(data),
     onSuccess: () => {
@@ -88,7 +85,6 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
     },
     onError: (error) => {
       console.error('Error creating reservation:', error);
-      // Error is displayed in the modal UI below
     },
   });
 
@@ -97,7 +93,6 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
   const handleChange = (field, value) => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
-      // Reset dependent fields when parent changes
       if (field === 'restaurantId') {
         updated.menuId = '';
       }
@@ -113,7 +108,6 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
       return;
     }
 
-    // Format date for API
     const date = new Date(formData.date);
     const formattedDate = date.toISOString();
 
@@ -148,7 +142,7 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ fontWeight: 600, color: '#0A1C59', pb: 2 }}>
+      <DialogTitle sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, pb: 2 }}>
         Yeni Rezervasyon Oluştur
       </DialogTitle>
       <DialogContent>
@@ -256,7 +250,7 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
           </Box>
         )}
         {createMutation.isError && (
-          <Box sx={{ mt: 2, p: 2, bgcolor: '#ffebee', borderRadius: '8px' }}>
+          <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.custom.background.errorLight, borderRadius: theme.custom.borderRadius.input }}>
             <Typography color="error" variant="body2">
               {createMutation.error?.response?.data?.message || 'Rezervasyon oluşturulurken bir hata oluştu'}
             </Typography>
@@ -272,10 +266,10 @@ const CreateReservationModal = ({ open, onClose, onSuccess }) => {
           variant="contained"
           disabled={!isFormValid || createMutation.isPending}
           sx={{
-            bgcolor: '#0A1C59',
+            bgcolor: theme.palette.primary.main,
             color: 'white',
             '&:hover': {
-              bgcolor: '#0d2a7a',
+              bgcolor: theme.palette.primary.darker,
             },
           }}
         >

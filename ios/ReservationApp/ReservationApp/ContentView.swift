@@ -4,7 +4,6 @@
 //
 //  Created by Mehmet Ali Kısacık on 13.11.2025.
 //
-//  This file is kept for compatibility but RootView is now the main entry point
 
 import SwiftUI
 

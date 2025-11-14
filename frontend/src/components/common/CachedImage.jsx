@@ -49,7 +49,7 @@ const CachedImage = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: theme.palette.custom?.background?.light || '#f5f5f5',
+          bgcolor: theme.palette.custom?.background?.light || theme.palette.custom.background.light,
           color: theme.palette.text.secondary,
           ...sx,
         }}
@@ -61,7 +61,6 @@ const CachedImage = ({
     );
   }
 
-  // Show loading placeholder while preloading
   if (showLoadingPlaceholder && !isLoaded && !error) {
     return (
       <Box
@@ -69,7 +68,7 @@ const CachedImage = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: theme.palette.custom?.background?.light || '#f5f5f5',
+          bgcolor: theme.palette.custom?.background?.light || theme.palette.custom.background.light,
           ...sx,
         }}
         style={style}
@@ -80,7 +79,6 @@ const CachedImage = ({
     );
   }
 
-  // Show error placeholder if image failed to load
   if (error) {
     return (
       <Box
@@ -88,7 +86,7 @@ const CachedImage = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: theme.palette.custom?.background?.light || '#f5f5f5',
+          bgcolor: theme.palette.custom?.background?.light || theme.palette.custom.background.light,
           color: theme.palette.text.secondary,
           ...sx,
         }}

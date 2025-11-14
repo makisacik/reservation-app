@@ -76,7 +76,7 @@ const Step5Confirmation = ({
           <Typography
             variant="subtitle2"
             sx={{
-              fontWeight: 600,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
               color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
@@ -87,7 +87,7 @@ const Step5Confirmation = ({
             <Box
               key={dateObj.date}
               sx={{
-                bgcolor: theme.palette.warning.light,
+                bgcolor: theme.palette.warning.light || '#FFF8E1',
                 borderRadius: theme.custom.borderRadius.button,
                 p: 2,
                 mb: 1.5,
@@ -96,7 +96,7 @@ const Step5Confirmation = ({
                 justifyContent: 'space-between',
               }}
             >
-              <Typography sx={{ color: '#333', fontSize: '14px' }}>
+              <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
                 {formatDateTurkish(dateObj.date)}
               </Typography>
               {dateObj.mealTimeSlotId && (
@@ -119,7 +119,7 @@ const Step5Confirmation = ({
           <Typography
             variant="subtitle2"
             sx={{
-              fontWeight: 600,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
               color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
@@ -128,12 +128,12 @@ const Step5Confirmation = ({
           </Typography>
           <Box
             sx={{
-              bgcolor: '#FFF8E1',
-              borderRadius: '12px',
+              bgcolor: theme.palette.warning.light || '#FFF8E1',
+              borderRadius: theme.custom.borderRadius.button,
               p: 2,
             }}
           >
-            <Typography sx={{ color: '#333', fontSize: '14px' }}>
+            <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
               {selectedRestaurant?.name}
             </Typography>
           </Box>
@@ -144,7 +144,7 @@ const Step5Confirmation = ({
           <Typography
             variant="subtitle2"
             sx={{
-              fontWeight: 600,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
               color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
@@ -153,12 +153,12 @@ const Step5Confirmation = ({
           </Typography>
           <Box
             sx={{
-              bgcolor: '#FFF8E1',
-              borderRadius: '12px',
+              bgcolor: theme.palette.warning.light || '#FFF8E1',
+              borderRadius: theme.custom.borderRadius.button,
               p: 2,
             }}
           >
-            <Typography sx={{ color: '#333', fontSize: '14px' }}>
+            <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
               {getMenuTypeName()}
             </Typography>
           </Box>
@@ -169,7 +169,7 @@ const Step5Confirmation = ({
           <Typography
             variant="subtitle2"
             sx={{
-              fontWeight: 600,
+              fontWeight: theme.custom.typography.fontWeight.semibold,
               color: theme.palette.custom.text.secondary,
               mb: 1.5,
             }}
@@ -178,12 +178,12 @@ const Step5Confirmation = ({
           </Typography>
           <Box
             sx={{
-              bgcolor: '#FFF8E1',
-              borderRadius: '12px',
+              bgcolor: theme.palette.warning.light || '#FFF8E1',
+              borderRadius: theme.custom.borderRadius.button,
               p: 2,
             }}
           >
-            <Typography sx={{ color: '#333', fontSize: '14px' }}>
+            <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
               {selectedMeal?.name || selectedMenu?.name || 'Menü seçilmedi'}
             </Typography>
           </Box>
@@ -195,7 +195,7 @@ const Step5Confirmation = ({
             <Typography
               variant="subtitle2"
               sx={{
-                fontWeight: 600,
+                fontWeight: theme.custom.typography.fontWeight.semibold,
                 color: theme.palette.custom.text.secondary,
                 mb: 1.5,
               }}
@@ -210,7 +210,7 @@ const Step5Confirmation = ({
                 border: `2px solid ${theme.palette.info.main}`,
               }}
             >
-              <Typography sx={{ color: '#333', fontSize: '14px' }}>
+              <Typography sx={{ color: theme.palette.custom.text.primary, fontSize: '14px' }}>
                 Mevsim meze tabağı
               </Typography>
             </Box>

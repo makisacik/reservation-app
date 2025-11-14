@@ -26,12 +26,9 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
         var sw = Stopwatch.StartNew();
         try
         {
-            // Normalize pagination parameters
             var page = query.Page < 1 ? 1 : query.Page;
             var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
-            if (pageSize > 100) pageSize = 100; // Max page size limit
-
-            // Start with base query
+            if (pageSize > 100) pageSize = 100;
             var q = _dbContext.Reservations
                 .Include(r => r.User)
                 .Include(r => r.Restaurant)
@@ -40,23 +37,19 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                 .Include(r => r.MealTimeSlot)
                 .AsQueryable();
 
-            // Apply search filter (user name contains) - case-insensitive for PostgreSQL
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
                 q = q.Where(r => EF.Functions.ILike(r.User.Name, $"%{query.Search}%"));
             }
 
-            // Apply date filters
             if (query.Date.HasValue)
             {
-                // Exact date filter (takes precedence over range filters)
                 var date = query.Date.Value.Date;
                 var nextDay = date.AddDays(1);
                 q = q.Where(r => r.Date >= date && r.Date < nextDay);
             }
             else
             {
-                // Apply date range filters only if exact date is not specified
                 if (query.From.HasValue)
                 {
                     q = q.Where(r => r.Date >= query.From.Value);
@@ -64,13 +57,11 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
 
                 if (query.To.HasValue)
                 {
-                    // Include the entire day for 'to' date
                     var toDate = query.To.Value.Date.AddDays(1).AddTicks(-1);
                     q = q.Where(r => r.Date <= toDate);
                 }
             }
 
-            // Apply sorting
             var sortBy = string.IsNullOrWhiteSpace(query.SortBy) ? "date" : query.SortBy.ToLower();
             var sortOrder = string.IsNullOrWhiteSpace(query.SortOrder) ? "asc" : query.SortOrder.ToLower();
 
@@ -87,19 +78,16 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                     : q.OrderBy(r => r.CreatedAt),
                 _ => sortOrder == "desc" 
                     ? q.OrderByDescending(r => r.Date) 
-                    : q.OrderBy(r => r.Date) // Default: date ascending
+                    : q.OrderBy(r => r.Date)
             };
 
-            // Get total count before pagination
             var totalCount = await q.CountAsync(cancellationToken);
 
-            // Apply pagination
             var data = await q
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            // Calculate total pages
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
             sw.Stop();
@@ -128,12 +116,10 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
         var sw = Stopwatch.StartNew();
         try
         {
-            // Normalize pagination parameters
             var page = query.Page < 1 ? 1 : query.Page;
             var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
-            if (pageSize > 100) pageSize = 100; // Max page size limit
+            if (pageSize > 100) pageSize = 100;
 
-            // Start with base query with all navigation properties
             var q = _dbContext.Reservations
                 .Include(r => r.User)
                 .Include(r => r.Restaurant)
@@ -142,37 +128,31 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                 .Include(r => r.MealTimeSlot)
                 .AsQueryable();
 
-            // Date range filter (required)
             var dateFrom = query.DateFrom.Date;
-            var dateTo = query.DateTo.Date.AddDays(1).AddTicks(-1); // Include the entire end date
+            var dateTo = query.DateTo.Date.AddDays(1).AddTicks(-1);
             q = q.Where(r => r.Date >= dateFrom && r.Date <= dateTo);
 
-            // Restaurant filter
             if (query.RestaurantId.HasValue)
             {
                 q = q.Where(r => r.RestaurantId == query.RestaurantId.Value);
             }
 
-            // Department filter (join from User)
             if (!string.IsNullOrEmpty(query.Department))
             {
                 var departmentLower = query.Department.ToLower();
                 q = q.Where(r => r.User.Department != null && r.User.Department.ToLower().Contains(departmentLower));
             }
 
-            // Status filter
             if (query.Status.HasValue)
             {
                 q = q.Where(r => r.Status == query.Status.Value);
             }
 
-            // Search filter - search by user name, menu meal names, or reservation number (partial Guid match)
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
                 var searchTerm = query.Search.Trim();
                 var searchLower = searchTerm.ToLower();
                 
-                // Extract Guid part from search if it starts with "REZ"
                 string? searchGuidPart = null;
                 if (searchLower.StartsWith("rez") && searchLower.Length > 3)
                 {
@@ -187,22 +167,15 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
                 var finalSearchGuidPart = searchGuidPart;
 
                 q = q.Where(r =>
-                    // Search by user name
                     EF.Functions.ILike(r.User.Name, $"%{finalSearchTerm}%") ||
-                    // Search by menu meal names
                     r.Menu.Meals.Any(meal => EF.Functions.ILike(meal.Name, $"%{finalSearchTerm}%")) ||
-                    // Search by reservation number (first 8 chars of Guid)
                     (finalSearchGuidPart != null && r.Id.ToString("N").ToLower().StartsWith(finalSearchGuidPart))
                 );
             }
 
-            // Order by date descending (most recent first)
             q = q.OrderByDescending(r => r.Date).ThenByDescending(r => r.CreatedAt);
 
-            // Get total count before pagination
             var totalCount = await q.CountAsync(cancellationToken);
-
-            // Apply pagination
             var data = await q
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -328,7 +301,7 @@ public class ReservationRepository : Repository<Reservation>, IReservationReposi
     {
         var today = DateTime.UtcNow.Date;
         var dayOfWeek = (int)today.DayOfWeek;
-        var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1; // Sunday = 0, convert to Monday = 0
+        var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
         var weekStart = today.AddDays(-daysFromMonday);
         var weekEnd = weekStart.AddDays(7);
 

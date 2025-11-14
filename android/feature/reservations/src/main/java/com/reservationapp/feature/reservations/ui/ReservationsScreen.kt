@@ -46,7 +46,6 @@ fun ReservationsScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            // Header
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,7 +65,6 @@ fun ReservationsScreen(
                 )
             }
 
-            // Tabs
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,8 +83,6 @@ fun ReservationsScreen(
                     onClick = { viewModel.setActiveTab(ReservationTab.PAST) }
                 )
             }
-
-            // Content
             when {
                 isLoading && filteredReservations.isEmpty() -> {
                     Box(
@@ -120,7 +116,6 @@ fun ReservationsScreen(
             }
         }
 
-        // Error Message
         errorMessage?.let { error ->
             Card(
                 modifier = Modifier

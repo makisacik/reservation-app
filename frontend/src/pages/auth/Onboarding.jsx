@@ -58,7 +58,7 @@ const Onboarding = () => {
       <Typography
         sx={{
           fontSize: { xs: '28px', sm: '38px', md: '44px', lg: '48px' },
-          fontWeight: 700,
+          fontWeight: theme.custom.typography.fontWeight.bold,
           color: theme.palette.custom.onboarding.primary,
           textAlign: 'center',
           mb: 2,

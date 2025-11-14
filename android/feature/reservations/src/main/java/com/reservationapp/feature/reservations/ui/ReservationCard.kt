@@ -40,7 +40,6 @@ fun ReservationCard(
                 .fillMaxWidth()
                 .padding(Spacing.lg)
         ) {
-            // Status Badge (top right)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -50,7 +49,6 @@ fun ReservationCard(
 
             Spacer(modifier = Modifier.height(Spacing.md))
 
-            // Meal Name
             Text(
                 text = mealName,
                 style = Typography.titleMedium,
@@ -59,7 +57,6 @@ fun ReservationCard(
                 modifier = Modifier.padding(bottom = Spacing.xs)
             )
 
-            // Restaurant Name
             Text(
                 text = reservation.restaurantName,
                 style = Typography.bodySmall,
@@ -67,7 +64,6 @@ fun ReservationCard(
                 modifier = Modifier.padding(bottom = Spacing.md)
             )
 
-            // Date Row
             InfoRow(
                 icon = Icons.Default.Event,
                 text = formatDate(reservation.date)
@@ -75,7 +71,6 @@ fun ReservationCard(
 
             Spacer(modifier = Modifier.height(Spacing.xs))
 
-            // Time Slot Row
             InfoRow(
                 icon = Icons.Default.AccessTime,
                 text = reservation.mealTimeSlotName
@@ -83,7 +78,6 @@ fun ReservationCard(
 
             Spacer(modifier = Modifier.height(Spacing.xs))
 
-            // Location Row
             InfoRow(
                 icon = Icons.Default.LocationOn,
                 text = reservation.restaurantName
@@ -144,7 +138,6 @@ fun InfoRow(
 
 private fun formatDate(dateString: String): String {
     return try {
-        // Try multiple ISO 8601 formats
         val formats = listOf(
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()),
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()),
@@ -159,13 +152,11 @@ private fun formatDate(dateString: String): String {
                 date = format.parse(dateString)
                 break
             } catch (e: Exception) {
-                // Try next format
             }
         }
         
         if (date == null) return dateString
 
-        // Format as Turkish date
         val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale("tr", "TR"))
         outputFormat.format(date)
     } catch (e: Exception) {

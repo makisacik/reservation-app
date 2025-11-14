@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import Combine
 
-// Date selection model
 struct SelectedDate: Identifiable, Equatable {
     let id = UUID()
     let date: String // YYYY-MM-DD format
@@ -27,7 +26,6 @@ class MakeReservationViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
     
-    // Reservation data
     @Published var selectedDates: [SelectedDate] = []
     @Published var selectedRestaurant: Restaurant?
     @Published var selectedMenuType: MenuType?
@@ -35,7 +33,6 @@ class MakeReservationViewModel: ObservableObject {
     @Published var selectedMeal: Meal?
     @Published var appetizer: Bool = false
     
-    // Available options
     @Published var restaurants: [Restaurant] = []
     @Published var mealTimeSlots: [MealTimeSlot] = []
     @Published var availableMenus: [Menu] = []
@@ -82,8 +79,6 @@ class MakeReservationViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            // Fetch menus for the first date
-            // Note: Backend expects date, restaurantId, and menuType
             let menus = try await homeRepository.getMenus(
                 date: firstDate,
                 restaurantId: restaurant.id,
@@ -99,14 +94,11 @@ class MakeReservationViewModel: ObservableObject {
     
     func selectDate(_ date: String) {
         if let index = selectedDates.firstIndex(where: { $0.date == date }) {
-            // Deselect
             selectedDates.remove(at: index)
         } else {
-            // Check max selections
             if selectedDates.count >= maxDateSelections {
                 return
             }
-            // Add new date
             selectedDates.append(SelectedDate(date: date, mealTimeSlotId: nil))
         }
     }
@@ -139,7 +131,6 @@ class MakeReservationViewModel: ObservableObject {
     func nextStep() {
         if canProceedToNextStep() && currentStep < 5 {
             if currentStep == 3 {
-                // Load menus when moving to step 4
                 Task {
                     await loadMenus()
                 }
@@ -161,7 +152,6 @@ class MakeReservationViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            // Fetch menus for each date
             var menuResults: [[Menu]] = []
             
             for dateObj in selectedDates {
@@ -173,7 +163,6 @@ class MakeReservationViewModel: ObservableObject {
                 menuResults.append(menus)
             }
             
-            // Create reservations for each date
             var reservationTasks: [Task<Reservation, Error>] = []
             
             for (index, dateObj) in selectedDates.enumerated() {
@@ -197,7 +186,6 @@ class MakeReservationViewModel: ObservableObject {
                 reservationTasks.append(task)
             }
             
-            // Wait for all reservations to complete
             var reservations: [Reservation] = []
             for task in reservationTasks {
                 let reservation = try await task.value
@@ -206,7 +194,6 @@ class MakeReservationViewModel: ObservableObject {
             
             successMessage = "Rezervasyonunuz başarıyla oluşturuldu! \(selectedDates.count) gün için rezervasyon yapıldı."
             
-            // Reset form after delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.resetForm()
             }

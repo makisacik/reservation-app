@@ -37,7 +37,6 @@ import CreateReservationModal from '../../components/reservations/CreateReservat
 import ReservationDetailModal from '../../components/reservations/ReservationDetailModal';
 import ConfirmApprovalDialog from '../../components/reservations/ConfirmApprovalDialog';
 
-// Turkish day names and months
 const TURKISH_DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const TURKISH_MONTHS = [
   'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
@@ -60,7 +59,6 @@ const formatDateTimeTurkish = (dateStr, timeSlotName) => {
   const month = TURKISH_MONTHS[date.getMonth()];
   const year = date.getFullYear();
   
-  // Extract time range from timeSlotName (e.g., "12:00-14:00" from "Öğle Yemeği (12:00-14:00)")
   let timeRange = '';
   if (timeSlotName) {
     const timeMatch = timeSlotName.match(/(\d{2}:\d{2}-\d{2}:\d{2})/);
@@ -86,7 +84,6 @@ const AdminReservations = () => {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [reservationToApprove, setReservationToApprove] = useState(null);
 
-  // Default date range: current month
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -94,7 +91,6 @@ const AdminReservations = () => {
   const [dateFrom, setDateFrom] = useState(firstDayOfMonth.toISOString().split('T')[0]);
   const [dateTo, setDateTo] = useState(lastDayOfMonth.toISOString().split('T')[0]);
 
-  // Build query params
   const queryParams = useMemo(() => {
     const params = {
       page: page + 1,
@@ -114,26 +110,22 @@ const AdminReservations = () => {
     return params;
   }, [page, pageSize, searchQuery, statusFilter, dateFrom, dateTo, firstDayOfMonth, lastDayOfMonth]);
 
-  // Fetch reservations
   const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
     queryKey: ['admin-reservations', queryParams],
     queryFn: () => reservationsApi.getReservations(queryParams),
   });
 
-  // Fetch summary statistics
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['reservation-summary'],
     queryFn: () => reservationsApi.getReservationSummary(),
   });
 
-  // Approve reservation mutation
   const approveMutation = useMutation({
     mutationFn: (id) => reservationsApi.approveReservation(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['admin-reservations']);
       queryClient.invalidateQueries(['reservation-summary']);
       setSnackbar({ open: true, message: 'Rezervasyon başarıyla onaylandı', severity: 'success' });
-      // Close dialog after successful approval
       setApprovalDialogOpen(false);
       setReservationToApprove(null);
     },
@@ -143,7 +135,6 @@ const AdminReservations = () => {
         message: error.response?.data?.message || 'Rezervasyon onaylanırken bir hata oluştu',
         severity: 'error',
       });
-      // Keep dialog open on error so user can try again or cancel
     },
   });
 
@@ -166,7 +157,6 @@ const AdminReservations = () => {
   };
 
   const handleExport = () => {
-    // TODO: Implement export functionality
     setSnackbar({ open: true, message: 'Dışa aktarma özelliği yakında eklenecek', severity: 'info' });
   };
 
@@ -202,7 +192,6 @@ const AdminReservations = () => {
 
   return (
     <Box sx={{ flexGrow: 1, p: 3, bgcolor: theme.palette.custom.background.page, minHeight: 'calc(100vh - 64px)' }}>
-      {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, mb: 0.5 }}>
@@ -231,7 +220,6 @@ const AdminReservations = () => {
         </Button>
       </Box>
 
-      {/* Filter Bar */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
           placeholder="İsim, rezervasyon no veya menü ara..."
@@ -240,7 +228,7 @@ const AdminReservations = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: '#999' }} />
+                <SearchIcon sx={{ color: theme.palette.custom.text.quaternary }} />
               </InputAdornment>
             ),
           }}
@@ -317,7 +305,6 @@ const AdminReservations = () => {
         </Button>
       </Box>
 
-      {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card
@@ -331,7 +318,7 @@ const AdminReservations = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Bugün
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
               {summaryLoading ? <CircularProgress size={24} /> : summary?.todayCount || 0}
             </Typography>
           </Card>
@@ -348,7 +335,7 @@ const AdminReservations = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Bu Hafta
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
               {summaryLoading ? <CircularProgress size={24} /> : summary?.thisWeekCount || 0}
             </Typography>
           </Card>
@@ -365,7 +352,7 @@ const AdminReservations = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Bu Ay
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#10b981' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.success.light }}>
               {summaryLoading ? <CircularProgress size={24} /> : summary?.thisMonthCount || 0}
             </Typography>
           </Card>
@@ -382,16 +369,15 @@ const AdminReservations = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Beklemede
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#f59e0b' }}>
+            <Typography variant="h4" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.warning.main }}>
               {summaryLoading ? <CircularProgress size={24} /> : summary?.pendingCount || 0}
             </Typography>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Reservation List */}
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: '#0A1C59', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, mb: 2 }}>
           Rezervasyon Listesi
         </Typography>
       </Box>
@@ -404,8 +390,8 @@ const AdminReservations = () => {
         <Card
           sx={{
             p: 4,
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            borderRadius: theme.custom.borderRadius.large,
+            boxShadow: theme.custom.shadows.card,
             bgcolor: 'white',
             textAlign: 'center',
           }}
@@ -418,22 +404,22 @@ const AdminReservations = () => {
         <TableContainer
           component={Paper}
           sx={{
-            borderRadius: '20px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            borderRadius: theme.custom.borderRadius.large,
+            boxShadow: theme.custom.shadows.card,
             bgcolor: 'white',
           }}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: '#F6F7FB' }}>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Rezervasyon No</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Kullanıcı</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Tarih</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Öğün</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Menü</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Restoran</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>Durum</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#333' }}>İşlemler</TableCell>
+              <TableRow sx={{ bgcolor: theme.palette.custom.background.page }}>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Rezervasyon No</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Kullanıcı</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Tarih</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Öğün</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Menü</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Restoran</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>Durum</TableCell>
+                <TableCell sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.custom.text.primary }}>İşlemler</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -456,7 +442,7 @@ const AdminReservations = () => {
                         component="button"
                         variant="body2"
                         onClick={() => handleOpenDetailModal(reservation.id)}
-                        sx={{ color: '#0A1C59', textDecoration: 'none', cursor: 'pointer' }}
+                        sx={{ color: theme.palette.primary.main, textDecoration: 'none', cursor: 'pointer' }}
                       >
                         Detay
                       </Link>
@@ -467,13 +453,13 @@ const AdminReservations = () => {
                           onClick={() => handleApproveClick(reservation)}
                           disabled={approveMutation.isPending}
                           sx={{
-                            bgcolor: '#1976d2',
+                            bgcolor: theme.palette.info.main,
                             color: 'white',
                             textTransform: 'none',
                             fontSize: '0.75rem',
                             px: 2,
                             '&:hover': {
-                              bgcolor: '#1565c0',
+                              bgcolor: theme.palette.info.dark || theme.palette.info.main,
                             },
                           }}
                         >
@@ -500,7 +486,6 @@ const AdminReservations = () => {
         </TableContainer>
       )}
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -516,7 +501,6 @@ const AdminReservations = () => {
         </Alert>
       </Snackbar>
 
-      {/* Create Reservation Modal */}
       <CreateReservationModal
         open={createModalOpen}
         onClose={handleCloseCreateModal}
@@ -525,14 +509,12 @@ const AdminReservations = () => {
         }}
       />
 
-      {/* Reservation Detail Modal */}
       <ReservationDetailModal
         open={detailModalOpen}
         onClose={handleCloseDetailModal}
         reservationId={selectedReservationId}
       />
 
-      {/* Confirm Approval Dialog */}
       <ConfirmApprovalDialog
         open={approvalDialogOpen}
         onClose={handleCloseApprovalDialog}

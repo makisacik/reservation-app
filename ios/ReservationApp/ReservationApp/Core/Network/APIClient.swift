@@ -22,7 +22,6 @@ class APIClient {
         self.keychainManager = keychainManager
         
         let configuration = URLSessionConfiguration.default
-        // Increased timeout for admin endpoints that may process large datasets
         configuration.timeoutIntervalForRequest = 60
         configuration.timeoutIntervalForResource = 120
         self.session = URLSession(configuration: configuration)
@@ -35,7 +34,6 @@ class APIClient {
         queryParams: [String: String]? = nil,
         responseType: T.Type
     ) async throws -> T {
-        // Build URL with query parameters
         var urlComponents = URLComponents(string: baseURL + endpoint.path)
         
         if let queryParams = queryParams {
@@ -52,12 +50,10 @@ class APIClient {
         request.httpMethod = method ?? endpoint.method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // Add authorization token if available
         if let token = keychainManager.getToken() {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        // Add request body if provided
         if let body = body {
             do {
                 request.httpBody = try JSONEncoder().encode(body)
@@ -73,31 +69,25 @@ class APIClient {
                 throw NetworkError.unknown
             }
             
-            // Handle 401 Unauthorized
             if httpResponse.statusCode == 401 {
                 keychainManager.deleteToken()
-                // Clear user from AuthStateManager
                 AuthStateManager.shared.clearUser()
                 onUnauthorized?()
                 throw NetworkError.unauthorized
             }
             
-            // Handle other error status codes
             guard (200...299).contains(httpResponse.statusCode) else {
                 let errorMessage = try? JSONDecoder().decode([String: String].self, from: data)
                 throw NetworkError.serverError(httpResponse.statusCode, errorMessage?["message"])
             }
             
-            // Handle empty response
             guard !data.isEmpty else {
-                // For empty responses, return a simple success indicator if T is Codable
                 if T.self == EmptyResponse.self {
                     return EmptyResponse() as! T
                 }
                 throw NetworkError.noData
             }
             
-            // Decode response
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -109,7 +99,6 @@ class APIClient {
         } catch let error as NetworkError {
             throw error
         } catch let urlError as URLError {
-            // Handle specific URL errors, especially timeouts
             if urlError.code == .timedOut {
                 throw NetworkError.timeout
             }
@@ -120,6 +109,5 @@ class APIClient {
     }
 }
 
-// Empty response type for endpoints that don't return data
 struct EmptyResponse: Codable {}
 

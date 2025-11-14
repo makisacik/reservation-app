@@ -9,7 +9,6 @@ public static class DbSeeder
 {
     public static async Task SeedAsync(ReservationDbContext context)
     {
-        // Seed admin user if it doesn't exist
         if (!await context.Users.AnyAsync(u => u.Email == "admin@example.com"))
         {
             var adminPasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123");
@@ -18,7 +17,6 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed regular user if it doesn't exist
         if (!await context.Users.AnyAsync(u => u.Email == "user@example.com"))
         {
             var userPasswordHash = BCrypt.Net.BCrypt.HashPassword("user123");
@@ -27,7 +25,6 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed default MealTimeSlots if they don't exist
         if (!await context.MealTimeSlots.AnyAsync())
         {
             var mealTimeSlots = new List<MealTimeSlot>
@@ -41,10 +38,8 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed default SystemSettings with categories
         var settingsToSeed = new List<SystemSetting>();
 
-        // General settings
         if (!await context.SystemSettings.AnyAsync(s => s.Category == "General" && s.Key == "CompanyName"))
         {
             settingsToSeed.Add(new SystemSetting("General", "CompanyName", "Toyota ISS", SettingType.String, "Company name"));
@@ -54,7 +49,6 @@ public static class DbSeeder
             settingsToSeed.Add(new SystemSetting("General", "Timezone", "Europe/Istanbul", SettingType.String, "System timezone"));
         }
 
-        // Reservation settings
         var maxWeeklyReservationsSetting = await context.SystemSettings.FirstOrDefaultAsync(s => s.Category == "Reservation" && s.Key == "MaxWeeklyReservations");
         if (maxWeeklyReservationsSetting == null)
         {
@@ -62,7 +56,6 @@ public static class DbSeeder
         }
         else if (int.TryParse(maxWeeklyReservationsSetting.Value, out var currentValue) && currentValue < 5)
         {
-            // Update existing setting if it's lower than the new default
             maxWeeklyReservationsSetting.UpdateValue("5");
             await context.SaveChangesAsync();
         }
@@ -107,7 +100,6 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed restaurants
         Restaurant? mainRestaurant = null;
         Restaurant? japaneseRestaurant = null;
         
@@ -139,7 +131,6 @@ public static class DbSeeder
             }
         }
 
-        // Seed menu categories
         MenuCategory? anaYemekCategory = null;
         MenuCategory? corbaCategory = null;
         MenuCategory? alakartCategory = null;
@@ -200,12 +191,10 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
-        // Seed meals
         if (!await context.Meals.AnyAsync())
         {
             var meals = new List<Meal>
             {
-                // Ana Yemek meals
                 new Meal("Izgara Köfte & Bulgur", anaYemekCategory!.Id, mainRestaurant!.Id, 
                     "Izgara köfte, bulgur pilavı ve salata", 650, 45m, 
                     "https://images.unsplash.com/photo-1544025162-d76694265947?w=400"),
@@ -219,7 +208,6 @@ public static class DbSeeder
                     "Izgara tavuk, bulgur pilavı ve salata", 550, 40m, 
                     "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400"),
                 
-                // Çorba meals
                 new Meal("Mantar Çorbası", corbaCategory!.Id, mainRestaurant.Id, 
                     "Kremalı mantar çorbası", 180, 25m, 
                     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400"),
@@ -230,7 +218,6 @@ public static class DbSeeder
                     "Kremalı domates çorbası", 160, 22m, 
                     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400"),
                 
-                // Alakart meals
                 new Meal("Bonfile Biftek", alakartCategory!.Id, mainRestaurant.Id, 
                     "Izgara bonfile biftek, patates ve salata", 720, 85m, 
                     "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400"),
@@ -238,7 +225,6 @@ public static class DbSeeder
                     "Izgara levrek, sebze ve pilav", 450, 65m, 
                     "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400"),
                 
-                // Vejetaryen meals
                 new Meal("Mantarlı Risotto", vejetaryenCategory!.Id, mainRestaurant.Id, 
                     "Mantarlı risotto ve salata", 420, 55m, 
                     "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400"),
@@ -246,7 +232,6 @@ public static class DbSeeder
                     "Taze sebzeli makarna", 380, 50m, 
                     "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400"),
                 
-                // Aperatif meals
                 new Meal("Sandviç Tabağı", aperatifCategory!.Id, mainRestaurant.Id, 
                     "Çeşitli sandviçler", 320, 35m, 
                     "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400"),
@@ -254,7 +239,6 @@ public static class DbSeeder
                     "Karışık salata tabağı", 250, 30m, 
                     "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400"),
                 
-                // Japanese restaurant meals
                 new Meal("Sushi Seti", anaYemekCategory.Id, japaneseRestaurant!.Id, 
                     "Karışık sushi seti", 450, 120m, 
                     "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400"),
@@ -268,7 +252,6 @@ public static class DbSeeder
         }
         else
         {
-            // Update existing meals that don't have prices or need image updates
             var priceMap = new Dictionary<string, decimal>
             {
                 { "Izgara Köfte & Bulgur", 45m },
@@ -294,7 +277,6 @@ public static class DbSeeder
                 { "Izgara Levrek", "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400" },
             };
 
-            // Get all meals that might need updates (null prices or all meals for image check)
             var allMeals = await context.Meals.ToListAsync();
             
             var mealsToUpdate = allMeals
@@ -305,14 +287,12 @@ public static class DbSeeder
             {
                 var entry = context.Entry(meal);
 
-                // Update price if null
                 if (meal.Price == null && priceMap.TryGetValue(meal.Name, out var price))
                 {
                     entry.Property("Price").CurrentValue = price;
                     entry.Property("Price").IsModified = true;
                 }
 
-                // Update image if needed
                 if (imageMap.TryGetValue(meal.Name, out var imageUrl))
                 {
                     entry.Property("ImageUrl").CurrentValue = imageUrl;
@@ -326,22 +306,16 @@ public static class DbSeeder
             }
         }
 
-        // Seed menus for the next 30 days
-        // Use application timezone for consistency (defaults to Europe/Istanbul)
         var today = DateTimeConversionHelper.ConvertFromUtc(DateTime.UtcNow).Date;
-        
-        // Convert back to UTC for storage
         var todayUtc = DateTimeConversionHelper.ConvertToUtc(new DateTime(today.Year, today.Month, today.Day, 0, 0, 0, DateTimeKind.Unspecified));
         for (int i = 0; i < 30; i++)
         {
             var menuDate = todayUtc.AddDays(i);
             
-            // Create Standard menu for Yemekhane restaurant if it doesn't exist
             if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == mainRestaurant!.Id && m.MenuType == MenuType.Standard))
             {
                 var standardMenu = new Menu(mainRestaurant!.Id, menuDate, MenuType.Standard);
                 
-                // Get meals for the menu
                 var menuMeals = await context.Meals
                     .Include(m => m.Category)
                     .Include(m => m.Restaurant)
@@ -361,12 +335,10 @@ public static class DbSeeder
                 await context.SaveChangesAsync();
             }
             
-            // Create Special menu for Yemekhane restaurant if it doesn't exist
             if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == mainRestaurant!.Id && m.MenuType == MenuType.Special))
             {
                 var specialMenuYemekhane = new Menu(mainRestaurant!.Id, menuDate, MenuType.Special);
                 
-                // Get meals for the special menu (can include more variety)
                 var specialMenuMeals = await context.Meals
                     .Include(m => m.Category)
                     .Include(m => m.Restaurant)
@@ -383,12 +355,10 @@ public static class DbSeeder
                 await context.SaveChangesAsync();
             }
             
-            // Create Standard menu for Japon Restoran if it doesn't exist
             if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == japaneseRestaurant!.Id && m.MenuType == MenuType.Standard))
             {
                 var standardMenuJapanese = new Menu(japaneseRestaurant!.Id, menuDate, MenuType.Standard);
                 
-                // Get Japanese meals for the standard menu (fewer items)
                 var japaneseStandardMeals = await context.Meals
                     .Include(m => m.Category)
                     .Include(m => m.Restaurant)
@@ -405,12 +375,10 @@ public static class DbSeeder
                 await context.SaveChangesAsync();
             }
             
-            // Create Special menu for Japon Restoran if it doesn't exist
             if (!await context.Menus.AnyAsync(m => m.Date >= menuDate && m.Date < menuDate.AddDays(1) && m.RestaurantId == japaneseRestaurant!.Id && m.MenuType == MenuType.Special))
             {
                 var specialMenu = new Menu(japaneseRestaurant!.Id, menuDate, MenuType.Special);
                 
-                // Get Japanese meals for the menu
                 var japaneseMenuMeals = await context.Meals
                     .Include(m => m.Category)
                     .Include(m => m.Restaurant)

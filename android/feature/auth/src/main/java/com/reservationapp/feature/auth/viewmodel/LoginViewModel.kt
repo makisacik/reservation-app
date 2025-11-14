@@ -39,16 +39,13 @@ class LoginViewModel(
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     fun login() {
-        // Clear previous error
         _errorMessage.value = null
 
-        // Basic validation
         if (email.value.isEmpty() || password.value.isEmpty()) {
             _errorMessage.value = "Lütfen email ve şifre girin"
             return
         }
 
-        // Email format validation
         if (!email.value.isValidEmail()) {
             _errorMessage.value = "Geçerli bir email adresi girin"
             return
@@ -61,19 +58,16 @@ class LoginViewModel(
                 is Result.Success -> {
                     val authResponse = result.data
 
-                    // Verify token was saved
                     if (authResponse.authToken.isEmpty()) {
                         _errorMessage.value = "Giriş başarısız. Token alınamadı."
                         _isLoading.value = false
                         return@launch
                     }
 
-                    // Fetch current user
                     when (val userResult = authRepository.getCurrentUser()) {
                         is Result.Success -> {
                             val user = userResult.data
 
-                            // Validate role matches selected role (case-sensitive to match iOS)
                             val isUserAdmin = user.role == "Admin"
                             val selectedIsAdmin = selectedRole.value == LoginRole.ADMIN
 
@@ -89,7 +83,6 @@ class LoginViewModel(
                                 return@launch
                             }
 
-                            // Success - set user and notify
                             _currentUser.value = user
                             _isAuthenticated.value = true
                             authStateManager.setCurrentUser(user)
@@ -98,9 +91,7 @@ class LoginViewModel(
                         is Result.Error -> {
                             _errorMessage.value = "Kullanıcı bilgileri alınamadı."
                         }
-                        is Result.Loading -> {
-                            // Handle loading
-                        }
+                        is Result.Loading -> {}
                     }
                 }
                 is Result.Error -> {
@@ -113,9 +104,7 @@ class LoginViewModel(
                         }
                     }
                 }
-                is Result.Loading -> {
-                    // Handle loading
-                }
+                is Result.Loading -> {}
             }
 
             _isLoading.value = false

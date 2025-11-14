@@ -51,7 +51,6 @@ fun AdminMenuScreen(
                 .padding(Spacing.md),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
-            // Header
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs)
@@ -70,16 +69,12 @@ fun AdminMenuScreen(
                 )
             }
 
-            // Filters
             MealFiltersView(viewModel = viewModel)
 
-            // Category Tabs
             MenuCategoryTabsView(
                 selectedTab = selectedCategoryTab,
                 onTabSelected = { viewModel.setSelectedCategoryTab(it) }
             )
-
-            // Meals Grid
             if (isLoading && filteredMeals.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -111,7 +106,6 @@ fun AdminMenuScreen(
             }
         }
 
-        // Loading overlay
         if (isLoading && filteredMeals.isNotEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -119,7 +113,6 @@ fun AdminMenuScreen(
             )
         }
 
-        // Error message
         errorMessage?.let { error ->
             Snackbar(
                 modifier = Modifier
@@ -135,7 +128,6 @@ fun AdminMenuScreen(
             }
         }
 
-        // Success message
         successMessage?.let { success ->
             LaunchedEffect(success) {
                 delay(3000)
@@ -155,14 +147,11 @@ fun AdminMenuScreen(
             }
         }
 
-        // Meal Form Modal
         MealFormView(
             isPresented = showMealForm,
             viewModel = viewModel,
             onDismiss = { viewModel.hideMealForm() }
         )
-
-        // Delete Confirmation Dialog
         if (showDeleteConfirmation && mealToDelete != null) {
             AlertDialog(
                 onDismissRequest = { 

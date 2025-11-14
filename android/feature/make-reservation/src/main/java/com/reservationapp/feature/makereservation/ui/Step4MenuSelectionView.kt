@@ -37,7 +37,6 @@ fun Step4MenuSelectionView(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg)
     ) {
-        // Header
         Column(
             verticalArrangement = Arrangement.spacedBy(Spacing.xs)
         ) {
@@ -56,7 +55,6 @@ fun Step4MenuSelectionView(
             }
         }
         
-        // Loading State
         if (isLoading) {
             Box(
                 modifier = Modifier
@@ -67,15 +65,12 @@ fun Step4MenuSelectionView(
                 CircularProgressIndicator(color = PrimaryMain)
             }
         }
-        // Error State
         else if (errorMessage != null) {
             ErrorView(message = errorMessage)
         }
-        // Empty State
         else if (menus.isEmpty()) {
             EmptyMenusView()
         }
-        // Meals List
         else {
             val meals = menus.firstOrNull()?.meals ?: emptyList()
             
@@ -97,7 +92,6 @@ fun Step4MenuSelectionView(
             
             Spacer(modifier = Modifier.height(Spacing.md))
             
-            // Appetizer Checkbox
             AppetizerCheckbox(
                 isChecked = appetizer,
                 onCheckedChange = onAppetizerChanged
@@ -127,7 +121,6 @@ fun MealSelectionCard(
         )
     ) {
         Column {
-            // Image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +147,6 @@ fun MealSelectionCard(
                 }
             }
             
-            // Info
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

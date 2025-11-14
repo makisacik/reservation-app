@@ -80,7 +80,6 @@ public class ReservationService : IReservationService
 
     public async Task<ReservationDto> CreateAsync(CreateReservationDto dto, Guid userId, CancellationToken cancellationToken = default)
     {
-        // Get user to check role
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null)
         {
@@ -89,24 +88,20 @@ public class ReservationService : IReservationService
 
         var isAdmin = user.Role == UserRole.Admin;
 
-        // Get settings using category-based methods
         var allowPastReservationsResult = await _settingService.GetValueAsync<bool?>("Reservation", "AllowPastReservations", null, cancellationToken);
         var allowPastReservations = allowPastReservationsResult ?? false;
         var maxWeeklyReservationsResult = await _settingService.GetValueAsync<int?>("Reservation", "MaxWeeklyReservations", null, cancellationToken);
         var maxWeeklyReservations = maxWeeklyReservationsResult ?? 5;
 
-        // Check past date (unless admin or setting allows)
         if (!isAdmin && !allowPastReservations && dto.Date.Date < DateTime.UtcNow.Date)
         {
             throw new InvalidReservationDateException(dto.Date);
         }
 
-        // Check duplicate reservation (same user, date, meal time slot)
         var reservationDate = DateOnly.FromDateTime(dto.Date);
         var hasDuplicate = await _reservationRepository.HasReservationForDayAsync(userId, reservationDate, dto.MealTimeSlotId, cancellationToken);
         if (hasDuplicate)
         {
-            // Get meal time slot name for error message
             var existingReservation = await _reservationRepository.GetUserReservationsAsync(userId, cancellationToken);
             var duplicate = existingReservation.FirstOrDefault(r => 
                 DateOnly.FromDateTime(r.Date) == reservationDate && r.MealTimeSlotId == dto.MealTimeSlotId);
@@ -114,10 +109,8 @@ public class ReservationService : IReservationService
             throw new DuplicateReservationException(dto.Date, mealTimeSlotName);
         }
 
-        // Check weekly limit (unless admin)
         if (!isAdmin)
         {
-            // Calculate week start (Monday) and end (Sunday) using ISO 8601
             var date = dto.Date.Date;
             var dayOfWeek = (int)date.DayOfWeek;
             var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1; // Sunday = 0, convert to Monday = 0
@@ -137,7 +130,6 @@ public class ReservationService : IReservationService
         _logger.LogInformation("Service - DTO Date Analysis: Value={Value}, Kind={Kind}, Ticks={Ticks}",
             dto.Date, dto.Date.Kind, dto.Date.Ticks);
 
-        // Ensure date is UTC before creating entity
         var utcReservationDate = await _timezoneService.ConvertToUtcAsync(dto.Date, cancellationToken);
         _logger.LogInformation("Service - Date converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
             dto.Date, utcReservationDate, utcReservationDate.Kind);
@@ -145,8 +137,6 @@ public class ReservationService : IReservationService
         _logger.LogInformation("Service - Final date before entity creation: Value={Value}, Kind={Kind}, Ticks={Ticks}",
             utcReservationDate, utcReservationDate.Kind, utcReservationDate.Ticks);
 
-        // Create reservation
-        // Note: All new reservations are created with Status = Pending by default
         _logger.LogInformation("Service - Creating Reservation entity...");
         var reservation = new Reservation(
             userId,
@@ -165,11 +155,9 @@ public class ReservationService : IReservationService
         await _reservationRepository.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Service - Changes saved successfully");
 
-        // Check if AutoApproval is enabled
         var autoApprovalResult = await _settingService.GetValueAsync<bool?>("Reservation", "AutoApproval", null, cancellationToken);
         var autoApproval = autoApprovalResult ?? false;
 
-        // If AutoApproval is enabled, approve the reservation immediately
         if (autoApproval)
         {
             _logger.LogInformation("Service - AutoApproval is enabled, approving reservation {ReservationId}", reservation.Id);
@@ -178,15 +166,12 @@ public class ReservationService : IReservationService
             _logger.LogInformation("Service - Reservation {ReservationId} approved automatically", reservation.Id);
         }
 
-        // Reload with navigation properties
         var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
         if (createdReservation == null)
         {
             throw new DomainException("Failed to retrieve created reservation.");
         }
 
-        // Send confirmation email only if reservation is Active (approved)
-        // EmailNotificationService will check if email is enabled and if reservation is Active
         if (createdReservation.Status == ReservationStatus.Active)
         {
             _ = Task.Run(async () =>
@@ -197,8 +182,6 @@ public class ReservationService : IReservationService
                 }
                 catch
                 {
-                    // Log but don't throw - email failures shouldn't break reservation creation
-                    // EmailNotificationService handles its own logging
                 }
             }, cancellationToken);
         }
@@ -217,7 +200,6 @@ public class ReservationService : IReservationService
         var reservation = await _reservationRepository.GetUserReservationByIdAsync(reservationId, userId, cancellationToken);
         if (reservation == null)
         {
-            // Check if reservation exists but belongs to another user
             var anyReservation = await _reservationRepository.GetByIdAsync(reservationId, cancellationToken);
             if (anyReservation != null)
             {
@@ -226,13 +208,11 @@ public class ReservationService : IReservationService
             throw new NotFoundException($"Reservation with id {reservationId} not found.");
         }
 
-        // Only allow cancellation of future reservations
         if (reservation.Date.Date < DateTime.UtcNow.Date)
         {
             throw new BadRequestException("Cannot cancel past reservations.");
         }
 
-        // Check if already cancelled
         if (reservation.Status == ReservationStatus.Cancelled)
         {
             throw new BadRequestException("Reservation is already cancelled.");
@@ -250,13 +230,11 @@ public class ReservationService : IReservationService
             throw new NotFoundException($"Reservation with id {id} not found.");
         }
 
-        // Check if already cancelled
         if (reservation.Status == ReservationStatus.Cancelled)
         {
             throw new BadRequestException("Reservation is already cancelled.");
         }
 
-        // Admin can cancel any reservation (no date restrictions)
         reservation.Cancel();
         await _reservationRepository.SaveChangesAsync(cancellationToken);
     }
@@ -272,14 +250,12 @@ public class ReservationService : IReservationService
         reservation.Approve();
         await _reservationRepository.SaveChangesAsync(cancellationToken);
 
-        // Reload with navigation properties for email
         var approvedReservation = await _reservationRepository.GetByIdAsync(id, cancellationToken);
         if (approvedReservation != null && approvedReservation.Status == ReservationStatus.Active)
         {
             var user = approvedReservation.User;
             if (user != null)
             {
-                // Send confirmation email (fire-and-forget)
                 _ = Task.Run(async () =>
                 {
                     try
@@ -288,8 +264,6 @@ public class ReservationService : IReservationService
                     }
                     catch
                     {
-                        // Log but don't throw - email failures shouldn't break approval
-                        // EmailNotificationService handles its own logging
                     }
                 }, cancellationToken);
             }
@@ -314,22 +288,16 @@ public class ReservationService : IReservationService
 
     public async Task<ReservationDto> AdminCreateAsync(AdminCreateReservationDto dto, CancellationToken cancellationToken = default)
     {
-        // Verify user exists
         var user = await _userRepository.GetByIdAsync(dto.UserId, cancellationToken);
         if (user == null)
         {
             throw new NotFoundException($"User with id {dto.UserId} not found.");
         }
 
-        // Admin can create reservations for any user, so we skip user-specific validations
-        // However, we still check for duplicates to prevent double-booking
-
-        // Check duplicate reservation (same user, date, meal time slot)
         var reservationDate = DateOnly.FromDateTime(dto.Date);
         var hasDuplicate = await _reservationRepository.HasReservationForDayAsync(dto.UserId, reservationDate, dto.MealTimeSlotId, cancellationToken);
         if (hasDuplicate)
         {
-            // Get meal time slot name for error message
             var existingReservation = await _reservationRepository.GetUserReservationsAsync(dto.UserId, cancellationToken);
             var duplicate = existingReservation.FirstOrDefault(r => 
                 DateOnly.FromDateTime(r.Date) == reservationDate && r.MealTimeSlotId == dto.MealTimeSlotId);
@@ -341,12 +309,10 @@ public class ReservationService : IReservationService
         _logger.LogInformation("Service - Received DTO: UserId={UserId}, RestaurantId={RestaurantId}, MenuId={MenuId}, MealTimeSlotId={MealTimeSlotId}, Date={Date}, Appetizer={Appetizer}",
             dto.UserId, dto.RestaurantId, dto.MenuId, dto.MealTimeSlotId, dto.Date, dto.Appetizer);
 
-        // Ensure date is UTC before creating entity
         var utcReservationDate = await _timezoneService.ConvertToUtcAsync(dto.Date, cancellationToken);
         _logger.LogInformation("Service - Date converted to UTC: Original={Original}, UTC={Utc}, UTC Kind={UtcKind}",
             dto.Date, utcReservationDate, utcReservationDate.Kind);
 
-        // Create reservation
         _logger.LogInformation("Service - Creating Reservation entity...");
         var reservation = new Reservation(
             dto.UserId,
@@ -365,11 +331,9 @@ public class ReservationService : IReservationService
         await _reservationRepository.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Service - Changes saved successfully");
 
-        // Check if AutoApproval is enabled
         var autoApprovalResult = await _settingService.GetValueAsync<bool?>("Reservation", "AutoApproval", null, cancellationToken);
         var autoApproval = autoApprovalResult ?? false;
 
-        // If AutoApproval is enabled, approve the reservation immediately
         if (autoApproval)
         {
             _logger.LogInformation("Service - AutoApproval is enabled, approving reservation {ReservationId}", reservation.Id);
@@ -378,15 +342,12 @@ public class ReservationService : IReservationService
             _logger.LogInformation("Service - Reservation {ReservationId} approved automatically", reservation.Id);
         }
 
-        // Reload with navigation properties
         var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
         if (createdReservation == null)
         {
             throw new DomainException("Failed to retrieve created reservation.");
         }
 
-        // Send confirmation email only if reservation is Active (approved)
-        // EmailNotificationService will check if email is enabled and if reservation is Active
         if (createdReservation.Status == ReservationStatus.Active)
         {
             _ = Task.Run(async () =>
@@ -397,8 +358,6 @@ public class ReservationService : IReservationService
                 }
                 catch
                 {
-                    // Log but don't throw - email failures shouldn't break reservation creation
-                    // EmailNotificationService handles its own logging
                 }
             }, cancellationToken);
         }
@@ -408,10 +367,8 @@ public class ReservationService : IReservationService
 
     private static ReservationDto MapToDto(Reservation reservation)
     {
-        // Generate reservation number from Guid (REZ + first 8 chars uppercase, no dashes)
         var reservationNumber = "REZ" + reservation.Id.ToString("N").Substring(0, 8).ToUpperInvariant();
 
-        // Get menu name - join all meal names with " & " or use first meal name
         var menuName = string.Empty;
         if (reservation.Menu?.Meals != null && reservation.Menu.Meals.Any())
         {

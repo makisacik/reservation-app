@@ -1,4 +1,3 @@
-// App routes
 export const ROUTES = {
   ONBOARDING: '/',
   LOGIN: '/login',
@@ -14,7 +13,6 @@ export const ROUTES = {
   ADMIN_SETTINGS: '/admin/settings',
 };
 
-// API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
@@ -47,19 +45,16 @@ export const API_ENDPOINTS = {
   },
 };
 
-// Local storage keys
 export const STORAGE_KEYS = {
   TOKEN: 'token',
   USER: 'user',
 };
 
-// Default pagination
 export const DEFAULT_PAGINATION = {
   PAGE: 1,
   PAGE_SIZE: 10,
 };
 
-// Home page constants
 export const HOME_PAGE_CONSTANTS = {
   DEFAULT_CATEGORY: 'Aylık Menü',
   BORDER_RADIUS: '20px',

@@ -21,6 +21,7 @@ const Table = ({
   onPageChange,
   onPageSizeChange,
 }) => {
+  const theme = useTheme();
   const handleChangePage = (event, newPage) => {
     if (onPageChange) {
       onPageChange(newPage);
@@ -50,7 +51,7 @@ const Table = ({
               <TableCell
                 key={column.id}
                 align={column.align || 'left'}
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: theme.custom.typography.fontWeight.semibold }}
               >
                 {column.label}
               </TableCell>

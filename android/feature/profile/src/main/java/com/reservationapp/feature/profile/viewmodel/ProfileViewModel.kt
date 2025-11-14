@@ -35,7 +35,6 @@ class ProfileViewModel(
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
-    // Editable fields
     val name = MutableStateFlow("")
     val email = MutableStateFlow("")
     val department = MutableStateFlow<String?>(null)
@@ -60,9 +59,7 @@ class ProfileViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Profil bilgileri yüklenemedi"
                 }
-                is Result.Loading -> {
-                    // Handle loading
-                }
+                is Result.Loading -> {}
             }
 
             _isLoading.value = false
@@ -95,9 +92,7 @@ class ProfileViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Profil güncellenirken bir hata oluştu"
                 }
-                is Result.Loading -> {
-                    // Handle loading
-                }
+                is Result.Loading -> {}
             }
 
             _isLoading.value = false
@@ -114,15 +109,12 @@ class ProfileViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            // Clear secure storage
             authRepository.logout()
             
-            // Clear user data from form
             name.value = ""
             email.value = ""
             department.value = null
             
-            // Clear auth state - this will trigger navigation to login
             authStateManager.clearUser()
         }
     }

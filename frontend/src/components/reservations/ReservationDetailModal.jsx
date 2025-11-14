@@ -10,6 +10,7 @@ import {
   Divider,
   Paper,
   CircularProgress,
+  useTheme,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { reservationsApi } from '../../api/reservationsApi';
@@ -42,6 +43,7 @@ const formatDateTimeTurkish = (dateStr) => {
 };
 
 const ReservationDetailModal = ({ open, onClose, reservationId }) => {
+  const theme = useTheme();
   const { data: reservation, isLoading } = useQuery({
     queryKey: ['reservation', reservationId],
     queryFn: () => reservationsApi.getReservationById(reservationId),
@@ -50,7 +52,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 600, color: '#0A1C59', pb: 2 }}>
+      <DialogTitle sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main, pb: 2 }}>
         Rezervasyon Detayları
       </DialogTitle>
       <DialogContent>
@@ -64,14 +66,14 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Paper
                 sx={{
                   p: 2,
-                  borderRadius: '12px',
-                  bgcolor: '#F6F7FB',
+                  borderRadius: theme.custom.borderRadius.button,
+                  bgcolor: theme.palette.custom.background.page,
                 }}
               >
                 <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                   Rezervasyon No
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0A1C59' }}>
+                <Typography variant="h6" sx={{ fontWeight: theme.custom.typography.fontWeight.semibold, color: theme.palette.primary.main }}>
                   {reservation.reservationNumber}
                 </Typography>
               </Paper>
@@ -83,7 +85,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Kullanıcı
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {reservation.userName}
               </Typography>
             </Grid>
@@ -97,7 +99,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Tarih
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {formatDateTurkish(reservation.date)}
               </Typography>
             </Grid>
@@ -105,7 +107,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Öğün
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {reservation.mealTimeSlotName}
               </Typography>
             </Grid>
@@ -113,7 +115,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Restoran
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {reservation.restaurantName}
               </Typography>
             </Grid>
@@ -121,7 +123,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Menü
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {reservation.menuName || '-'}
               </Typography>
             </Grid>
@@ -129,7 +131,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
                 Çorba
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              <Typography variant="body1" sx={{ fontWeight: theme.custom.typography.fontWeight.medium }}>
                 {reservation.appetizer ? 'Evet' : 'Hayır'}
               </Typography>
             </Grid>
@@ -160,7 +162,7 @@ const ReservationDetailModal = ({ open, onClose, reservationId }) => {
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} variant="contained" sx={{ bgcolor: '#0A1C59' }}>
+        <Button onClick={onClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main }}>
           Kapat
         </Button>
       </DialogActions>

@@ -41,7 +41,6 @@ fun LoginScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isAuthenticated by viewModel.isAuthenticated.collectAsState()
 
-    // Navigate on successful login
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated) {
             onLoginSuccess()
@@ -70,7 +69,6 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(100.dp))
 
-            // Card container
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -84,7 +82,6 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(Spacing.lg)
                 ) {
-                    // App Icon
                     Box(
                         modifier = Modifier
                             .size(60.dp)
@@ -108,7 +105,6 @@ fun LoginScreen(
                         )
                     }
 
-                    // Title
                     Text(
                         text = "Yemek Rezervasyon Sistemi",
                         style = Typography.headlineSmall,
@@ -116,7 +112,6 @@ fun LoginScreen(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    // Subtitle
                     Text(
                         text = "Lütfen giriş yapmak için bilgilerinizi girin",
                         style = Typography.bodyMedium,
@@ -124,7 +119,6 @@ fun LoginScreen(
                         modifier = Modifier.padding(horizontal = Spacing.md)
                     )
 
-                    // Role Picker
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
@@ -144,7 +138,6 @@ fun LoginScreen(
                         }
                     }
 
-                    // Error Alert
                     errorMessage?.let { error ->
                         Card(
                             colors = CardDefaults.cardColors(
@@ -173,7 +166,6 @@ fun LoginScreen(
                         }
                     }
 
-                    // Form
                     Column(
                         verticalArrangement = Arrangement.spacedBy(Spacing.md)
                     ) {
@@ -199,7 +191,6 @@ fun LoginScreen(
                         )
                     }
 
-                    // Login Button
                     Button(
                         onClick = { viewModel.login() },
                         modifier = Modifier.fillMaxWidth(),

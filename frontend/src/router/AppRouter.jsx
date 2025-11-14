@@ -7,7 +7,6 @@ import { HomePage, MakeReservation, MyReservations, Profile } from '../pages/use
 import { Dashboard, AdminReservations, MenuManagement, Users, Settings } from '../pages/admin';
 import { Navbar, Sidebar } from '../components/layout';
 
-// Protected route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -29,7 +28,6 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to={ROUTES.LOGIN} replace />;
 };
 
-// Admin-only route component
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
@@ -59,7 +57,6 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
-// User-only route component (non-admin)
 const UserRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
@@ -89,7 +86,6 @@ const UserRoute = ({ children }) => {
   return children;
 };
 
-// Public route component (redirects based on role if already authenticated)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
@@ -119,17 +115,16 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Layout component that wraps protected routes with Navbar and Sidebar
 const AppLayout = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      <Box 
+        <Box 
         sx={{ 
           display: 'flex', 
           flex: 1, 
           mt: '64px',
-          alignItems: 'flex-start', // Align items at the top
+          alignItems: 'flex-start',
         }}
       >
         <Sidebar />

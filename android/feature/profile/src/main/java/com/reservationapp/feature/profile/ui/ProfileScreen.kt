@@ -36,7 +36,6 @@ fun ProfileScreen(
     val successMessage by viewModel.successMessage.collectAsState()
     var showLogoutConfirmation by remember { mutableStateOf(false) }
 
-    // Clear messages after a delay
     LaunchedEffect(errorMessage, successMessage) {
         if (errorMessage != null || successMessage != null) {
             kotlinx.coroutines.delay(5000)
@@ -68,12 +67,10 @@ fun ProfileScreen(
                 .padding(paddingValues)
                 .padding(Spacing.md)
         ) {
-        // Header
         ProfileHeaderView(user = currentUser)
 
         Spacer(modifier = Modifier.height(Spacing.lg))
 
-        // Error/Success Messages
         errorMessage?.let { error ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -104,7 +101,6 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Spacing.md))
         }
 
-        // Profile Form
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = BackgroundPaper)
@@ -150,12 +146,10 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.md))
 
-                // Action Buttons - Cancel and Update side by side
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
-                    // Cancel Button (Secondary)
                     OutlinedButton(
                         onClick = { viewModel.resetForm() },
                         modifier = Modifier.weight(1f),
@@ -167,7 +161,6 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Update Button (Primary)
                     Button(
                         onClick = { viewModel.updateProfile() },
                         modifier = Modifier.weight(1f),
@@ -193,7 +186,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(Spacing.lg))
 
-        // User Info Card
         currentUser?.let { user ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -223,7 +215,6 @@ fun ProfileScreen(
         }
     }
 
-        // Logout Confirmation Dialog
         if (showLogoutConfirmation) {
             AlertDialog(
                 onDismissRequest = { showLogoutConfirmation = false },

@@ -37,21 +37,18 @@ public class MealService : IMealService
 
     public async Task<MealDto> CreateAsync(MealCreateDto dto, CancellationToken cancellationToken = default)
     {
-        // Validate restaurant exists
         var restaurant = await _restaurantRepository.GetByIdAsync(dto.RestaurantId, cancellationToken);
         if (restaurant == null)
         {
             throw new NotFoundException($"Restaurant with id {dto.RestaurantId} not found.");
         }
 
-        // Validate category exists
         var categoryExists = await _mealRepository.CategoryExistsAsync(dto.CategoryId, cancellationToken);
         if (!categoryExists)
         {
             throw new NotFoundException($"Category with id {dto.CategoryId} not found.");
         }
 
-        // Create meal
         var meal = new Meal(
             dto.Name,
             dto.CategoryId,
@@ -65,7 +62,6 @@ public class MealService : IMealService
         await _mealRepository.AddAsync(meal, cancellationToken);
         await _mealRepository.SaveChangesAsync(cancellationToken);
 
-        // Reload with navigation properties
         var createdMeal = await _mealRepository.GetByIdAsync(meal.Id, cancellationToken);
         if (createdMeal == null)
         {
@@ -83,20 +79,17 @@ public class MealService : IMealService
             throw new NotFoundException($"Meal with id {id} not found.");
         }
 
-        // Validate category exists
         var categoryExists = await _mealRepository.CategoryExistsAsync(dto.CategoryId, cancellationToken);
         if (!categoryExists)
         {
             throw new NotFoundException($"Category with id {dto.CategoryId} not found.");
         }
 
-        // Update meal
         meal.Update(dto.Name, dto.CategoryId, dto.Description, dto.Kcal, dto.Price, dto.ImageUrl);
 
         await _mealRepository.UpdateAsync(meal, cancellationToken);
         await _mealRepository.SaveChangesAsync(cancellationToken);
 
-        // Reload with navigation properties
         var updatedMeal = await _mealRepository.GetByIdAsync(meal.Id, cancellationToken);
         if (updatedMeal == null)
         {
@@ -111,7 +104,6 @@ public class MealService : IMealService
         var meal = await _mealRepository.GetByIdAsync(id, cancellationToken);
         if (meal == null)
         {
-            // Idempotent delete: if meal doesn't exist, consider it already deleted
             return;
         }
 

@@ -156,8 +156,8 @@ const Login = () => {
                 flex: 1,
               },
               '& .Mui-selected': {
-                backgroundColor: '#fff',
-                color: '#000',
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.custom.text.primary,
                 boxShadow: theme.custom.shadows.input,
               },
             }}

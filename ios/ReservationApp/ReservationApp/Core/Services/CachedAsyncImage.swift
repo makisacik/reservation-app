@@ -52,7 +52,6 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             return
         }
         
-        // Check cache first
         if let cachedImage = await ImageCacheService.shared.getImage(for: url) {
             await MainActor.run {
                 self.image = cachedImage
@@ -61,7 +60,6 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             return
         }
         
-        // Download from network
         await MainActor.run {
             self.isLoading = true
         }
@@ -77,10 +75,8 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                 return
             }
             
-            // Store in cache
             await ImageCacheService.shared.storeImage(downloadedImage, for: url)
             
-            // Update UI
             await MainActor.run {
                 self.image = downloadedImage
                 self.isLoading = false

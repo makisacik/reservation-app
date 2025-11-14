@@ -32,14 +32,11 @@ fun Step1DateSelectionView(
             style = Typography.titleLarge
         )
 
-        // Calendar/Date Picker
-        // Note: Use Material DatePicker or custom calendar
         DatePickerSection(
             selectedDates = selectedDates,
             onDatesSelected = onDatesSelected
         )
 
-        // Meal Time Slot Selection
         Text(
             text = "Öğün Seçin",
             style = Typography.titleMedium
@@ -97,7 +94,6 @@ fun DatePickerSection(
                 style = Typography.titleMedium
             )
             
-            // Show selected dates as chips
             if (selectedDates.isNotEmpty()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm)
@@ -137,7 +133,6 @@ fun DatePickerSection(
                 }
             }
             
-            // Add date button (only if less than max)
             if (selectedDates.size < maxSelections) {
                 Button(
                     onClick = { showDatePicker = true },
@@ -166,7 +161,6 @@ fun DatePickerSection(
                     onDateSelected = { date ->
                         date?.let {
                             val newDate = Date(it)
-                            // Check if date is already selected
                             val dateString = dateFormat.format(newDate)
                             val isAlreadySelected = selectedDates.any { 
                                 dateFormat.format(it) == dateString 
@@ -175,7 +169,6 @@ fun DatePickerSection(
                             if (!isAlreadySelected && selectedDates.size < maxSelections) {
                                 val newDates = selectedDates.toMutableList()
                                 newDates.add(newDate)
-                                // Sort dates
                                 newDates.sort()
                                 onDatesSelected(newDates)
                             }

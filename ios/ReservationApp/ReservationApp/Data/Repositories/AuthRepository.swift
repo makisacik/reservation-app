@@ -25,7 +25,6 @@ class AuthRepository: AuthRepositoryProtocol {
             responseType: AuthResponse.self
         )
         
-        // Save token to keychain
         if !response.authToken.isEmpty {
             _ = keychainManager.saveToken(response.authToken)
         }
@@ -40,7 +39,6 @@ class AuthRepository: AuthRepositoryProtocol {
             responseType: AuthResponse.self
         )
         
-        // Save token to keychain if provided
         if !response.authToken.isEmpty {
             _ = keychainManager.saveToken(response.authToken)
         }
@@ -57,8 +55,6 @@ class AuthRepository: AuthRepositoryProtocol {
     }
     
     func updateUserProfile(request: UpdateUserProfileRequest) async throws -> User {
-        // TODO: Implement once endpoint is ready
-        // Placeholder implementation
         let user: User = try await apiClient.request(
             endpoint: .updateUserProfile,
             method: "PUT",

@@ -13,12 +13,14 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '../../api/usersApi';
 
 const CreateUserModal = ({ open, onClose, onSuccess }) => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: '',
@@ -31,7 +33,6 @@ const CreateUserModal = ({ open, onClose, onSuccess }) => {
 
   useEffect(() => {
     if (!open) {
-      // Reset form when modal closes
       setFormData({
         name: '',
         email: '',
@@ -88,7 +89,6 @@ const CreateUserModal = ({ open, onClose, onSuccess }) => {
       password: formData.password,
       department: formData.department.trim() || null,
       role: formData.role,
-      // Status defaults to Active in backend, not sent in request
     });
   };
 
@@ -107,8 +107,8 @@ const CreateUserModal = ({ open, onClose, onSuccess }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           pb: 2,
-          fontWeight: 600,
-          color: '#0A1C59',
+          fontWeight: theme.custom.typography.fontWeight.semibold,
+          color: theme.palette.primary.main,
         }}
       >
         Yeni Kullanıcı Oluştur
@@ -186,8 +186,8 @@ const CreateUserModal = ({ open, onClose, onSuccess }) => {
             variant="contained"
             disabled={createMutation.isPending}
             sx={{
-              bgcolor: '#0A1C59',
-              '&:hover': { bgcolor: '#0d2a7a' },
+              bgcolor: theme.palette.primary.main,
+              '&:hover': { bgcolor: theme.palette.primary.darker },
             }}
           >
             {createMutation.isPending ? <CircularProgress size={20} /> : 'Oluştur'}

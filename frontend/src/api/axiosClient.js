@@ -8,7 +8,6 @@ const axiosClient = axios.create({
   },
 });
 
-// Request interceptor to add authorization token
 axiosClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
@@ -22,14 +21,12 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors
 axiosClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
       localStorage.removeItem(STORAGE_KEYS.TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER);
       window.location.href = '/login';

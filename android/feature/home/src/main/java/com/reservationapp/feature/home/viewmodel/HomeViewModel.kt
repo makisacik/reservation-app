@@ -68,7 +68,6 @@ class HomeViewModel(
         _errorMessage.value = null
 
         viewModelScope.launch {
-            // Load all data in parallel
             val statsTask = homeRepository.getHomeStats()
             val userTask = authRepository.getCurrentUser()
             val categoriesTask = homeRepository.getCategories()
@@ -78,30 +77,28 @@ class HomeViewModel(
             when (statsTask) {
                 is Result.Success -> _stats.value = statsTask.data
                 is Result.Error -> _errorMessage.value = "İstatistikler yüklenemedi"
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
 
             when (userTask) {
                 is Result.Success -> {
                     authStateManager.setCurrentUser(userTask.data)
                 }
-                is Result.Error -> { /* Handle error silently */ }
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Error -> {}
+                is Result.Loading -> {}
             }
 
             when (categoriesTask) {
                 is Result.Success -> {
                     _categories.value = categoriesTask.data
-                    // Set default category
                     if (categoriesTask.data.isNotEmpty() && _selectedCategory.value.isEmpty()) {
-                        // Try to find "Aylık Menü" or use first category
                         val aylikMenu = categoriesTask.data.firstOrNull { it.name == "Aylık Menü" }
                         val defaultCategory = aylikMenu?.name ?: categoriesTask.data.firstOrNull()?.name ?: ""
                         _selectedCategory.value = defaultCategory
                     }
                 }
                 is Result.Error -> _errorMessage.value = "Kategoriler yüklenemedi"
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
 
             when (mealsTask) {
@@ -109,7 +106,7 @@ class HomeViewModel(
                     _allMeals.value = mealsTask.data
                 }
                 is Result.Error -> _errorMessage.value = "Yemekler yüklenemedi"
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
 
             when (menusTask) {
@@ -117,13 +114,10 @@ class HomeViewModel(
                     _todayMenus.value = menusTask.data
                 }
                 is Result.Error -> _errorMessage.value = "Menüler yüklenemedi"
-                is Result.Loading -> { /* Handle loading */ }
+                is Result.Loading -> {}
             }
 
-            // Filter meals based on selected category
             filterMeals()
-
-            // Generate alert message
             generateAlertMessage()
 
             _isLoading.value = false
@@ -146,7 +140,6 @@ class HomeViewModel(
         val categoriesList = _categories.value
 
         if (selectedCategoryName.isEmpty()) {
-            // Show today's menu meals or first 4 meals
             val todayMenuMeals = todayMenusList.firstOrNull()?.meals ?: emptyList()
             _displayedMeals.value = if (todayMenuMeals.isEmpty()) {
                 allMealsList.take(4)
@@ -154,10 +147,8 @@ class HomeViewModel(
                 todayMenuMeals
             }
         } else {
-            // Find category by name
             val category = categoriesList.firstOrNull { it.name == selectedCategoryName }
             if (category == null) {
-                // Category not found, show today's menu
                 val todayMenuMeals = todayMenusList.firstOrNull()?.meals ?: emptyList()
                 _displayedMeals.value = if (todayMenuMeals.isEmpty()) {
                     allMealsList.take(4)
@@ -167,7 +158,6 @@ class HomeViewModel(
                 return
             }
 
-            // Special handling for "Aylık Menü"
             if (selectedCategoryName == "Aylık Menü") {
                 val todayMenuMeals = todayMenusList.firstOrNull()?.meals ?: emptyList()
                 _displayedMeals.value = if (todayMenuMeals.isEmpty()) {
@@ -176,10 +166,8 @@ class HomeViewModel(
                     todayMenuMeals
                 }
             } else if (selectedCategoryName == "Japon Restoran") {
-                // Filter by restaurant name
                 _displayedMeals.value = allMealsList.filter { it.restaurantName == "Japon Restoran" }
             } else {
-                // Filter by category ID
                 _displayedMeals.value = allMealsList.filter { it.categoryId == category.id }
             }
         }
@@ -196,7 +184,6 @@ class HomeViewModel(
             return
         }
 
-        // Check for "Karnıyarık"
         val hasKarniyarik = menuMeals.any {
             it.name.contains("Karnıyarık", ignoreCase = true) ||
             it.name.contains("Karniyarik", ignoreCase = true)
@@ -210,7 +197,6 @@ class HomeViewModel(
             return
         }
 
-        // Show first meal
         menuMeals.firstOrNull()?.let { firstMeal ->
             _alertMessage.value = AlertMessage(
                 title = "Bugünün Özel Menüsü!",

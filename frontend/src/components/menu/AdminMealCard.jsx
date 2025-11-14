@@ -6,6 +6,7 @@ import {
   Chip,
   Button,
   IconButton,
+  useTheme,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,18 +20,19 @@ import CachedImage from '../common/CachedImage';
  * @param {function} onDelete - Delete button click handler
  */
 const AdminMealCard = ({ meal, onEdit, onDelete }) => {
+  const theme = useTheme();
   return (
     <Card
       sx={{
-        borderRadius: '20px',
+        borderRadius: theme.custom.borderRadius.large,
         overflow: 'hidden',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        boxShadow: theme.custom.shadows.card,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         transition: 'all 0.2s ease',
         '&:hover': {
-          boxShadow: '0 8px 20px rgba(0,0,0,0.10)',
+          boxShadow: theme.custom.shadows.cardHover,
         },
       }}
     >
@@ -72,11 +74,11 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
             position: 'absolute',
             top: 12,
             right: 12,
-            bgcolor: '#0A1C59',
+            bgcolor: theme.palette.primary.main,
             color: 'white',
-            fontWeight: 600,
+            fontWeight: theme.custom.typography.fontWeight.semibold,
             fontSize: '0.75rem',
-            borderRadius: '8px',
+            borderRadius: theme.custom.borderRadius.input,
             height: '24px',
           }}
         />
@@ -89,9 +91,9 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
             <Typography
               variant="h6"
               sx={{
-                fontWeight: 600,
+                fontWeight: theme.custom.typography.fontWeight.semibold,
                 fontSize: '1rem',
-                color: '#333',
+                color: theme.palette.custom.text.primary,
                 mb: 0.5,
               }}
             >
@@ -100,7 +102,7 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
             <Typography
               variant="body2"
               sx={{
-                color: '#666',
+                color: theme.palette.custom.text.secondary,
                 fontSize: '0.875rem',
               }}
             >
@@ -111,8 +113,8 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
             <Typography
               variant="h6"
               sx={{
-                fontWeight: 600,
-                color: '#333',
+                fontWeight: theme.custom.typography.fontWeight.semibold,
+                color: theme.palette.custom.text.primary,
                 ml: 2,
                 whiteSpace: 'nowrap',
               }}
@@ -130,12 +132,12 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
             onClick={() => onEdit(meal)}
             sx={{
               flex: 1,
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               textTransform: 'none',
-              borderColor: '#ddd',
-              color: '#333',
+              borderColor: theme.palette.custom.border.default,
+              color: theme.palette.custom.text.primary,
               '&:hover': {
-                borderColor: '#0A1C59',
+                borderColor: theme.palette.primary.main,
                 bgcolor: 'rgba(10, 28, 89, 0.04)',
               },
             }}
@@ -145,13 +147,13 @@ const AdminMealCard = ({ meal, onEdit, onDelete }) => {
           <IconButton
             onClick={() => onDelete(meal)}
             sx={{
-              bgcolor: '#f44336',
+              bgcolor: theme.palette.error.main,
               color: 'white',
-              borderRadius: '12px',
+              borderRadius: theme.custom.borderRadius.button,
               width: '48px',
               height: '48px',
               '&:hover': {
-                bgcolor: '#d32f2f',
+                bgcolor: theme.palette.error.dark || theme.palette.error.main,
               },
             }}
           >

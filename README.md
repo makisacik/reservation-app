@@ -210,7 +210,7 @@ reservation-app/
 
 **"role 'postgres' does not exist" (macOS/Homebrew)**:
 - This is common on macOS when PostgreSQL is installed via Homebrew. It uses your system username instead of `postgres`.
-- **Solution**: Update `appsettings.Development.json` to use your username (usually no password needed):
+- **Solution**: Update `appsettings.Development.json` (located at `backend/ReservationApp.API/appsettings.Development.json`) to use your username (usually no password needed):
   ```json
   "DefaultConnection": "Host=localhost;Database=reservationdb;Username=your_username"
   ```

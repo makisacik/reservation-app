@@ -16,13 +16,12 @@ public class Reservation
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
-    // Navigation properties
     public User User { get; private set; } = null!;
     public Restaurant Restaurant { get; private set; } = null!;
     public Menu Menu { get; private set; } = null!;
     public MealTimeSlot MealTimeSlot { get; private set; } = null!;
 
-    private Reservation() { } // For EF Core
+    private Reservation() { }
 
     public Reservation(Guid userId, Guid restaurantId, Guid menuId, int mealTimeSlotId, DateTime date, bool appetizer = false)
     {
@@ -46,10 +45,8 @@ public class Reservation
         RestaurantId = restaurantId;
         MenuId = menuId;
         MealTimeSlotId = mealTimeSlotId;
-        // Store only date part, explicitly as UTC for PostgreSQL compatibility
         Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
-        // All new reservations default to Pending status - must be approved by admin
         Status = ReservationStatus.Pending;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
@@ -66,7 +63,6 @@ public class Reservation
 
         MenuId = menuId;
         MealTimeSlotId = mealTimeSlotId;
-        // Store only date part, explicitly as UTC for PostgreSQL compatibility
         Date = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
         Appetizer = appetizer;
         UpdatedAt = DateTime.UtcNow;

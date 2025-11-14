@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
     const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
@@ -24,7 +23,6 @@ export const AuthProvider = ({ children }) => {
           console.error('Error parsing stored user:', error);
         }
       }
-      // Fetch current user from API
       fetchCurrentUser(storedToken);
     } else {
       setLoading(false);
@@ -51,22 +49,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await authApi.login(email, password);
-      console.log('Login response:', response); // Debug log
+      console.log('Login response:', response);
       
-      // Handle both camelCase (token) and PascalCase (Token) from backend
       const authToken = response.token || response.Token;
       
       if (authToken) {
-        // Temporarily set token in localStorage so axios interceptor can use it
-        // This will be cleared if role doesn't match, or kept if it does
         localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
         
         try {
-          // Fetch user data first without setting auth state
           const userData = await usersApi.getCurrentUser();
           return { success: true, user: userData, token: authToken };
         } catch (userError) {
-          // If fetching user fails, remove the token we just set
           localStorage.removeItem(STORAGE_KEYS.TOKEN);
           throw userError;
         }
@@ -74,8 +67,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: 'Invalid credentials - no token received' };
     } catch (error) {
       console.error('Login error:', error);
-      console.error('Error response:', error.response?.data); // Debug log
-      // Make sure token is cleared on error
+      console.error('Error response:', error.response?.data);
       localStorage.removeItem(STORAGE_KEYS.TOKEN);
       return {
         success: false,

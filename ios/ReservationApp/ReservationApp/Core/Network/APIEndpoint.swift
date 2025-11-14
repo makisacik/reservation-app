@@ -23,34 +23,29 @@ enum APIEndpoint {
     case mealTimeSlots
     case updateUserProfile
     
-    // Admin Dashboard
     case adminDashboardSummary
     case adminPopularMeals
     case adminTodayReservations
     case adminWeeklyTrends
     case adminDailySummary
     
-    // Admin Reservations
     case adminReservations
     case adminApproveReservation(id: String)
     case adminCancelReservation(id: String)
     case reservationSummary
     case getReservationById(id: String)
     
-    // Admin Meals
     case adminMeals
     case adminMeal(id: String)
     case adminCreateMeal
     case adminUpdateMeal(id: String)
     case adminDeleteMeal(id: String)
     
-    // Admin Users
     case adminUserStatistics
     case adminCreateUser
     case adminUpdateUser(id: String)
     case adminDeleteUser(id: String)
     
-    // Admin Settings
     case adminGeneralSettings
     case adminUpdateGeneralSettings
     case adminReservationSettings

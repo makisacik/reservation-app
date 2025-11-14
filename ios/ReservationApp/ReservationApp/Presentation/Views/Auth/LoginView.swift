@@ -13,7 +13,6 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            // Gradient background
             LinearGradient(
                 colors: [
                     Color(hex: "#f5f7fa"),
@@ -29,9 +28,7 @@ struct LoginView: View {
                     Spacer()
                         .frame(height: 100)
                     
-                    // Card container
                     VStack(spacing: AppSpacing.lg) {
-                        // App Icon
                         ZStack {
                             RoundedRectangle(cornerRadius: ThemeManager.BorderRadius.button.value)
                                 .fill(
@@ -53,17 +50,15 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                         }
                         
-                        // Title
                         Text("Yemek Rezervasyon Sistemi")
                             .font(AppTypography.h6())
                             .foregroundColor(AppColors.primaryMain)
                         
-                        // Subtitle
                         Text("Lütfen giriş yapmak için bilgilerinizi girin")
                             .font(AppTypography.body2())
                             .foregroundColor(AppColors.textSecondary)
                             .multilineTextAlignment(.center)
-                        // Role Picker
+                        
                         Picker("Role", selection: $viewModel.selectedRole) {
                             ForEach(LoginRole.allCases, id: \.self) { role in
                                 Text(role.rawValue).tag(role)
@@ -73,7 +68,6 @@ struct LoginView: View {
                         .padding(.vertical, AppSpacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        // Error Alert
                         if let errorMessage = viewModel.errorMessage {
                             HStack {
                                 Image(systemName: "exclamationmark.triangle.fill")
@@ -88,7 +82,6 @@ struct LoginView: View {
                             .cornerRadius(ThemeManager.BorderRadius.medium.value)
                         }
                         
-                        // Form
                         VStack(spacing: AppSpacing.md) {
                             CustomTextField(
                                 placeholder: "ornek@sirket.com",
@@ -103,7 +96,6 @@ struct LoginView: View {
                             )
                         }
                         
-                        // Login Button
                         PrimaryButton(
                             title: viewModel.selectedRole == .admin ? "Admin Girişi" : "Personel Girişi",
                             action: {
@@ -127,7 +119,6 @@ struct LoginView: View {
             }
         }
         .onAppear {
-            // Set callback for successful login
             viewModel.onLoginSuccess = { user in
                 authState.setAuthenticated(true)
             }

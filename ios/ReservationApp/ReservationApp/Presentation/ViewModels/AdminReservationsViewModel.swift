@@ -17,18 +17,15 @@ class AdminReservationsViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
     
-    // Pagination
     @Published var currentPage: Int = 0
     @Published var pageSize: Int = 10
     @Published var totalCount: Int = 0
     
-    // Filters
     @Published var searchQuery: String = ""
     @Published var statusFilter: ReservationStatusFilter = .all
     @Published var dateFrom: Date?
     @Published var dateTo: Date?
     
-    // Modals
     @Published var showCreateModal = false
     @Published var showDetailModal = false
     @Published var showApprovalDialog = false
@@ -40,7 +37,6 @@ class AdminReservationsViewModel: ObservableObject {
     init(adminRepository: AdminRepositoryProtocol = AdminRepository()) {
         self.adminRepository = adminRepository
         
-        // Set default date range to current month
         let calendar = Calendar.current
         let now = Date()
         dateFrom = calendar.date(from: calendar.dateComponents([.year, .month], from: now))
@@ -61,7 +57,6 @@ class AdminReservationsViewModel: ObservableObject {
         )
         
         do {
-            // Use Task to handle isolation properly
             let result = try await adminRepository.getAdminReservations(queryParams: queryParams)
             let summaryResult = try await adminRepository.getReservationSummary()
             
@@ -69,7 +64,6 @@ class AdminReservationsViewModel: ObservableObject {
             self.totalCount = result.totalCount
             self.summary = summaryResult
         } catch let error as NetworkError {
-            // Provide more specific error messages
             errorMessage = error.errorDescription ?? "Rezervasyonlar yüklenirken bir hata oluştu."
         } catch {
             errorMessage = "Rezervasyonlar yüklenirken bir hata oluştu: \(error.localizedDescription)"
@@ -83,13 +77,10 @@ class AdminReservationsViewModel: ObservableObject {
     }
     
     func approveReservation(_ reservation: Reservation) async {
-        // Close dialog first
         showApprovalDialog = false
         reservationToApprove = nil
         
-        // Optimistically update the reservation status in the local array
         if let index = reservations.firstIndex(where: { $0.id == reservation.id }) {
-            // Create updated reservation with new status
             let updatedReservation = Reservation(
                 id: reservation.id,
                 reservationNumber: reservation.reservationNumber,
@@ -110,7 +101,6 @@ class AdminReservationsViewModel: ObservableObject {
             )
             reservations[index] = updatedReservation
             
-            // Optimistically update summary if available
             if let currentSummary = summary {
                 summary = ReservationSummary(
                     todayCount: currentSummary.todayCount,
@@ -128,11 +118,9 @@ class AdminReservationsViewModel: ObservableObject {
             try await adminRepository.approveReservation(id: reservation.id)
             successMessage = "Rezervasyon başarıyla onaylandı"
             
-            // Reload reservations to sync with server
             await loadReservations()
         } catch {
             errorMessage = "Rezervasyon onaylanırken bir hata oluştu."
-            // Reload on error to get correct state
             await loadReservations()
         }
         
@@ -147,7 +135,6 @@ class AdminReservationsViewModel: ObservableObject {
             try await adminRepository.cancelReservation(id: reservation.id)
             successMessage = "Rezervasyon başarıyla iptal edildi"
             
-            // Reload reservations to get updated status
             await loadReservations()
         } catch {
             errorMessage = "Rezervasyon iptal edilirken bir hata oluştu."

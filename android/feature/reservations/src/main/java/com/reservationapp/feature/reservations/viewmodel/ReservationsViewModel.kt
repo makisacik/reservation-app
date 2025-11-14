@@ -62,9 +62,7 @@ class ReservationsViewModel(
                 is Result.Error -> {
                     _errorMessage.value = "Rezervasyonlar yüklenirken bir hata oluştu."
                 }
-                is Result.Loading -> {
-                    // Handle loading state
-                }
+                is Result.Loading -> {}
             }
             _isLoading.value = false
         }
@@ -83,7 +81,6 @@ class ReservationsViewModel(
         tab: ReservationTab
     ): List<Reservation> {
         val now = Date()
-        // Try multiple ISO 8601 formats
         val formats = listOf(
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()),
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()),
@@ -101,7 +98,6 @@ class ReservationsViewModel(
                             reservationDate = format.parse(reservation.date)
                             break
                         } catch (e: Exception) {
-                            // Try next format
                         }
                     }
                     if (reservationDate == null) return@filter false
@@ -126,7 +122,6 @@ class ReservationsViewModel(
                             if (date2 == null) date2 = format.parse(res2.date)
                             if (date1 != null && date2 != null) break
                         } catch (e: Exception) {
-                            // Try next format
                         }
                     }
                     val d1 = date1 ?: Date(0)

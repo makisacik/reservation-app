@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 const steps = [
@@ -10,6 +10,7 @@ const steps = [
 ];
 
 const ReservationStepper = ({ currentStep }) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -47,12 +48,12 @@ const ReservationStepper = ({ currentStep }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 bgcolor: isCompleted
-                  ? '#0A1C59'
+                  ? theme.palette.primary.main
                   : isActive
-                  ? '#0A1C59'
-                  : '#E0E0E0',
-                color: isCompleted || isActive ? 'white' : '#999',
-                fontWeight: 600,
+                  ? theme.palette.primary.main
+                  : theme.palette.custom.border.default,
+                color: isCompleted || isActive ? 'white' : theme.palette.custom.text.quaternary,
+                fontWeight: theme.custom.typography.fontWeight.semibold,
                 fontSize: '16px',
                 mb: 1,
                 position: 'relative',
@@ -70,8 +71,8 @@ const ReservationStepper = ({ currentStep }) => {
             <Typography
               sx={{
                 fontSize: '12px',
-                fontWeight: isActive ? 600 : 400,
-                color: isCompleted || isActive ? '#0A1C59' : '#999',
+                fontWeight: isActive ? theme.custom.typography.fontWeight.semibold : theme.custom.typography.fontWeight.regular,
+                color: isCompleted || isActive ? theme.palette.primary.main : theme.palette.custom.text.quaternary,
                 textAlign: 'center',
               }}
             >
@@ -87,7 +88,7 @@ const ReservationStepper = ({ currentStep }) => {
                   left: '50%',
                   width: 'calc(100% - 48px)',
                   height: '2px',
-                  bgcolor: isCompleted ? '#0A1C59' : '#E0E0E0',
+                  bgcolor: isCompleted ? theme.palette.primary.main : theme.palette.custom.border.default,
                   zIndex: 1,
                 }}
               />

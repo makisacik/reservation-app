@@ -28,10 +28,8 @@ class KeychainManager {
             kSecValueData as String: data
         ]
         
-        // Delete existing item first
         SecItemDelete(query as CFDictionary)
         
-        // Add new item
         let status = SecItemAdd(query as CFDictionary, nil)
         return status == errSecSuccess
     }

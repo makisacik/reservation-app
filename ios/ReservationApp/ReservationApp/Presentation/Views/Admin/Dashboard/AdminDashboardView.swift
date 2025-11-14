@@ -13,7 +13,6 @@ struct AdminDashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: ThemeManager.shared.spacing.lg) {
-                // Header
                 VStack(alignment: .leading, spacing: ThemeManager.shared.spacing.xs) {
                     Text("Panel")
                         .font(AppTypography.h4())
@@ -25,12 +24,10 @@ struct AdminDashboardView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                // Top Metrics Cards
                 if let summary = viewModel.summary {
                     DashboardStatsGridView(summary: summary)
                 }
                 
-                // Middle Row: Today's Reservations and Popular Menus
                 VStack(spacing: ThemeManager.shared.spacing.md) {
                     TodayReservationsView(
                         reservations: viewModel.todayReservations,
@@ -43,7 +40,6 @@ struct AdminDashboardView: View {
                     )
                 }
                 
-                // Bottom Row: Weekly Summary
                 WeeklySummaryView(
                     dailyData: viewModel.dailySummary,
                     isLoading: viewModel.isLoading

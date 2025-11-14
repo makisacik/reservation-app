@@ -66,22 +66,18 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(Spacing.md)
         ) {
-            // Header Section
             PersonalHeaderView(user = currentUser)
 
             Spacer(modifier = Modifier.height(Spacing.lg))
 
-            // Notification Card
             NotificationCardView(alertMessage = alertMessage)
 
             Spacer(modifier = Modifier.height(Spacing.lg))
 
-            // Stats Section
             StatsGridView(stats = stats)
 
             Spacer(modifier = Modifier.height(Spacing.lg))
 
-            // Menu Section
             MenuSectionView(
                 categories = categories,
                 selectedCategory = selectedCategory,
@@ -94,7 +90,6 @@ fun HomeScreen(
             )
         }
 
-        // Loading overlay
         if (isLoading && stats == null) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -102,10 +97,8 @@ fun HomeScreen(
             )
         }
 
-        // Error alert
         errorMessage?.let { error ->
             LaunchedEffect(error) {
-                // Show error - could use a snackbar or alert dialog
             }
         }
     }
@@ -131,7 +124,6 @@ fun PersonalHeaderView(user: User?) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar with initials
                 Box(
                     modifier = Modifier
                         .size(60.dp)
@@ -153,7 +145,6 @@ fun PersonalHeaderView(user: User?) {
 
                 Spacer(modifier = Modifier.width(Spacing.md))
 
-                // Name and Department
                 Column {
                     Text(
                         text = user?.name ?: "Kullanıcı",
@@ -293,7 +284,6 @@ fun StatCardView(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1
                 )
-                // Icon placeholder - can be replaced with custom icon implementation
                 Spacer(modifier = Modifier.width(24.dp))
             }
         }
@@ -319,7 +309,6 @@ fun MenuSectionView(
                 .padding(Spacing.lg),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
-            // Header
             Column(
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs)
             ) {
@@ -336,21 +325,18 @@ fun MenuSectionView(
                 )
             }
 
-            // Category tabs
             CategoryTabsView(
                 categories = categories,
                 selectedCategory = selectedCategory,
                 onCategorySelected = onCategorySelected
             )
 
-            // Meal grid
             MealGridView(
                 meals = meals,
                 isLoading = isLoading,
                 maxItems = 4
             )
 
-            // Reservation button
             Button(
                 onClick = onReservationTap,
                 modifier = Modifier.fillMaxWidth(),
@@ -450,14 +436,12 @@ fun MealCardView(meal: Meal) {
         colors = CardDefaults.cardColors(containerColor = BackgroundPaper)
     ) {
         Column {
-            // Image section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
                 contentAlignment = Alignment.TopEnd
             ) {
-                // Meal image or placeholder
                 val placeholderGradient = Brush.linearGradient(
                     colors = listOf(
                         PrimaryLight.copy(alpha = 0.3f),
@@ -482,7 +466,6 @@ fun MealCardView(meal: Meal) {
                     ) {
                         when (painter.state) {
                             is AsyncImagePainter.State.Loading -> {
-                                // Show placeholder gradient while loading
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -491,7 +474,6 @@ fun MealCardView(meal: Meal) {
                                 )
                             }
                             is AsyncImagePainter.State.Error -> {
-                                // Show placeholder gradient on error
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -505,7 +487,6 @@ fun MealCardView(meal: Meal) {
                         }
                     }
                 } else {
-                    // Placeholder gradient when no image URL
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -514,7 +495,6 @@ fun MealCardView(meal: Meal) {
                     )
                 }
                 
-                // Category badge
                 meal.categoryName?.let { categoryName ->
                     Box(
                         modifier = Modifier.padding(Spacing.sm)
@@ -524,7 +504,6 @@ fun MealCardView(meal: Meal) {
                 }
             }
 
-            // Content section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -589,7 +568,6 @@ fun EmptyMealsView() {
     }
 }
 
-// Helper functions
 private fun getInitials(name: String?): String {
     if (name.isNullOrEmpty()) return "?"
     val words = name.trim().split("\\s+".toRegex())

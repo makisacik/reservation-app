@@ -15,7 +15,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog early to see startup logs
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -35,15 +34,12 @@ try
     Log.Information("Starting ReservationApp API...");
     builder.Host.UseSerilog();
 
-    // Add services to the container
     builder.Services.AddControllers()
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.WriteIndented = true;
-            // Serialize enums as strings instead of numbers
             options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-            // Add custom DateTime converter to handle Unspecified dates
             options.JsonSerializerOptions.Converters.Add(new ReservationApp.Application.Converters.UtcDateTimeJsonConverter());
         });
     builder.Services.AddEndpointsApiExplorer();
@@ -52,39 +48,30 @@ try
         c.SwaggerDoc("v1", new() { Title = "ReservationApp API", Version = "v1" });
     });
 
-    // Add Infrastructure services
     builder.Services.AddInfrastructureServices(builder.Configuration);
-
-    // Add Memory Cache
     builder.Services.AddMemoryCache();
-
-    // Add Application services
     builder.Services.AddApplicationServices();
-
-    // Add FluentValidation
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.AddValidatorsFromAssemblyContaining<CreateReservationDtoValidator>();
 
-    // Add CORS
-    // Allow common development ports for Vite (5173-5180) and React (3000-3010)
     var allowedOrigins = new[]
     {
-        "http://localhost:3000",   // React dev server (Create React App)
-        "http://localhost:5173",   // Vite dev server (default)
-        "http://localhost:5174",   // Vite dev server (fallback)
-        "http://localhost:5175",   // Vite dev server (fallback)
-        "http://localhost:5176",   // Vite dev server (fallback)
-        "http://localhost:5177",   // Vite dev server (fallback)
-        "http://localhost:5178",   // Vite dev server (fallback)
-        "http://localhost:5179",   // Vite dev server (fallback)
-        "http://localhost:5180",   // Vite dev server (fallback)
-        "http://127.0.0.1:5173",   // Vite dev server (alternative)
-        "http://127.0.0.1:5174",   // Vite dev server (alternative)
-        "http://127.0.0.1:5175",   // Vite dev server (alternative)
-        "http://127.0.0.1:3000",    // React dev server (alternative)
-        "http://127.0.0.1",        // iOS simulator
-        "http://10.0.2.2"          // Android emulator
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+        "http://localhost:5177",
+        "http://localhost:5178",
+        "http://localhost:5179",
+        "http://localhost:5180",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1",
+        "http://10.0.2.2"
     };
 
     builder.Services.AddCors(options =>
@@ -98,7 +85,6 @@ try
         });
     });
 
-    // Add JWT Authentication
     var jwtKey = builder.Configuration["Jwt:Key"]
         ?? throw new InvalidOperationException("JWT Key not found in configuration.");
     
@@ -123,10 +109,8 @@ try
         options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
     });
 
-    // Add Rate Limiting
     builder.Services.AddRateLimiter(options =>
     {
-        // 10,000 requests every 10 minutes per IP — practically unlimited for dev
         options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
         {
             var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -147,7 +131,6 @@ try
 
     var app = builder.Build();
 
-    // Seed database in Development mode
     if (app.Environment.IsDevelopment())
     {
         using (var scope = app.Services.CreateScope())
@@ -159,7 +142,6 @@ try
                 await DbSeeder.SeedAsync(context);
                 Log.Information("Database seeded successfully");
                 
-                // Initialize DateTimeConversionHelper with timezone from database
                 var timezoneService = services.GetRequiredService<ITimezoneService>();
                 var timezone = await timezoneService.GetApplicationTimezoneAsync();
                 DateTimeConversionHelper.Initialize(timezone);
@@ -176,7 +158,6 @@ try
     }
     else
     {
-        // Initialize DateTimeConversionHelper in production as well
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
@@ -194,24 +175,18 @@ try
         }
     }
 
-    // Only use HTTPS redirection in production
     if (!app.Environment.IsDevelopment())
     {
         app.UseHttpsRedirection();
     }
 
-    // Add Serilog request logging
     app.UseSerilogRequestLogging();
 
     app.UseCors("LocalCorsPolicy");
 
     app.UseRateLimiter();
-
-    // Add authentication and authorization middleware
     app.UseAuthentication();
     app.UseAuthorization();
-
-    // Add exception handling middleware
     app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.MapControllers();

@@ -78,14 +78,11 @@ public class ReservationController : ControllerBase
 
         _logger.LogInformation("Controller - UserId: {UserId}", userId);
 
-        // Convert date to UTC for PostgreSQL compatibility
-        // PostgreSQL requires DateTime with Kind=Utc for timestamp with time zone columns
         var inputDate = createReservationDto.Date;
         _logger.LogInformation("Controller - Input Date Analysis: Value={Value}, Kind={Kind}, Ticks={Ticks}, Year={Year}, Month={Month}, Day={Day}, Hour={Hour}, Minute={Minute}, Second={Second}",
             inputDate, inputDate.Kind, inputDate.Ticks, inputDate.Year, inputDate.Month, inputDate.Day, 
             inputDate.Hour, inputDate.Minute, inputDate.Second);
         
-        // Convert date to UTC using application timezone
         _logger.LogInformation("Controller - Converting date to UTC using application timezone");
         createReservationDto.Date = await _timezoneService.ConvertToUtcAsync(inputDate, cancellationToken);
         _logger.LogInformation("Controller - Date conversion: Input={InputDate}, UTC={UtcTime}, UTC Kind={UtcKind}",
